@@ -1,0 +1,47 @@
+jsSHA - A JavaScript implementation of the complete Secure Hash Standard family
+            (SHA-1, SHA-224, SHA-256, SHA-384, and SHA-512) by Brian Turek
+
+About
+-------------------------
+jsSHA is a javaScript implementation of the complete Secure Hash Algorithm family as defined
+by FIPS PUB 180-2 (http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf)
+
+With the slow phasing out of MD5 as the standard hash to use in web applications, a client-side
+implementation of the complete Secure Hash Standard family was needed.  Due to SHA-384 and SHA-512's
+use of 64-bit values throughout the algorithm, JavaScript can not easily natively support the calculation
+of these hashes.  As a result, a bit of hacking had to be done to make sure the values behaved themselves.
+SHA-224 was added to the Secure Hash Standard family on 25 February 2004 so it was also included in this
+package.
+
+
+Files
+-------------------------
+src/sha.js
+The complete SHA implementation
+
+src/sha1.js
+A smaller/web friendly implementation of only SHA-1.  Only includes HEX output support.
+
+src/sha256.js
+A smaller/web friendly implementation of only SHA-224 and SHA-256.  Only includes HEX output support.
+
+src/sha512.js
+A smaller/web friendly implementation of only SHA-384 and SHA-512.  Only includes HEX output support.
+
+test/test.html
+A test page that calculates various hashes and has their correct values.
+
+
+Usage
+-------------------------
+Include the desired JavaScript file - sha.js, sha1.js, sha256.js, or sha512.js - in your header (sha.js used below):
+<script type="text/javascript" src="/path/to/sha.js"></script>
+
+Call the function with your string to be hashed and the algorithm to hash it ("This is a Test" and "SHA-512"
+were used below, respectively):
+var hash = hex_sha("This is a Test", "SHA-512");
+
+
+Contact Info
+-------------------------
+The project's website is located at http://jssha.sourceforge.net/

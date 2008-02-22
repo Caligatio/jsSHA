@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<title>jsSHA (http://jssha.sourceforge.net/) - Test</title>
+		<script type="text/javascript" src="../src/sha.js"></script>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+		<style type="text/css">
+			label
+			{
+				width: 160px;
+				display: block;
+				float: left;
+				text-align: right;
+				padding-right: 10px;
+			}
+
+			.correct
+			{
+				color: #00FF00;
+				background-color: #FFFFFF;
+			}
+
+			.incorrect
+			{
+				color: #FF0000;
+				background-color: #FFFFFF;
+			}
+		</style>
+		<script type="text/javascript">
+			function calcHashes()
+			{
+				calcHash("sha1-short", "SHA-1");
+				calcHash("sha1-long", "SHA-1");
+				calcHash("sha224-short", "SHA-224");
+				calcHash("sha224-long", "SHA-224");
+				calcHash("sha256-short", "SHA-256");
+				calcHash("sha256-long", "SHA-256");
+				calcHash("sha384-short", "SHA-384");
+				calcHash("sha384-long", "SHA-384");
+				calcHash("sha512-long", "SHA-512");
+				calcHash("sha512-short", "SHA-512");
+			}
+
+			function calcHash(fieldGroupName, variant)
+			{
+				var tmp = document.getElementById(fieldGroupName+"-comp");
+
+				document.getElementById(fieldGroupName+"-result").value = hex_sha(document.getElementById(fieldGroupName+"-input").value, variant);
+				if (document.getElementById(fieldGroupName+"-result").value == document.getElementById(fieldGroupName+"-correct").value)
+				{
+					tmp.className = "correct";
+					tmp.innerHTML = "Match!";
+				} else {
+					tmp.className = "incorrect";
+					tmp.innerHTML = "Mismatch!";
+				}
+			}
+
+		</script>
+	</head>
+	<body onload="calcHashes()">
+		<h1><a href="http://jssha.sourceforge.net/">jsSHA</a> Hash Test Page</h1>
+		<p>
+			The short/long inputs as well as their correct hashes are supplied by the FIPS 180-2 specification.  It can be found at <a href="http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf">http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf</a>.
+		</p>
+
+		<p>
+			<span style="font-weight: bold">Instructions:</span> By default, this page should load 10 of the 15 test vectors given by the FIPS 180-2 specification.  You may also change any of the input values and then click off the input box to have the hash update.
+		</p>
+		<form method="get" action="test.html" onsubmit="return false">
+			<fieldset>
+				<legend>SHA-1 Tests</legend>
+				<div>
+					<label for="sha1-short-input">SHA-1 Short Input:</label><input type="text" size="10" value="abc" id="sha1-short-input" onchange="calcHash('sha1-short', 'SHA-1')" />
+				</div>
+				<div>
+					<label for="sha1-short-result">SHA-1 Short Result:</label><input type="text" size="50" disabled="disabled" id="sha1-short-result" />
+				</div>
+				<div>
+					<label for="sha1-short-correct">SHA-1 Short Correct:</label><input type="text" size="50" value="a9993e364706816aba3e25717850c26c9cd0d89d" disabled="disabled" id="sha1-short-correct" />
+					<span id="sha1-short-comp"></span>
+				</div>
+				<div>
+					<label for="sha1-long-input">SHA-1 Long Input:</label><input type="text" size="60" value="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" id="sha1-long-input" onchange="calcHash('sha1-long', 'SHA-1')" />
+				</div>
+				<div>
+					<label for="sha1-long-result">SHA-1 Long Result:</label><input type="text" size="50" disabled="disabled" id="sha1-long-result" />
+				</div>
+				<div>
+					<label for="sha1-long-correct">SHA-1 Long Correct:</label><input type="text" size="50" value="84983e441c3bd26ebaae4aa1f95129e5e54670f1" disabled="disabled" id="sha1-long-correct" />
+					<span id="sha1-long-comp"></span>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>SHA-224 Tests</legend>
+				<div>
+					<label for="sha224-short-input">SHA-224 Short Input:</label><input type="text" size="10" value="abc" id="sha224-short-input" onchange="calcHash('sha224-short', 'SHA-224')" />
+				</div>
+				<div>
+					<label for="sha224-short-result">SHA-224 Short Result:</label><input type="text" size="65" disabled="disabled" id="sha224-short-result" />
+				</div>
+				<div>
+					<label for="sha224-short-correct">SHA-224 Short Correct:</label><input type="text" size="65" value="23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7" disabled="disabled" id="sha224-short-correct" />
+					<span id="sha224-short-comp"></span>
+				</div>
+				<div>
+					<label for="sha224-long-input">SHA-224 Long Input:</label><input type="text" size="60" value="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" id="sha224-long-input" onchange="calcHash('sha224-long', 'SHA-224')" />
+				</div>
+				<div>
+					<label for="sha224-long-result">SHA-224 Long Result:</label><input type="text" size="65" disabled="disabled" id="sha224-long-result" />
+				</div>
+				<div>
+					<label for="sha224-long-correct">SHA-224 Long Correct:</label><input type="text" size="65" value="75388b16512776cc5dba5da1fd890150b0c6455cb4f58b1952522525" disabled="disabled" id="sha224-long-correct" />
+					<span id="sha224-long-comp"></span>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>SHA-256 Tests</legend>
+				<div>
+					<label for="sha256-short-input">SHA-256 Short Input:</label><input type="text" size="10" value="abc" id="sha256-short-input" onchange="calcHash('sha256-short', 'SHA-256')" />
+				</div>
+				<div>
+					<label for="sha256-short-result">SHA-256 Short Result:</label><input type="text" size="75" id="sha256-short-result" disabled="disabled" />
+				</div>
+				<div>
+					<label for="sha256-short-correct">SHA-256 Short Correct:</label><input type="text" size="75" value="ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" disabled="disabled" id="sha256-short-correct" />
+					<span id="sha256-short-comp"></span>
+				</div>
+				<div>
+					<label for="sha256-long-input">SHA-256 Long Input:</label><input type="text" size="60" value="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" id="sha256-long-input" onchange="calcHash('sha256-long', 'SHA-256')" />
+				</div>
+				<div>
+					<label for="sha256-long-result">SHA-256 Long Result:</label><input type="text" size="75" id="sha256-long-result" disabled="disabled" />
+				</div>
+				<div>
+					<label for="sha256-long-correct">SHA-256 Long Correct:</label><input type="text" size="75" value="248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1" disabled="disabled" id="sha256-long-correct" />
+					<span id="sha256-long-comp"></span>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>SHA-384 Tests</legend>
+				<div>
+					<label for="sha384-short-input">SHA-384 Short Input:</label><input type="text" size="10" value="abc" id="sha384-short-input" onchange="calcHash('sha384-short', 'SHA-384')" />
+				</div>
+				<div>
+					<label for="sha384-short-result">SHA-384 Short Result:</label><input type="text" size="115" id="sha384-short-result" disabled="disabled" />
+				</div>
+				<div>
+					<label for="sha384-short-correct">SHA-384 Short Correct:</label><input type="text" size="115" value="cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7" disabled="disabled" id="sha384-short-correct" />
+					<span id="sha384-short-comp"></span>
+				</div>
+				<div>
+					<label for="sha384-long-input">SHA-384 Long Input:</label><input type="text" size="120" value="abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu" id="sha384-long-input" onchange="calcHash('sha384-long', 'SHA-384')" />
+				</div>
+				<div>
+					<label for="sha384-long-result">SHA-384 Long Result:</label><input type="text" size="115" id="sha384-long-result" disabled="disabled" />
+				</div>
+				<div>
+					<label for="sha384-long-correct">SHA-384 Long Correct:</label><input type="text" size="115" value="09330c33f71147e83d192fc782cd1b4753111b173b3b05d22fa08086e3b0f712fcc7c71a557e2db966c3e9fa91746039" disabled="disabled" id="sha384-long-correct" />
+					<span id="sha384-long-comp"></span>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>SHA-512 Tests</legend>
+				<div>
+					<label for="sha512-short-input">SHA-512 Short Input:</label><input type="text" size="10" value="abc" id="sha512-short-input" onchange="calcHash('sha512-short', 'SHA-512')" />
+				</div>
+				<div>
+					<label for="sha512-short-result">SHA-512 Short Result:</label><input type="text" size="150" id="sha512-short-result" disabled="disabled" />
+				</div>
+				<div>
+					<label for="sha512-short-correct">SHA-512 Short Correct:</label><input type="text" size="150" value="ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f" disabled="disabled" id="sha512-short-correct" />
+					<span id="sha512-short-comp"></span>
+				</div>
+				<div>
+					<label for="sha512-long-input">SHA-512 Long Input:</label><input type="text" size="120" value="abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu" id="sha512-long-input" onchange="calcHash('sha512-long', 'SHA-512')" />
+				</div>
+				<div>
+					<label for="sha512-long-result">SHA-512 Long Result:</label><input type="text" size="150" id="sha512-long-result" disabled="disabled" />
+				</div>
+				<div>
+					<label for="sha512-long-correct">SHA-512 Long Correct:</label><input type="text" size="150" value="8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909" disabled="disabled" id="sha512-long-correct" />
+					<span id="sha512-long-comp"></span>
+				</div>
+			</fieldset>
+		</form>
+	</body>
+</html>
