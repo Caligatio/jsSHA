@@ -2,7 +2,12 @@
     jsSHA - ChangeLog
 -------------------------
 
-1.0 (2008-08-25)
+1.1 (2008-09-25)
+=========================
+- Fixed an issue with incorrect hashes being generated when jsSHA ojbects were used to generate
+  multiple hashes
+
+1.0 (2008-09-25)
 =========================
 - Made all functions/variables follow an object-orientated methodology
 - Removed support for string hash output as the hash is rarely ASCII friendly

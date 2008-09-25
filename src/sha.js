@@ -1,5 +1,5 @@
 /* A JavaScript implementation of the SHA family of hashes, as defined in FIPS PUB 180-2
- * Version 1.0 Copyright Brian Turek 2008
+ * Version 1.1 Copyright Brian Turek 2008
  * Distributed under the BSD License
  * See http://jssha.sourceforge.net/ for more information
  *
@@ -417,14 +417,12 @@ function jsSHA(srcString) {
 	};
 
 	/*
-	 * Calculates the SHA-1 hash of the input
+	 * Calculates the SHA-1 hash of the string set at instantiation
 	 *
 	 * @private
-	 * @param {String} message The string to be hashed represented in binary
-	 * @param {Number} messageLength The number of bits in message
 	 * @return The array of integers representing the SHA-1 hash of message
 	 */
-	var coreSHA1 = function (message, messageLength) {
+	var coreSHA1 = function () {
 		var W = [];
 		var a, b, c, d, e;
 		var T;
@@ -454,9 +452,10 @@ function jsSHA(srcString) {
 			0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6,
 			0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6
 		];
+		var message = strToHash.slice();
 
-		message[messageLength >> 5] |= 0x80 << (24 - messageLength % 32); // Append '1' at  the end of the binary string
-		message[((messageLength + 1 + 64 >> 9) << 4) + 15] = messageLength; // Append length of binary string in the position such that the new length is a multiple of 512
+		message[strBinLen >> 5] |= 0x80 << (24 - strBinLen % 32); // Append '1' at  the end of the binary string
+		message[((strBinLen + 1 + 64 >> 9) << 4) + 15] = strBinLen; // Append length of binary string in the position such that the new length is a multiple of 512
 
 		var appendedMessageLength = message.length;
 
@@ -502,15 +501,13 @@ function jsSHA(srcString) {
 	};
 
 	/*
-	 * Calculates the desired SHA-2 hash of the input
+	 * Calculates the desired SHA-2 hash of the string set at instantiation
 	 *
 	 * @private
-	 * @param {String} message The string to be hashed represented in binary
-	 * @param {Number} messageLength The number of bits in message
 	 * @param {String} variant The desired SHA-2 variant
 	 * @return The array of integers representing the SHA-2 hash of message
 	 */
-	var coreSHA2 = function (message, messageLength, variant) {
+	var coreSHA2 = function (variant) {
 		var W = [];
 		var a, b, c, d, e, f, g, h;
 		var T1, T2;
@@ -518,12 +515,13 @@ function jsSHA(srcString) {
 		var numRounds, lengthPosition, binaryStringInc, binaryStringMult;
 		var safeAdd, gamma0, gamma1, sigma0, sigma1, ch, maj, Int;
 		var K;
+		var message = strToHash.slice();
 
 		// Set up the various function handles and variable for the specific variant
 		if (variant === "SHA-224" || variant === "SHA-256") // 32-bit variant
 		{
 			numRounds = 64;
-			lengthPosition = ((messageLength + 1 + 64 >> 9) << 4) + 15;
+			lengthPosition = ((strBinLen + 1 + 64 >> 9) << 4) + 15;
 			binaryStringInc = 16;
 			binaryStringMult = 1;
 			Int = Number;
@@ -566,7 +564,7 @@ function jsSHA(srcString) {
 			}
 		} else if (variant === "SHA-384" || variant === "SHA-512") {// 64-bit variant
 			numRounds = 80;
-			lengthPosition = ((messageLength + 1 + 128 >> 10) << 5) + 31;
+			lengthPosition = ((strBinLen + 1 + 128 >> 10) << 5) + 31;
 			binaryStringInc = 32;
 			binaryStringMult = 2;
 			Int = Int_64;
@@ -614,8 +612,8 @@ function jsSHA(srcString) {
 			}
 		}
 
-		message[messageLength >> 5] |= 0x80 << (24 - messageLength % 32); // Append '1' at  the end of the binary string
-		message[lengthPosition] = messageLength; // Append length of binary string in the position such that the new length is correct
+		message[strBinLen >> 5] |= 0x80 << (24 - strBinLen % 32); // Append '1' at  the end of the binary string
+		message[lengthPosition] = strBinLen; // Append length of binary string in the position such that the new length is correct
 
 		var appendedMessageLength = message.length;
 
@@ -715,27 +713,27 @@ function jsSHA(srcString) {
 		switch (variant) {
 		case "SHA-1":
 			if (sha1 === null) {
-				sha1 = coreSHA1(strToHash, strBinLen);
+				sha1 = coreSHA1();
 			}
 			return formatFunc(sha1);
 		case "SHA-224":
 			if (sha224 === null) {
-				sha224 = coreSHA2(strToHash, strBinLen, variant);
+				sha224 = coreSHA2(variant);
 			}
 			return formatFunc(sha224);
 		case "SHA-256":
 			if (sha256 === null) {
-				sha256 = coreSHA2(strToHash, strBinLen, variant);
+				sha256 = coreSHA2(variant);
 			}
 			return formatFunc(sha256);
 		case "SHA-384":
 			if (sha384 === null) {
-				sha384 = coreSHA2(strToHash, strBinLen, variant);
+				sha384 = coreSHA2(variant);
 			}
 			return formatFunc(sha384);
 		case "SHA-512":
 			if (sha512 === null) {
-				sha512 = coreSHA2(strToHash, strBinLen, variant);
+				sha512 = coreSHA2(variant);
 			}
 			return formatFunc(sha512);
 		default:
