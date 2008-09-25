@@ -20,13 +20,16 @@ src/sha.js
 The complete SHA implementation
 
 src/sha1.js
-A smaller/web friendly implementation of only SHA-1.  Only includes HEX output support.
+A smaller/web friendly implementation of only SHA-1.
 
 src/sha256.js
-A smaller/web friendly implementation of only SHA-224 and SHA-256.  Only includes HEX output support.
+A smaller/web friendly implementation of only SHA-224 and SHA-256.
 
 src/sha512.js
-A smaller/web friendly implementation of only SHA-384 and SHA-512.  Only includes HEX output support.
+A smaller/web friendly implementation of only SHA-384 and SHA-512.
+
+src/wrapper.js
+Wrapper functions to be added to the above script files if the jsSHA 0.1 interface is desired
 
 test/test.html
 A test page that calculates various hashes and has their correct values.
@@ -34,13 +37,20 @@ A test page that calculates various hashes and has their correct values.
 
 Usage
 -------------------------
-Include the desired JavaScript file - sha.js, sha1.js, sha256.js, or sha512.js - in your header (sha.js used below):
+Include the desired JavaScript file (sha.js, sha1.js, sha256.js, or sha512.js) in your header (sha.js used below):
 <script type="text/javascript" src="/path/to/sha.js"></script>
 
-Call the function with your string to be hashed and the algorithm to hash it ("This is a Test" and "SHA-512"
-were used below, respectively):
-var hash = hex_sha("This is a Test", "SHA-512");
+Instantiate a new jsSHA object with your string to be hashed as the only parameter.  Then, call getHash with the desired
+hash variant (SHA-1, SHA-224, SHA-256, SHA-384, or SHA-512) and output type (HEX or B64).  In the example below,
+"This is a Test" and "SHA-512" were used as the string to be hashed and variant respectively.
 
+var shaObj = new jsSHA("This is a Test");
+var hash = shaObj.getHash("SHA-512", "HEX");
+
+NOTE: If you are using sha1.js, omit the SHA variant parameter as there is only one option.
+
+Since the interface was changed drastically from 0.1 to 1.0, src/wrapper.js is included in case the old interface is desired.
+Simply copy and paste the correct functions from wrapper.js to the bottom of the used jsSHA JS file.
 
 Contact Info
 -------------------------

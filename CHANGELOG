@@ -2,6 +2,13 @@
     jsSHA - ChangeLog
 -------------------------
 
+1.0 (2008-08-25)
+=========================
+- Made all functions/variables follow an object-orientated methodology
+- Removed support for string hash output as the hash is rarely ASCII friendly
+- Changed the interface to calculate hashes (see README)
+- Made sha.js validate against JSLint (http://www.jslint.com/) using "Recommended" settings
+
 0.1 (2008-02-21)
 =========================
 - Initial public release

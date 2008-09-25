@@ -44,8 +44,9 @@
 			function calcHash(fieldGroupName, variant)
 			{
 				var tmp = document.getElementById(fieldGroupName+"-comp");
-
-				document.getElementById(fieldGroupName+"-result").value = hex_sha(document.getElementById(fieldGroupName+"-input").value, variant);
+				var shaObj = new jsSHA(document.getElementById(fieldGroupName+"-input").value);
+				
+				document.getElementById(fieldGroupName+"-result").value = shaObj.getHash(variant, "HEX");
 				if (document.getElementById(fieldGroupName+"-result").value == document.getElementById(fieldGroupName+"-correct").value)
 				{
 					tmp.className = "correct";
