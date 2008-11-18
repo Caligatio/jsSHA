@@ -2,6 +2,10 @@
     jsSHA - ChangeLog
 -------------------------
 
+1.11 (2008-XX-XX)
+=========================
+- Fixed a base-64 encoding issue resulting from a missing capital 'X'
+
 1.1 (2008-09-25)
 =========================
 - Fixed an issue with incorrect hashes being generated when jsSHA ojbects were used to generate

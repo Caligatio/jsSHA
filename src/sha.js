@@ -1,5 +1,5 @@
 /* A JavaScript implementation of the SHA family of hashes, as defined in FIPS PUB 180-2
- * Version 1.1 Copyright Brian Turek 2008
+ * Version 1.11 Copyright Brian Turek 2008
  * Distributed under the BSD License
  * See http://jssha.sourceforge.net/ for more information
  *
@@ -89,7 +89,7 @@ function jsSHA(srcString) {
 	 * @return Base-64 encoded representation of the parameter in String form
 	 */
 	var binb2b64 = function (binarray) {
-		var tab = "ABCDEFGHIJKLMNOPQRSTUVWxYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+		var tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 		var str = "";
 		var length = binarray.length * 4;
 		for (var i = 0; i < length; i += 3)
