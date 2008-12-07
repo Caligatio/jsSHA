@@ -2,7 +2,7 @@
     jsSHA - ChangeLog
 -------------------------
 
-1.11 (2008-XX-XX)
+1.11 (2008-12-07)
 =========================
 - Fixed a base-64 encoding issue resulting from a missing capital 'X'
 
