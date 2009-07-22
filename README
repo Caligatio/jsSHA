@@ -1,10 +1,12 @@
 jsSHA - A JavaScript implementation of the complete Secure Hash Standard family
-            (SHA-1, SHA-224, SHA-256, SHA-384, and SHA-512) by Brian Turek
+        (SHA-1, SHA-224, SHA-256, SHA-384, and SHA-512) as well as HMAC by Brian Turek
 
 About
 -------------------------
 jsSHA is a javaScript implementation of the complete Secure Hash Algorithm family as defined
-by FIPS PUB 180-2 (http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf)
+by FIPS PUB 180-2 (http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf).  It
+also includes the HMAC algorithm with SHA support as defined by FIPS PUB 198a
+(http://csrc.nist.gov/publications/fips/fips198/fips-198a.pdf)
 
 With the slow phasing out of MD5 as the standard hash to use in web applications, a client-side
 implementation of the complete Secure Hash Standard family was needed.  Due to SHA-384 and SHA-512's
@@ -28,11 +30,12 @@ A smaller/web friendly implementation of only SHA-224 and SHA-256.
 src/sha512.js
 A smaller/web friendly implementation of only SHA-384 and SHA-512.
 
-src/wrapper.js
-Wrapper functions to be added to the above script files if the jsSHA 0.1 interface is desired
-
 test/test.html
 A test page that calculates various hashes and has their correct values.
+
+test/HMACGen.py
+A Python 3.X script that generates the correct HMAC hashes as the specification did not provide hashes for
+algorithms other than SHA-1
 
 
 Usage
@@ -42,15 +45,14 @@ Include the desired JavaScript file (sha.js, sha1.js, sha256.js, or sha512.js) i
 
 Instantiate a new jsSHA object with your string to be hashed as the only parameter.  Then, call getHash with the desired
 hash variant (SHA-1, SHA-224, SHA-256, SHA-384, or SHA-512) and output type (HEX or B64).  In the example below,
-"This is a Test" and "SHA-512" were used as the string to be hashed and variant respectively.
+"This is a Test" and "SHA-512" were used as the string to be hashed and variant respectively.  Also, the HMAC using ASCII
+key "SecretKey" and hashing algorithm SHA-512 was calculated.
 
-var shaObj = new jsSHA("This is a Test");
+var shaObj = new jsSHA("This is a Test", "ASCII");
 var hash = shaObj.getHash("SHA-512", "HEX");
+var hmac = shaObj.getHMAC("SecretKey", "ASCII", "SHA-512", "HEX");
 
 NOTE: If you are using sha1.js, omit the SHA variant parameter as there is only one option.
-
-Since the interface was changed drastically from 0.1 to 1.0, src/wrapper.js is included in case the old interface is desired.
-Simply copy and paste the correct functions from wrapper.js to the bottom of the used jsSHA JS file.
 
 Contact Info
 -------------------------

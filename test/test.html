@@ -7,7 +7,7 @@
 		<style type="text/css">
 			label
 			{
-				width: 160px;
+				width: 235px;
 				display: block;
 				float: left;
 				text-align: right;
@@ -39,14 +39,61 @@
 				calcHash("sha384-long", "SHA-384");
 				calcHash("sha512-long", "SHA-512");
 				calcHash("sha512-short", "SHA-512");
+				calcHMAC('hmac-sha1-short', "ASCII", "ASCII", "SHA-1");
+				calcHMAC('hmac-sha1-med', "ASCII", "HEX", "SHA-1");
+				calcHMAC('hmac-sha1-large', "HEX", "HEX", "SHA-1");
+				calcHMAC('hmac-sha224-short', "ASCII", "ASCII", "SHA-224");
+				calcHMAC('hmac-sha224-med', "ASCII", "HEX", "SHA-224");
+				calcHMAC('hmac-sha224-large', "HEX", "HEX", "SHA-224");
+				calcHMAC('hmac-sha256-short', "ASCII", "ASCII", "SHA-256");
+				calcHMAC('hmac-sha256-med', "ASCII", "HEX", "SHA-256");
+				calcHMAC('hmac-sha256-large', "HEX", "HEX", "SHA-256");
+				calcHMAC('hmac-sha384-short', "ASCII", "ASCII", "SHA-384");
+				calcHMAC('hmac-sha384-med', "ASCII", "HEX", "SHA-384");
+				calcHMAC('hmac-sha384-large', "HEX", "HEX", "SHA-384");
+				calcHMAC('hmac-sha512-short', "ASCII", "ASCII", "SHA-512");
+				calcHMAC('hmac-sha512-med', "ASCII", "HEX", "SHA-512");
+				calcHMAC('hmac-sha512-large', "HEX", "HEX", "SHA-512");
 			}
 
 			function calcHash(fieldGroupName, variant)
 			{
+				var tmp = document.getElementById(fieldGroupName+"-ascii-comp");
+
+				var shaObj = new jsSHA(document.getElementById(fieldGroupName+"-ascii-input").value, "ASCII");
+
+				document.getElementById(fieldGroupName+"-ascii-result").value = shaObj.getHash(variant, "HEX");
+				if (document.getElementById(fieldGroupName+"-ascii-result").value == document.getElementById(fieldGroupName+"-correct").value)
+				{
+					tmp.className = "correct";
+					tmp.innerHTML = "Match!";
+				} else {
+					tmp.className = "incorrect";
+					tmp.innerHTML = "Mismatch!";
+				}
+
+				tmp = document.getElementById(fieldGroupName+"-hex-comp");
+
+				shaObj = new jsSHA(document.getElementById(fieldGroupName+"-hex-input").value, "HEX");
+
+				document.getElementById(fieldGroupName+"-hex-result").value = shaObj.getHash(variant, "HEX");
+				if (document.getElementById(fieldGroupName+"-hex-result").value == document.getElementById(fieldGroupName+"-correct").value)
+				{
+					tmp.className = "correct";
+					tmp.innerHTML = "Match!";
+				} else {
+					tmp.className = "incorrect";
+					tmp.innerHTML = "Mismatch!";
+				}
+			}
+
+			function calcHMAC(fieldGroupName, textFormat, keyFormat, variant)
+			{
 				var tmp = document.getElementById(fieldGroupName+"-comp");
-				var shaObj = new jsSHA(document.getElementById(fieldGroupName+"-input").value);
-				
-				document.getElementById(fieldGroupName+"-result").value = shaObj.getHash(variant, "HEX");
+
+				var shaObj = new jsSHA(document.getElementById(fieldGroupName+"-text").value, textFormat);
+
+				document.getElementById(fieldGroupName+"-result").value = shaObj.getHMAC(document.getElementById(fieldGroupName+"-key").value, keyFormat, variant, "HEX");
 				if (document.getElementById(fieldGroupName+"-result").value == document.getElementById(fieldGroupName+"-correct").value)
 				{
 					tmp.className = "correct";
@@ -62,126 +109,409 @@
 	<body onload="calcHashes()">
 		<h1><a href="http://jssha.sourceforge.net/">jsSHA</a> Hash Test Page</h1>
 		<p>
-			The short/long inputs as well as their correct hashes are supplied by the FIPS 180-2 specification.  It can be found at <a href="http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf">http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf</a>.
+			The short/long inputs as well as their correct hashes are supplied by the FIPS 180-2 specification; it can be found at <a href="http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf">http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf</a>.  The short/medium/large inputs for HMAC and their corresponding correct hashes (at least for SHA-1) can be found at <a href="http://csrc.nist.gov/publications/fips/fips198/fips-198a.pdf">http://csrc.nist.gov/publications/fips/fips198/fips-198a.pdf</a>.
 		</p>
 
 		<p>
-			<span style="font-weight: bold">Instructions:</span> By default, this page should load 10 of the 15 test vectors given by the FIPS 180-2 specification.  You may also change any of the input values and then click off the input box to have the hash update.
+			<span style="font-weight: bold">Instructions:</span> By default, this page should load 10 of the 15 test vectors given by the FIPS 180-2 specification and 3 of the 4 test vectors given by the FIPS 198a specification.  You may also change any of the input values and then click off the input box to have the hash update.
 		</p>
 		<form method="get" action="test.html" onsubmit="return false">
 			<fieldset>
 				<legend>SHA-1 Tests</legend>
 				<div>
-					<label for="sha1-short-input">SHA-1 Short Input:</label><input type="text" size="10" value="abc" id="sha1-short-input" onchange="calcHash('sha1-short', 'SHA-1')" />
+					<label for="sha1-short-ascii-input">SHA-1 Med ASCII Input:</label><input type="text" size="5" value="abc" id="sha1-short-ascii-input" onchange="calcHash('sha1-short', 'SHA-1')" />
 				</div>
 				<div>
-					<label for="sha1-short-result">SHA-1 Short Result:</label><input type="text" size="50" disabled="disabled" id="sha1-short-result" />
+					<label for="sha1-short-ascii-result">SHA-1 Med ASCII Result:</label><input type="text" size="50" disabled="disabled" id="sha1-short-ascii-result" />
+					<span id="sha1-short-ascii-comp"></span>
 				</div>
 				<div>
-					<label for="sha1-short-correct">SHA-1 Short Correct:</label><input type="text" size="50" value="a9993e364706816aba3e25717850c26c9cd0d89d" disabled="disabled" id="sha1-short-correct" />
-					<span id="sha1-short-comp"></span>
+					<label for="sha1-short-hex-input">SHA-1 Med Hex Input:</label><input type="text" size="10" value="616263" id="sha1-short-hex-input" onchange="calcHash('sha1-short', 'SHA-1')" />
 				</div>
 				<div>
-					<label for="sha1-long-input">SHA-1 Long Input:</label><input type="text" size="60" value="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" id="sha1-long-input" onchange="calcHash('sha1-long', 'SHA-1')" />
+					<label for="sha1-short-hex-result">SHA-1 Med Hex Result:</label><input type="text" size="50" disabled="disabled" id="sha1-short-hex-result" />
+					<span id="sha1-short-hex-comp"></span>
 				</div>
 				<div>
-					<label for="sha1-long-result">SHA-1 Long Result:</label><input type="text" size="50" disabled="disabled" id="sha1-long-result" />
+					<label for="sha1-short-correct">SHA-1 Med Correct:</label><input type="text" size="50" value="a9993e364706816aba3e25717850c26c9cd0d89d" disabled="disabled" id="sha1-short-correct" />
+				</div>
+				<div>
+					<label for="sha1-long-ascii-input">SHA-1 Long ASCII Input:</label><input type="text" size="60" value="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" id="sha1-long-ascii-input" onchange="calcHash('sha1-long', 'SHA-1')" />
+				</div>
+				<div>
+					<label for="sha1-long-ascii-result">SHA-1 Long ASCII Result:</label><input type="text" size="50" disabled="disabled" id="sha1-long-ascii-result" />
+					<span id="sha1-long-ascii-comp"></span>
+				</div>
+				<div>
+					<label for="sha1-long-hex-input">SHA-1 Long Hex Input:</label><input type="text" size="140" value="6162636462636465636465666465666765666768666768696768696A68696A6B696A6B6C6A6B6C6D6B6C6D6E6C6D6E6F6D6E6F706E6F7071" id="sha1-long-hex-input" onchange="calcHash('sha1-long', 'SHA-1')" />
+				</div>
+				<div>
+					<label for="sha1-long-hex-result">SHA-1 Long Hex Result:</label><input type="text" size="50" disabled="disabled" id="sha1-long-hex-result" />
+					<span id="sha1-long-hex-comp"></span>
 				</div>
 				<div>
 					<label for="sha1-long-correct">SHA-1 Long Correct:</label><input type="text" size="50" value="84983e441c3bd26ebaae4aa1f95129e5e54670f1" disabled="disabled" id="sha1-long-correct" />
-					<span id="sha1-long-comp"></span>
 				</div>
 			</fieldset>
 			<fieldset>
 				<legend>SHA-224 Tests</legend>
 				<div>
-					<label for="sha224-short-input">SHA-224 Short Input:</label><input type="text" size="10" value="abc" id="sha224-short-input" onchange="calcHash('sha224-short', 'SHA-224')" />
+					<label for="sha224-short-ascii-input">SHA-224 Med ASCII Input:</label><input type="text" size="5" value="abc" id="sha224-short-ascii-input" onchange="calcHash('sha224-short', 'SHA-224')" />
 				</div>
 				<div>
-					<label for="sha224-short-result">SHA-224 Short Result:</label><input type="text" size="65" disabled="disabled" id="sha224-short-result" />
+					<label for="sha224-short-ascii-result">SHA-224 Med ASCII Result:</label><input type="text" size="65" disabled="disabled" id="sha224-short-ascii-result" />
+					<span id="sha224-short-ascii-comp"></span>
 				</div>
 				<div>
-					<label for="sha224-short-correct">SHA-224 Short Correct:</label><input type="text" size="65" value="23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7" disabled="disabled" id="sha224-short-correct" />
-					<span id="sha224-short-comp"></span>
+					<label for="sha224-short-hex-input">SHA-224 Med Hex Input:</label><input type="text" size="10" value="616263" id="sha224-short-hex-input" onchange="calcHash('sha224-short', 'SHA-224')" />
 				</div>
 				<div>
-					<label for="sha224-long-input">SHA-224 Long Input:</label><input type="text" size="60" value="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" id="sha224-long-input" onchange="calcHash('sha224-long', 'SHA-224')" />
+					<label for="sha224-short-hex-result">SHA-224 Med Hex Result:</label><input type="text" size="65" disabled="disabled" id="sha224-short-hex-result" />
+					<span id="sha224-short-hex-comp"></span>
 				</div>
 				<div>
-					<label for="sha224-long-result">SHA-224 Long Result:</label><input type="text" size="65" disabled="disabled" id="sha224-long-result" />
+					<label for="sha224-short-correct">SHA-224 Med Correct:</label><input type="text" size="65" value="23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7" disabled="disabled" id="sha224-short-correct" />
+				</div>
+				<div>
+					<label for="sha224-long-ascii-input">SHA-224 Long ASCII Input:</label><input type="text" size="60" value="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" id="sha224-long-ascii-input" onchange="calcHash('sha224-long', 'SHA-224')" />
+				</div>
+				<div>
+					<label for="sha224-long-ascii-result">SHA-224 Long ASCII Result:</label><input type="text" size="65" disabled="disabled" id="sha224-long-ascii-result" />
+					<span id="sha224-long-ascii-comp"></span>
+				</div>
+				<div>
+					<label for="sha224-long-hex-input">SHA-224 Long Hex Input:</label><input type="text" size="140" value="6162636462636465636465666465666765666768666768696768696A68696A6B696A6B6C6A6B6C6D6B6C6D6E6C6D6E6F6D6E6F706E6F7071" id="sha224-long-hex-input" onchange="calcHash('sha224-long', 'SHA-224')" />
+				</div>
+				<div>
+					<label for="sha224-long-hex-result">SHA-224 Long Hex Result:</label><input type="text" size="65" disabled="disabled" id="sha224-long-hex-result" />
+					<span id="sha224-long-hex-comp"></span>
 				</div>
 				<div>
 					<label for="sha224-long-correct">SHA-224 Long Correct:</label><input type="text" size="65" value="75388b16512776cc5dba5da1fd890150b0c6455cb4f58b1952522525" disabled="disabled" id="sha224-long-correct" />
-					<span id="sha224-long-comp"></span>
 				</div>
 			</fieldset>
 			<fieldset>
 				<legend>SHA-256 Tests</legend>
 				<div>
-					<label for="sha256-short-input">SHA-256 Short Input:</label><input type="text" size="10" value="abc" id="sha256-short-input" onchange="calcHash('sha256-short', 'SHA-256')" />
+					<label for="sha256-short-ascii-input">SHA-256 Med ASCII Input:</label><input type="text" size="5" value="abc" id="sha256-short-ascii-input" onchange="calcHash('sha256-short', 'SHA-256')" />
 				</div>
 				<div>
-					<label for="sha256-short-result">SHA-256 Short Result:</label><input type="text" size="75" id="sha256-short-result" disabled="disabled" />
+					<label for="sha256-short-ascii-result">SHA-256 Med ASCII Result:</label><input type="text" size="75" disabled="disabled" id="sha256-short-ascii-result" />
+					<span id="sha256-short-ascii-comp"></span>
 				</div>
 				<div>
-					<label for="sha256-short-correct">SHA-256 Short Correct:</label><input type="text" size="75" value="ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" disabled="disabled" id="sha256-short-correct" />
-					<span id="sha256-short-comp"></span>
+					<label for="sha256-short-hex-input">SHA-256 Med Hex Input:</label><input type="text" size="10" value="616263" id="sha256-short-hex-input" onchange="calcHash('sha256-short', 'SHA-256')" />
 				</div>
 				<div>
-					<label for="sha256-long-input">SHA-256 Long Input:</label><input type="text" size="60" value="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" id="sha256-long-input" onchange="calcHash('sha256-long', 'SHA-256')" />
+					<label for="sha256-short-hex-result">SHA-256 Med Hex Result:</label><input type="text" size="75" disabled="disabled" id="sha256-short-hex-result" />
+					<span id="sha256-short-hex-comp"></span>
 				</div>
 				<div>
-					<label for="sha256-long-result">SHA-256 Long Result:</label><input type="text" size="75" id="sha256-long-result" disabled="disabled" />
+					<label for="sha256-short-correct">SHA-256 Med Correct:</label><input type="text" size="75" value="ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" disabled="disabled" id="sha256-short-correct" />
+				</div>
+				<div>
+					<label for="sha256-long-ascii-input">SHA-256 Long ASCII Input:</label><input type="text" size="60" value="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" id="sha256-long-ascii-input" onchange="calcHash('sha256-long', 'SHA-256')" />
+				</div>
+				<div>
+					<label for="sha256-long-ascii-result">SHA-256 Long ASCII Result:</label><input type="text" size="75" disabled="disabled" id="sha256-long-ascii-result" />
+					<span id="sha256-long-ascii-comp"></span>
+				</div>
+				<div>
+					<label for="sha256-long-hex-input">SHA-256 Long Hex Input:</label><input type="text" size="140" value="6162636462636465636465666465666765666768666768696768696A68696A6B696A6B6C6A6B6C6D6B6C6D6E6C6D6E6F6D6E6F706E6F7071" id="sha256-long-hex-input" onchange="calcHash('sha256-long', 'SHA-256')" />
+				</div>
+				<div>
+					<label for="sha256-long-hex-result">SHA-256 Long Hex Result:</label><input type="text" size="75" disabled="disabled" id="sha256-long-hex-result" />
+					<span id="sha256-long-hex-comp"></span>
 				</div>
 				<div>
 					<label for="sha256-long-correct">SHA-256 Long Correct:</label><input type="text" size="75" value="248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1" disabled="disabled" id="sha256-long-correct" />
-					<span id="sha256-long-comp"></span>
 				</div>
 			</fieldset>
 			<fieldset>
 				<legend>SHA-384 Tests</legend>
 				<div>
-					<label for="sha384-short-input">SHA-384 Short Input:</label><input type="text" size="10" value="abc" id="sha384-short-input" onchange="calcHash('sha384-short', 'SHA-384')" />
+					<label for="sha384-short-ascii-input">SHA-384 Med ASCII Input:</label><input type="text" size="5" value="abc" id="sha384-short-ascii-input" onchange="calcHash('sha384-short', 'SHA-384')" />
 				</div>
 				<div>
-					<label for="sha384-short-result">SHA-384 Short Result:</label><input type="text" size="115" id="sha384-short-result" disabled="disabled" />
+					<label for="sha384-short-ascii-result">SHA-384 Med ASCII Result:</label><input type="text" size="115" disabled="disabled" id="sha384-short-ascii-result" />
+					<span id="sha384-short-ascii-comp"></span>
 				</div>
 				<div>
-					<label for="sha384-short-correct">SHA-384 Short Correct:</label><input type="text" size="115" value="cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7" disabled="disabled" id="sha384-short-correct" />
-					<span id="sha384-short-comp"></span>
+					<label for="sha384-short-hex-input">SHA-384 Med Hex Input:</label><input type="text" size="10" value="616263" id="sha384-short-hex-input" onchange="calcHash('sha384-short', 'SHA-384')" />
 				</div>
 				<div>
-					<label for="sha384-long-input">SHA-384 Long Input:</label><input type="text" size="120" value="abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu" id="sha384-long-input" onchange="calcHash('sha384-long', 'SHA-384')" />
+					<label for="sha384-short-hex-result">SHA-384 Med Hex Result:</label><input type="text" size="115" disabled="disabled" id="sha384-short-hex-result" />
+					<span id="sha384-short-hex-comp"></span>
 				</div>
 				<div>
-					<label for="sha384-long-result">SHA-384 Long Result:</label><input type="text" size="115" id="sha384-long-result" disabled="disabled" />
+					<label for="sha384-short-correct">SHA-384 Med Correct:</label><input type="text" size="115" value="cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7" disabled="disabled" id="sha384-short-correct" />
+				</div>
+				<div>
+					<label for="sha384-long-ascii-input">SHA-384 Long ASCII Input:</label><input type="text" size="120" value="abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu" id="sha384-long-ascii-input" onchange="calcHash('sha384-long', 'SHA-384')" />
+				</div>
+				<div>
+					<label for="sha384-long-ascii-result">SHA-384 Long ASCII Result:</label><input type="text" size="115" disabled="disabled" id="sha384-long-ascii-result" />
+					<span id="sha384-long-ascii-comp"></span>
+				</div>
+				<div>
+					<label for="sha384-long-hex-input">SHA-384 Long Hex Input:</label><input type="text" size="100" value="61626364656667686263646566676869636465666768696A6465666768696A6B65666768696A6B6C666768696A6B6C6D6768696A6B6C6D6E68696A6B6C6D6E6F696A6B6C6D6E6F706A6B6C6D6E6F70716B6C6D6E6F7071726C6D6E6F707172736D6E6F70717273746E6F707172737475" id="sha384-long-hex-input" onchange="calcHash('sha384-long', 'SHA-384')" />
+				</div>
+				<div>
+					<label for="sha384-long-hex-result">SHA-384 Long Hex Result:</label><input type="text" size="115" disabled="disabled" id="sha384-long-hex-result" />
+					<span id="sha384-long-hex-comp"></span>
 				</div>
 				<div>
 					<label for="sha384-long-correct">SHA-384 Long Correct:</label><input type="text" size="115" value="09330c33f71147e83d192fc782cd1b4753111b173b3b05d22fa08086e3b0f712fcc7c71a557e2db966c3e9fa91746039" disabled="disabled" id="sha384-long-correct" />
-					<span id="sha384-long-comp"></span>
 				</div>
 			</fieldset>
 			<fieldset>
 				<legend>SHA-512 Tests</legend>
 				<div>
-					<label for="sha512-short-input">SHA-512 Short Input:</label><input type="text" size="10" value="abc" id="sha512-short-input" onchange="calcHash('sha512-short', 'SHA-512')" />
+					<label for="sha512-short-ascii-input">SHA-512 Med ASCII Input:</label><input type="text" size="5" value="abc" id="sha512-short-ascii-input" onchange="calcHash('sha512-short', 'SHA-512')" />
 				</div>
 				<div>
-					<label for="sha512-short-result">SHA-512 Short Result:</label><input type="text" size="150" id="sha512-short-result" disabled="disabled" />
+					<label for="sha512-short-ascii-result">SHA-512 Med ASCII Result:</label><input type="text" size="150" disabled="disabled" id="sha512-short-ascii-result" />
+					<span id="sha512-short-ascii-comp"></span>
 				</div>
 				<div>
-					<label for="sha512-short-correct">SHA-512 Short Correct:</label><input type="text" size="150" value="ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f" disabled="disabled" id="sha512-short-correct" />
-					<span id="sha512-short-comp"></span>
+					<label for="sha512-short-hex-input">SHA-512 Med Hex Input:</label><input type="text" size="10" value="616263" id="sha512-short-hex-input" onchange="calcHash('sha512-short', 'SHA-512')" />
 				</div>
 				<div>
-					<label for="sha512-long-input">SHA-512 Long Input:</label><input type="text" size="120" value="abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu" id="sha512-long-input" onchange="calcHash('sha512-long', 'SHA-512')" />
+					<label for="sha512-short-hex-result">SHA-512 Med Hex Result:</label><input type="text" size="150" disabled="disabled" id="sha512-short-hex-result" />
+					<span id="sha512-short-hex-comp"></span>
 				</div>
 				<div>
-					<label for="sha512-long-result">SHA-512 Long Result:</label><input type="text" size="150" id="sha512-long-result" disabled="disabled" />
+					<label for="sha512-short-correct">SHA-512 Med Correct:</label><input type="text" size="150" value="ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f" disabled="disabled" id="sha512-short-correct" />
+				</div>
+				<div>
+					<label for="sha512-long-ascii-input">SHA-512 Long ASCII Input:</label><input type="text" size="120" value="abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu" id="sha512-long-ascii-input" onchange="calcHash('sha512-long', 'SHA-512')" />
+				</div>
+				<div>
+					<label for="sha512-long-ascii-result">SHA-512 Long ASCII Result:</label><input type="text" size="150" disabled="disabled" id="sha512-long-ascii-result" />
+					<span id="sha512-long-ascii-comp"></span>
+				</div>
+				<div>
+					<label for="sha512-long-hex-input">SHA-512 Long Hex Input:</label><input type="text" size="100" value="61626364656667686263646566676869636465666768696A6465666768696A6B65666768696A6B6C666768696A6B6C6D6768696A6B6C6D6E68696A6B6C6D6E6F696A6B6C6D6E6F706A6B6C6D6E6F70716B6C6D6E6F7071726C6D6E6F707172736D6E6F70717273746E6F707172737475" id="sha512-long-hex-input" onchange="calcHash('sha512-long', 'SHA-512')" />
+				</div>
+				<div>
+					<label for="sha512-long-hex-result">SHA-512 Long Hex Result:</label><input type="text" size="150" disabled="disabled" id="sha512-long-hex-result" />
+					<span id="sha512-long-hex-comp"></span>
 				</div>
 				<div>
 					<label for="sha512-long-correct">SHA-512 Long Correct:</label><input type="text" size="150" value="8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909" disabled="disabled" id="sha512-long-correct" />
-					<span id="sha512-long-comp"></span>
+				</div>
+			</fieldset>
+		</form>
+		<form method="get" action="test.html" onsubmit="return false">
+			<fieldset>
+				<legend>HMAC/SHA-1 Tests</legend>
+
+				<div>
+					<label for="hmac-sha1-short-text">HMAC/SHA-1 Short ASCII Text:</label><input type="text" size="10" value="Sample #2" id="hmac-sha1-short-text" onchange="calcHMAC('hmac-sha1-short', 'ASCII', 'ASCII', 'SHA-1')" />
+				</div>
+				<div>
+					<label for="hmac-sha1-short-key">HMAC/SHA-1 Short Hex Key:</label><input type="text" size="25" value="0123456789:;&lt;=>?@ABC" id="hmac-sha1-short-key" onchange="calcHMAC('hmac-sha1-short', 'ASCII', 'ASCII', 'SHA-1')" />
+				</div>
+				<div>
+					<label for="hmac-sha1-short-result">HMAC/SHA-1 Short Hex Result:</label><input type="text" size="45" disabled="disabled" id="hmac-sha1-short-result" />
+					<span id="hmac-sha1-short-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha1-short-correct">HMAC/SHA-1 Short Correct:</label><input type="text" size="45" value="0922d3405faa3d194f82a45830737d5cc6c75d24" disabled="disabled" id="hmac-sha1-short-correct" />
+				</div>
+				<div>
+					<label for="hmac-sha1-med-text">HMAC/SHA-1 Med ASCII Text:</label><input type="text" size="10" value="Sample #1" id="hmac-sha1-med-text" onchange="calcHMAC('hmac-sha1-med', 'ASCII', 'HEX', 'SHA-1')" />
+				</div>
+				<div>
+					<label for="hmac-sha1-med-key">HMAC/SHA-1 Med Hex Key:</label><input type="text" size="150" value="000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f" id="hmac-sha1-med-key" onchange="calcHMAC('hmac-sha1-med', 'ASCII', 'HEX', 'SHA-1')" />
+				</div>
+				<div>
+					<label for="hmac-sha1-med-result">HMAC/SHA-1 Med Hex Result:</label><input type="text" size="45" disabled="disabled" id="hmac-sha1-med-result" />
+					<span id="hmac-sha1-med-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha1-med-correct">HMAC/SHA-1 Med Correct:</label><input type="text" size="45" value="4f4ca3d5d68ba7cc0a1208c9c61e9c5da0403c0a" disabled="disabled" id="hmac-sha1-med-correct" />
+				</div>
+				<div>
+					<label for="hmac-sha1-large-text">HMAC/SHA-1 Large Hex Text:</label><input type="text" size="20" value="53616D706C65202333" id="hmac-sha1-large-text" onchange="calcHMAC('hmac-sha1-large', 'HEX', 'HEX', 'SHA-1')" />
+				</div>
+				<div>
+					<label for="hmac-sha1-large-key">HMAC/SHA-1 Large Hex Key:</label><input type="text" size="100" value="505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3" id="hmac-sha1-large-key" onchange="calcHMAC('hmac-sha1-large', 'HEX', 'HEX', 'SHA-1')" />
+				</div>
+				<div>
+					<label for="hmac-sha1-large-result">HMAC/SHA-1 Large Hex Result:</label><input type="text" size="45" disabled="disabled" id="hmac-sha1-large-result" />
+					<span id="hmac-sha1-large-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha1-large-correct">HMAC/SHA-1 Large Correct:</label><input type="text" size="45" value="bcf41eab8bb2d802f3d05caf7cb092ecf8d1a3aa" disabled="disabled" id="hmac-sha1-large-correct" />
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>HMAC/SHA-224 Tests</legend>
+				<div>
+					<label for="hmac-sha224-short-text">HMAC/SHA-224 Short ASCII Text:</label><input type="text" size="10" value="Sample #2" id="hmac-sha224-short-text" onchange="calcHMAC('hmac-sha224-short', 'ASCII', 'ASCII', 'SHA-224')" />
+				</div>
+				<div>
+					<label for="hmac-sha224-short-key">HMAC/SHA-224 Short Hex Key:</label><input type="text" size="25" value="0123456789:;&lt;=>?@ABC" id="hmac-sha224-short-key" onchange="calcHMAC('hmac-sha224-short', 'ASCII', 'ASCII', 'SHA-224')" />
+				</div>
+				<div>
+					<label for="hmac-sha224-short-result">HMAC/SHA-224 Short Hex Result:</label><input type="text" size="65" disabled="disabled" id="hmac-sha224-short-result" />
+					<span id="hmac-sha224-short-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha224-short-correct">HMAC/SHA-224 Short Correct:</label><input type="text" size="65" value="ddef0a40cb7d50fb6ee6cea120ba26aa08f3077587b8ad1b8c8d12c7" disabled="disabled" id="hmac-sha224-short-correct" />
+				</div>
+				<div>
+					<label for="hmac-sha224-med-text">HMAC/SHA-224 Med ASCII Text:</label><input type="text" size="10" value="Sample #1" id="hmac-sha224-med-text" onchange="calcHMAC('hmac-sha224-med', 'ASCII', 'HEX', 'SHA-224')" />
+				</div>
+				<div>
+					<label for="hmac-sha224-med-key">HMAC/SHA-224 Med Hex Key:</label><input type="text" size="150" value="000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f" id="hmac-sha224-med-key" onchange="calcHMAC('hmac-sha224-med', 'ASCII', 'HEX', 'SHA-224')" />
+				</div>
+				<div>
+					<label for="hmac-sha224-med-result">HMAC/SHA-224 Med Hex Result:</label><input type="text" size="65" disabled="disabled" id="hmac-sha224-med-result" />
+					<span id="hmac-sha224-med-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha224-med-correct">HMAC/SHA-224 Med Correct:</label><input type="text" size="65" value="a6a3e27f8b4cfaf2bd157cc5e87c5b5d7d7f22b009fa6644fbbd3813" disabled="disabled" id="hmac-sha224-med-correct" />
+				</div>
+				<div>
+					<label for="hmac-sha224-large-text">HMAC/SHA-224 Large Hex Text:</label><input type="text" size="20" value="53616D706C65202333" id="hmac-sha224-large-text" onchange="calcHMAC('hmac-sha224-large', 'HEX', 'HEX', 'SHA-224')" />
+				</div>
+				<div>
+					<label for="hmac-sha224-large-key">HMAC/SHA-224 Large Hex Key:</label><input type="text" size="100" value="505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3" id="hmac-sha224-large-key" onchange="calcHMAC('hmac-sha224-large', 'HEX', 'HEX', 'SHA-224')" />
+				</div>
+				<div>
+					<label for="hmac-sha224-large-result">HMAC/SHA-224 Large Hex Result:</label><input type="text" size="45" disabled="disabled" id="hmac-sha224-large-result" />
+					<span id="hmac-sha224-large-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha224-large-correct">HMAC/SHA-224 Large Correct:</label><input type="text" size="45" value="9c2919912e4453d727292cee4c678d3e105fe316f1195ef9cfafe9f0" disabled="disabled" id="hmac-sha224-large-correct" />
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>HMAC/SHA-256 Tests</legend>
+				<div>
+					<label for="hmac-sha256-short-text">HMAC/SHA-256 Short ASCII Text:</label><input type="text" size="10" value="Sample #2" id="hmac-sha256-short-text" onchange="calcHMAC('hmac-sha256-short', 'ASCII', 'ASCII', 'SHA-256')" />
+				</div>
+				<div>
+					<label for="hmac-sha256-short-key">HMAC/SHA-256 Short Hex Key:</label><input type="text" size="25" value="0123456789:;&lt;=>?@ABC" id="hmac-sha256-short-key" onchange="calcHMAC('hmac-sha256-short', 'ASCII', 'ASCII', 'SHA-256')" />
+				</div>
+				<div>
+					<label for="hmac-sha256-short-result">HMAC/SHA-256 Short Hex Result:</label><input type="text" size="75" disabled="disabled" id="hmac-sha256-short-result" />
+					<span id="hmac-sha256-short-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha256-short-correct">HMAC/SHA-256 Short Correct:</label><input type="text" size="75" value="b8f20db541ea4309ca4ea9380cd0e834f71fbe9174a261380dc17eae6a3451d9" disabled="disabled" id="hmac-sha256-short-correct" />
+				</div>
+				<div>
+					<label for="hmac-sha256-med-text">HMAC/SHA-256 Med ASCII Text:</label><input type="text" size="10" value="Sample #1" id="hmac-sha256-med-text" onchange="calcHMAC('hmac-sha256-med', 'ASCII', 'HEX', 'SHA-256')" />
+				</div>
+				<div>
+					<label for="hmac-sha256-med-key">HMAC/SHA-256 Med Hex Key:</label><input type="text" size="150" value="000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f" id="hmac-sha256-med-key" onchange="calcHMAC('hmac-sha256-med', 'ASCII', 'HEX', 'SHA-256')" />
+				</div>
+				<div>
+					<label for="hmac-sha256-med-result">HMAC/SHA-256 Med Hex Result:</label><input type="text" size="75" disabled="disabled" id="hmac-sha256-med-result" />
+					<span id="hmac-sha256-med-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha256-med-correct">HMAC/SHA-256 Med Correct:</label><input type="text" size="75" value="3519f0cddfa090f8ace819d9ae8501578c46920502c62baa47bfe6014864a93a" disabled="disabled" id="hmac-sha256-med-correct" />
+				</div>
+				<div>
+					<label for="hmac-sha256-large-text">HMAC/SHA-256 Large Hex Text:</label><input type="text" size="20" value="53616D706C65202333" id="hmac-sha256-large-text" onchange="calcHMAC('hmac-sha256-large', 'HEX', 'HEX', 'SHA-256')" />
+				</div>
+				<div>
+					<label for="hmac-sha256-large-key">HMAC/SHA-256 Large Hex Key:</label><input type="text" size="100" value="505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3" id="hmac-sha256-large-key" onchange="calcHMAC('hmac-sha256-large', 'HEX', 'HEX', 'SHA-256')" />
+				</div>
+				<div>
+					<label for="hmac-sha256-large-result">HMAC/SHA-256 Large Hex Result:</label><input type="text" size="75" disabled="disabled" id="hmac-sha256-large-result" />
+					<span id="hmac-sha256-large-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha256-large-correct">HMAC/SHA-256 Large Correct:</label><input type="text" size="75" value="2d7d0d7f3e52ffe89d65c978f39d555bb48b0ba48d5b6eb404654ad1afdb4ca3" disabled="disabled" id="hmac-sha256-large-correct" />
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>HMAC/SHA-384 Tests</legend>
+				<div>
+					<label for="hmac-sha384-short-text">HMAC/SHA-384 Short ASCII Text:</label><input type="text" size="10" value="Sample #2" id="hmac-sha384-short-text" onchange="calcHMAC('hmac-sha384-short', 'ASCII', 'ASCII', 'SHA-384')" />
+				</div>
+				<div>
+					<label for="hmac-sha384-short-key">HMAC/SHA-384 Short Hex Key:</label><input type="text" size="50" value="0123456789:;&lt;=>?@ABC0123456789:;&lt;=>?@ABC" id="hmac-sha384-short-key" onchange="calcHMAC('hmac-sha384-short', 'ASCII', 'ASCII', 'SHA-384')" />
+				</div>
+				<div>
+					<label for="hmac-sha384-short-result">HMAC/SHA-384 Short Hex Result:</label><input type="text" size="115" disabled="disabled" id="hmac-sha384-short-result" />
+					<span id="hmac-sha384-short-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha384-short-correct">HMAC/SHA-384 Short Correct:</label><input type="text" size="115" value="97ab4a9c2e17af122bb32b4b1678cff917ca700a111925f455ae25348214dcbd7d163c4a4e644e401b2f87cb1b752fc5" disabled="disabled" id="hmac-sha384-short-correct" />
+				</div>
+				<div>
+					<label for="hmac-sha384-med-text">HMAC/SHA-384 Med ASCII Text:</label><input type="text" size="10" value="Sample #1" id="hmac-sha384-med-text" onchange="calcHMAC('hmac-sha384-med', 'ASCII', 'HEX', 'SHA-384')" />
+				</div>
+				<div>
+					<label for="hmac-sha384-med-key">HMAC/SHA-384 Med Hex Key:</label><input type="text" size="100" value="000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f" id="hmac-sha384-med-key" onchange="calcHMAC('hmac-sha384-med', 'ASCII', 'HEX', 'SHA-384')" />
+				</div>
+				<div>
+					<label for="hmac-sha384-med-result">HMAC/SHA-384 Med Hex Result:</label><input type="text" size="115" disabled="disabled" id="hmac-sha384-med-result" />
+					<span id="hmac-sha384-med-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha384-med-correct">HMAC/SHA-384 Med Correct:</label><input type="text" size="115" value="bed40c524441b2e0ebe20be79b914067a57a74adb4b008d9c2f9f944c89b0fa8ce23227002aa6c1d256ee276d697332e" disabled="disabled" id="hmac-sha384-med-correct" />
+				</div>
+				<div>
+					<label for="hmac-sha384-large-text">HMAC/SHA-384 Large Hex Text:</label><input type="text" size="20" value="53616D706C65202333" id="hmac-sha384-large-text" onchange="calcHMAC('hmac-sha384-large', 'HEX', 'HEX', 'SHA-384')" />
+				</div>
+				<div>
+					<label for="hmac-sha384-large-key">HMAC/SHA-384 Large Hex Key:</label><input type="text" size="100" value="505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3" id="hmac-sha384-large-key" onchange="calcHMAC('hmac-sha384-large', 'HEX', 'HEX', 'SHA-384')" />
+				</div>
+				<div>
+					<label for="hmac-sha384-large-result">HMAC/SHA-384 Large Hex Result:</label><input type="text" size="115" disabled="disabled" id="hmac-sha384-large-result" />
+					<span id="hmac-sha384-large-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha384-large-correct">HMAC/SHA-384 Large Correct:</label><input type="text" size="115" value="96b8cfd4340494cd12bd2e4d5df413b5585020d6fa078659cdf938c35e3fcdee84af95e8e598481dc5f064126d561c31" disabled="disabled" id="hmac-sha384-large-correct" />
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>HMAC/SHA-512 Tests</legend>
+				<div>
+					<label for="hmac-sha512-short-text">HMAC/SHA-512 Short ASCII Text:</label><input type="text" size="10" value="Sample #2" id="hmac-sha512-short-text" onchange="calcHMAC('hmac-sha512-short', 'ASCII', 'ASCII', 'SHA-512')" />
+				</div>
+				<div>
+					<label for="hmac-sha512-short-key">HMAC/SHA-512 Short Hex Key:</label><input type="text" size="50" value="0123456789:;&lt;=>?@ABC0123456789:;&lt;=>?@ABC" id="hmac-sha512-short-key" onchange="calcHMAC('hmac-sha512-short', 'ASCII', 'ASCII', 'SHA-512')" />
+				</div>
+				<div>
+					<label for="hmac-sha512-short-result">HMAC/SHA-512 Short Hex Result:</label><input type="text" size="150" disabled="disabled" id="hmac-sha512-short-result" />
+					<span id="hmac-sha512-short-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha512-short-correct">HMAC/SHA-512 Short Correct:</label><input type="text" size="150" value="74ed1131b8e37c0e18829b7ae7d99925664cfe055c2d01fa00d0f152ac321a50f3ef1ee91a36fd6248de60ede4196a4f9e5acca4981a09a91a0745d674ca11d3" disabled="disabled" id="hmac-sha512-short-correct" />
+				</div>
+				<div>
+					<label for="hmac-sha512-med-text">HMAC/SHA-512 Med ASCII Text:</label><input type="text" size="10" value="Sample #1" id="hmac-sha512-med-text" onchange="calcHMAC('hmac-sha512-med', 'ASCII', 'HEX', 'SHA-512')" />
+				</div>
+				<div>
+					<label for="hmac-sha512-med-key">HMAC/SHA-512 Med Hex Key:</label><input type="text" size="100" value="000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f" id="hmac-sha512-med-key" onchange="calcHMAC('hmac-sha512-med', 'ASCII', 'HEX', 'SHA-512')" />
+				</div>
+				<div>
+					<label for="hmac-sha512-med-result">HMAC/SHA-512 Med Hex Result:</label><input type="text" size="150" disabled="disabled" id="hmac-sha512-med-result" />
+					<span id="hmac-sha512-med-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha512-med-correct">HMAC/SHA-512 Med Correct:</label><input type="text" size="150" value="e3c46b747b407ae103d75d94cc2247d6fef607a019e9dca6a1183966a163eb19317e7642da27b6e6ed22fea8224c493d5f20a458f83a555b94264253ddceb242" disabled="disabled" id="hmac-sha512-med-correct" />
+				</div>
+				<div>
+					<label for="hmac-sha512-large-text">HMAC/SHA-512 Large Hex Text:</label><input type="text" size="20" value="53616D706C65202333" id="hmac-sha512-large-text" onchange="calcHMAC('hmac-sha512-large', 'HEX', 'HEX', 'SHA-512')" />
+				</div>
+				<div>
+					<label for="hmac-sha512-large-key">HMAC/SHA-512 Large Hex Key:</label><input type="text" size="100" value="505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3" id="hmac-sha512-large-key" onchange="calcHMAC('hmac-sha512-large', 'HEX', 'HEX', 'SHA-512')" />
+				</div>
+				<div>
+					<label for="hmac-sha512-large-result">HMAC/SHA-512 Large Hex Result:</label><input type="text" size="150" disabled="disabled" id="hmac-sha512-large-result" />
+					<span id="hmac-sha512-large-comp"></span>
+				</div>
+				<div>
+					<label for="hmac-sha512-large-correct">HMAC/SHA-512 Large Correct:</label><input type="text" size="150" value="a2a8627f166e8c52d95fbf5c55271d466d43b73696e94977d08262f021d9a916f9d10f09f40db64e038c2ed3b16fbb9e61082c9173acfa86445612ccd4d8836c" disabled="disabled" id="hmac-sha512-large-correct" />
 				</div>
 			</fieldset>
 		</form>

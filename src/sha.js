@@ -1,5 +1,6 @@
 /* A JavaScript implementation of the SHA family of hashes, as defined in FIPS PUB 180-2
- * Version 1.11 Copyright Brian Turek 2008
+ * as well as the corresponding HMAC implementation as defined in FIPS PUB 198a
+ * Version 1.2 Copyright Brian Turek 2009
  * Distributed under the BSD License
  * See http://jssha.sourceforge.net/ for more information
  *
@@ -24,15 +25,16 @@ function Int_64(msint_32, lsint_32) {
  *
  * @constructor
  * @param {String} srcString The string to be hashed
+ * @param {String} inputFormat The format of srcString, ASCII or HEX
  */
-function jsSHA(srcString) {
+function jsSHA(srcString, inputFormat) {
 
 	/*
 	 * Configurable variables. Defaults typically work
 	 */
-	jsSHA.charSize = 8; /* Number of Bits Per character (8 for ASCII, 16 for Unicode)	  */
-	jsSHA.b64pad  = ""; /* base-64 pad character. "=" for strict RFC compliance   */
-	jsSHA.hexCase = 0; /* hex output format. 0 - lowercase; 1 - uppercase		*/
+	jsSHA.charSize = 8; // Number of Bits Per character (8 for ASCII, 16 for Unicode)
+	jsSHA.b64pad  = ""; // base-64 pad character. "=" for strict RFC compliance
+	jsSHA.hexCase = 0; // hex output format. 0 - lowercase; 1 - uppercase
 
 	var sha1 = null;
 	var sha224 = null;
@@ -53,14 +55,52 @@ function jsSHA(srcString) {
 		var length = str.length * jsSHA.charSize;
 
 		for (var i = 0; i < length; i += jsSHA.charSize) {
-			bin[i >> 5] |= (str.charCodeAt(i / jsSHA.charSize) & mask) << (32 - jsSHA.charSize - i % 32);
+			bin[i >> 5] |= (str.charCodeAt(i / jsSHA.charSize) & mask) <<
+				(32 - jsSHA.charSize - i % 32);
 		}
 
 		return bin;
 	};
 
-    var strBinLen = srcString.length * jsSHA.charSize;
-	var strToHash = str2binb(srcString);
+	/*
+	 * Convert a hex string to an array of big-endian words
+	 *
+	 * @param {String} str String to be converted to binary representation
+	 * @return Integer array representation of the parameter
+	 */
+	var hex2binb = function (str) {
+		var bin = [];
+		var length = str.length;
+
+		for (var i = 0; i < length; i += 2) {
+			var num = parseInt(str.substr(i, 2), 16);
+			if (!isNaN(num)) {
+				bin[i >> 3] |= num << (24 - (4 * (i % 8)));
+			} else {
+				return "INVALID HEX STRING";
+			}
+		}
+
+		return bin;
+	};
+
+	var strBinLen = null;
+	var strToHash = null;
+
+	// Convert the input string into the correct type
+	if ("HEX" === inputFormat) {
+		if (0 !== (srcString.length % 2)) {
+			return "TEXT MUST BE IN BYTE INCREMENTS";
+		}
+		strBinLen = srcString.length * 4;
+		strToHash = hex2binb(srcString);
+	} else if (("ASCII" === inputFormat) ||
+		('undefined' === typeof(inputFormat))) {
+		strBinLen = srcString.length * jsSHA.charSize;
+		strToHash = str2binb(srcString);
+	} else {
+		return "UNKNOWN TEXT INPUT TYPE";
+	}
 
 	/*
 	 * Convert an array of big-endian words to a hex string.
@@ -75,7 +115,8 @@ function jsSHA(srcString) {
 		var length = binarray.length * 4;
 
 		for (var i = 0; i < length; i++) {
-			str += hex_tab.charAt((binarray[i >> 2] >> ((3 - i % 4) * 8 + 4)) & 0xF) + hex_tab.charAt((binarray[i >> 2] >> ((3 - i % 4) * 8)) & 0xF);
+			str += hex_tab.charAt((binarray[i >> 2] >> ((3 - i % 4) * 8 + 4)) & 0xF) +
+				hex_tab.charAt((binarray[i >> 2] >> ((3 - i % 4) * 8)) & 0xF);
 		}
 
 		return str;
@@ -94,7 +135,9 @@ function jsSHA(srcString) {
 		var length = binarray.length * 4;
 		for (var i = 0; i < length; i += 3)
 		{
-			var triplet = (((binarray[i >> 2] >> 8 * (3 - i % 4)) & 0xFF) << 16) | (((binarray[i + 1 >> 2] >> 8 * (3 - (i + 1) % 4)) & 0xFF) << 8) | ((binarray[i + 2 >> 2] >> 8 * (3 - (i + 2) % 4)) & 0xFF);
+			var triplet = (((binarray[i >> 2] >> 8 * (3 - i % 4)) & 0xFF) << 16) |
+				(((binarray[i + 1 >> 2] >> 8 * (3 - (i + 1) % 4)) & 0xFF) << 8) |
+				((binarray[i + 2 >> 2] >> 8 * (3 - (i + 2) % 4)) & 0xFF);
 			for (var j = 0; j < 4; j++) {
 				if (i * 8 + j * 6 > binarray.length * 32) {
 					str += jsSHA.b64pad;
@@ -380,7 +423,7 @@ function jsSHA(srcString) {
 	};
 
 	/*
-	 * Add 32-bit integers, wrapping at 2^32. This uses 16-bit operations internally
+	 * Add two 32-bit integers, wrapping at 2^32. This uses 16-bit operations internally
 	 * to work around bugs in some JS interpreters.
 	 *
 	 * @private
@@ -388,7 +431,7 @@ function jsSHA(srcString) {
 	 * @param {Number} y The second 32-bit integer argument to be added
 	 * @return The sum of x + y
 	 */
-	var safeAdd_32 = function (x, y) {
+	var safeAdd_32_2 = function (x, y) {
 		var lsw = (x & 0xFFFF) + (y & 0xFFFF);
 		var msw = (x >>> 16) + (y >>> 16) + (lsw >>> 16);
 
@@ -396,7 +439,46 @@ function jsSHA(srcString) {
 	};
 
 	/*
-	 * Add 64-bit integers, wrapping at 2^64. This uses 16-bit operations internally
+	 * Add four 32-bit integers, wrapping at 2^32. This uses 16-bit operations internally
+	 * to work around bugs in some JS interpreters.
+	 *
+	 * @private
+	 * @param {Number} a The first 32-bit integer argument to be added
+	 * @param {Number} b The second 32-bit integer argument to be added
+	 * @param {Number} c The third 32-bit integer argument to be added
+	 * @param {Number} d The fourth 32-bit integer argument to be added
+	 * @return The sum of a + b + c + d
+	 */
+	var safeAdd_32_4 = function (a, b, c, d) {
+		var lsw = (a & 0xFFFF) + (b & 0xFFFF) + (c & 0xFFFF) + (d & 0xFFFF);
+		var msw = (a >>> 16) + (b >>> 16) + (c >>> 16) + (d >>> 16) + (lsw >>> 16);
+
+		return ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
+	};
+
+	/*
+	 * Add five 32-bit integers, wrapping at 2^32. This uses 16-bit operations internally
+	 * to work around bugs in some JS interpreters.
+	 *
+	 * @private
+	 * @param {Number} a The first 32-bit integer argument to be added
+	 * @param {Number} b The second 32-bit integer argument to be added
+	 * @param {Number} c The third 32-bit integer argument to be added
+	 * @param {Number} d The fourth 32-bit integer argument to be added
+	 * @param {Number} e The fifth 32-bit integer argument to be added
+	 * @return The sum of a + b + c + d + e
+	 */
+	var safeAdd_32_5 = function (a, b, c, d, e) {
+		var lsw = (a & 0xFFFF) + (b & 0xFFFF) + (c & 0xFFFF) + (d & 0xFFFF) +
+			(e & 0xFFFF);
+		var msw = (a >>> 16) + (b >>> 16) + (c >>> 16) + (d >>> 16) +
+			(e >>> 16) + (lsw >>> 16);
+
+		return ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
+	};
+
+	/*
+	 * Add two 64-bit integers, wrapping at 2^64. This uses 16-bit operations internally
 	 * to work around bugs in some JS interpreters.
 	 *
 	 * @private
@@ -404,7 +486,7 @@ function jsSHA(srcString) {
 	 * @param {Int_64} y The second 64-bit integer argument to be added
 	 * @return The sum of x + y
 	 */
-	var safeAdd_64 = function (x, y) {
+	var safeAdd_64_2 = function (x, y) {
 		var lsw = (x.lowOrder & 0xFFFF) + (y.lowOrder & 0xFFFF);
 		var msw = (x.lowOrder >>> 16) + (y.lowOrder >>> 16) + (lsw >>> 16);
 		var lowOrder = ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
@@ -417,16 +499,77 @@ function jsSHA(srcString) {
 	};
 
 	/*
+	 * Add four 64-bit integers, wrapping at 2^64. This uses 16-bit operations internally
+	 * to work around bugs in some JS interpreters.
+	 *
+	 * @private
+	 * @param {Int_64} a The first 64-bit integer argument to be added
+	 * @param {Int_64} b The second 64-bit integer argument to be added
+	 * @param {Int_64} c The third 64-bit integer argument to be added
+	 * @param {Int_64} d The fouth 64-bit integer argument to be added
+	 * @return The sum of a + b + c + d
+	 */
+	var safeAdd_64_4 = function (a, b, c, d) {
+		var lsw = (a.lowOrder & 0xFFFF) + (b.lowOrder & 0xFFFF) +
+			(c.lowOrder & 0xFFFF) + (d.lowOrder & 0xFFFF);
+		var msw = (a.lowOrder >>> 16) + (b.lowOrder >>> 16) +
+			(c.lowOrder >>> 16) + (d.lowOrder >>> 16) + (lsw >>> 16);
+		var lowOrder = ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
+
+		lsw = (a.highOrder & 0xFFFF) + (b.highOrder & 0xFFFF) +
+			(c.highOrder & 0xFFFF) + (d.highOrder & 0xFFFF) + (msw >>> 16);
+		msw = (a.highOrder >>> 16) + (b.highOrder >>> 16) +
+			(c.highOrder >>> 16) + (d.highOrder >>> 16) + (lsw >>> 16);
+		var highOrder = ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
+
+		return new Int_64(highOrder, lowOrder);
+	};
+
+	/*
+	 * Add five 64-bit integers, wrapping at 2^64. This uses 16-bit operations internally
+	 * to work around bugs in some JS interpreters.
+	 *
+	 * @private
+	 * @param {Int_64} a The first 64-bit integer argument to be added
+	 * @param {Int_64} b The second 64-bit integer argument to be added
+	 * @param {Int_64} c The third 64-bit integer argument to be added
+	 * @param {Int_64} d The fouth 64-bit integer argument to be added
+	 * @param {Int_64} e The fouth 64-bit integer argument to be added
+	 * @return The sum of a + b + c + d + e
+	 */
+	var safeAdd_64_5 = function (a, b, c, d, e) {
+		var lsw = (a.lowOrder & 0xFFFF) + (b.lowOrder & 0xFFFF) +
+			(c.lowOrder & 0xFFFF) + (d.lowOrder & 0xFFFF) + (e.lowOrder & 0xFFFF);
+		var msw = (a.lowOrder >>> 16) + (b.lowOrder >>> 16) +
+			(c.lowOrder >>> 16) + (d.lowOrder >>> 16) + (e.lowOrder >>> 16) +
+			(lsw >>> 16);
+		var lowOrder = ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
+
+		lsw = (a.highOrder & 0xFFFF) + (b.highOrder & 0xFFFF) +
+			(c.highOrder & 0xFFFF) + (d.highOrder & 0xFFFF) +
+            (e.highOrder & 0xFFFF) + (msw >>> 16);
+		msw = (a.highOrder >>> 16) + (b.highOrder >>> 16) +
+			(c.highOrder >>> 16) + (d.highOrder >>> 16) + (e.highOrder >>> 16) +
+			(lsw >>> 16);
+		var highOrder = ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
+
+		return new Int_64(highOrder, lowOrder);
+	};
+
+	/*
 	 * Calculates the SHA-1 hash of the string set at instantiation
 	 *
 	 * @private
+	 * @param {Array} message The binary array representation of the string to hash
+	 * @param {Number} messageLen The number of bits in the message
 	 * @return The array of integers representing the SHA-1 hash of message
 	 */
-	var coreSHA1 = function () {
+	var coreSHA1 = function (message, messageLen) {
 		var W = [];
 		var a, b, c, d, e;
 		var T;
-		var ch = ch_32, parity = parity_32, maj = maj_32, rotl = rotl_32, safeAdd = safeAdd_32;
+		var ch = ch_32, parity = parity_32, maj = maj_32, rotl = rotl_32,
+			safeAdd_2 = safeAdd_32_2, safeAdd_5 = safeAdd_32_5;
 		var H = [
 			0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476,	0xc3d2e1f0
 		];
@@ -452,10 +595,11 @@ function jsSHA(srcString) {
 			0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6,
 			0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6
 		];
-		var message = strToHash.slice();
 
-		message[strBinLen >> 5] |= 0x80 << (24 - strBinLen % 32); // Append '1' at  the end of the binary string
-		message[((strBinLen + 1 + 64 >> 9) << 4) + 15] = strBinLen; // Append length of binary string in the position such that the new length is a multiple of 512
+		// Append '1' at  the end of the binary string
+		message[messageLen >> 5] |= 0x80 << (24 - messageLen % 32);
+		// Append length of binary string in the position such that the new length is a multiple of 512
+		message[((messageLen + 1 + 64 >> 9) << 4) + 15] = messageLen;
 
 		var appendedMessageLength = message.length;
 
@@ -474,13 +618,13 @@ function jsSHA(srcString) {
 				}
 
 				if (t < 20) {
-					T = safeAdd(safeAdd(safeAdd(safeAdd(rotl(a, 5), ch(b, c, d)), e), K[t]), W[t]);
+					T = safeAdd_5(rotl(a, 5), ch(b, c, d), e, K[t], W[t]);
 				} else if (t < 40) {
-					T = safeAdd(safeAdd(safeAdd(safeAdd(rotl(a, 5), parity(b, c, d)), e), K[t]), W[t]);
+					T = safeAdd_5(rotl(a, 5), parity(b, c, d), e, K[t], W[t]);
 				} else if (t < 60) {
-					T = safeAdd(safeAdd(safeAdd(safeAdd(rotl(a, 5), maj(b, c, d)), e), K[t]), W[t]);
+					T = safeAdd_5(rotl(a, 5), maj(b, c, d), e, K[t], W[t]);
 				} else {
-					T = safeAdd(safeAdd(safeAdd(safeAdd(rotl(a, 5), parity(b, c, d)), e), K[t]), W[t]);
+					T = safeAdd_5(rotl(a, 5), parity(b, c, d), e, K[t], W[t]);
 				}
 
 				e = d;
@@ -490,11 +634,11 @@ function jsSHA(srcString) {
 				a = T;
 			}
 
-			H[0] = safeAdd(a, H[0]);
-			H[1] = safeAdd(b, H[1]);
-			H[2] = safeAdd(c, H[2]);
-			H[3] = safeAdd(d, H[3]);
-			H[4] = safeAdd(e, H[4]);
+			H[0] = safeAdd_2(a, H[0]);
+			H[1] = safeAdd_2(b, H[1]);
+			H[2] = safeAdd_2(c, H[2]);
+			H[3] = safeAdd_2(d, H[3]);
+			H[4] = safeAdd_2(e, H[4]);
 		}
 
 		return H;
@@ -504,28 +648,32 @@ function jsSHA(srcString) {
 	 * Calculates the desired SHA-2 hash of the string set at instantiation
 	 *
 	 * @private
+	 * @param {Array} The binary array representation of the string to hash
+	 * @param {Number} The number of bits in message
 	 * @param {String} variant The desired SHA-2 variant
 	 * @return The array of integers representing the SHA-2 hash of message
 	 */
-	var coreSHA2 = function (variant) {
+	var coreSHA2 = function (message, messageLen, variant) {
 		var W = [];
 		var a, b, c, d, e, f, g, h;
 		var T1, T2;
 		var H;
 		var numRounds, lengthPosition, binaryStringInc, binaryStringMult;
-		var safeAdd, gamma0, gamma1, sigma0, sigma1, ch, maj, Int;
+		var safeAdd_2, safeAdd_4, safeAdd_5, gamma0, gamma1, sigma0, sigma1,
+			ch, maj, Int;
 		var K;
-		var message = strToHash.slice();
 
 		// Set up the various function handles and variable for the specific variant
 		if (variant === "SHA-224" || variant === "SHA-256") // 32-bit variant
 		{
 			numRounds = 64;
-			lengthPosition = ((strBinLen + 1 + 64 >> 9) << 4) + 15;
+			lengthPosition = ((messageLen + 1 + 64 >> 9) << 4) + 15;
 			binaryStringInc = 16;
 			binaryStringMult = 1;
 			Int = Number;
-			safeAdd = safeAdd_32;
+			safeAdd_2 = safeAdd_32_2;
+			safeAdd_4 = safeAdd_32_4;
+			safeAdd_5 = safeAdd_32_5;
 			gamma0 = gamma0_32;
 			gamma1 = gamma1_32;
 			sigma0 = sigma0_32;
@@ -564,11 +712,13 @@ function jsSHA(srcString) {
 			}
 		} else if (variant === "SHA-384" || variant === "SHA-512") {// 64-bit variant
 			numRounds = 80;
-			lengthPosition = ((strBinLen + 1 + 128 >> 10) << 5) + 31;
+			lengthPosition = ((messageLen + 1 + 128 >> 10) << 5) + 31;
 			binaryStringInc = 32;
 			binaryStringMult = 2;
 			Int = Int_64;
-			safeAdd = safeAdd_64;
+			safeAdd_2 = safeAdd_64_2;
+			safeAdd_4 = safeAdd_64_4;
+			safeAdd_5 = safeAdd_64_5;
 			gamma0 = gamma0_64;
 			gamma1 = gamma1_64;
 			sigma0 = sigma0_64;
@@ -612,8 +762,10 @@ function jsSHA(srcString) {
 			}
 		}
 
-		message[strBinLen >> 5] |= 0x80 << (24 - strBinLen % 32); // Append '1' at  the end of the binary string
-		message[lengthPosition] = strBinLen; // Append length of binary string in the position such that the new length is correct
+		// Append '1' at  the end of the binary string
+		message[messageLen >> 5] |= 0x80 << (24 - messageLen % 32);
+		// Append length of binary string in the position such that the new length is correct
+		message[lengthPosition] = messageLen;
 
 		var appendedMessageLength = message.length;
 
@@ -629,31 +781,32 @@ function jsSHA(srcString) {
 
 			for (var t = 0; t < numRounds; t++) {
 				if (t < 16) {
-					W[t] = new Int(message[t * binaryStringMult + i], message[t * binaryStringMult + i + 1]); // Bit of a hack - for 32-bit, the second term is ignored
+					// Bit of a hack - for 32-bit, the second term is ignored
+					W[t] = new Int(message[t * binaryStringMult + i], message[t * binaryStringMult + i + 1]);
 				} else {
-					W[t] = safeAdd(safeAdd(safeAdd(gamma1(W[t - 2]), W[t - 7]), gamma0(W[t - 15])), W[t - 16]);
+					W[t] = safeAdd_4(gamma1(W[t - 2]), W[t - 7], gamma0(W[t - 15]), W[t - 16]);
 				}
 
-				T1 = safeAdd(safeAdd(safeAdd(safeAdd(h, sigma1(e)), ch(e, f, g)), K[t]), W[t]);
-				T2 = safeAdd(sigma0(a), maj(a, b, c));
+				T1 = safeAdd_5(h, sigma1(e), ch(e, f, g), K[t], W[t]);
+				T2 = safeAdd_2(sigma0(a), maj(a, b, c));
 				h = g;
 				g = f;
 				f = e;
-				e = safeAdd(d, T1);
+				e = safeAdd_2(d, T1);
 				d = c;
 				c = b;
 				b = a;
-				a = safeAdd(T1, T2);
+				a = safeAdd_2(T1, T2);
 			}
 
-			H[0] = safeAdd(a, H[0]);
-			H[1] = safeAdd(b, H[1]);
-			H[2] = safeAdd(c, H[2]);
-			H[3] = safeAdd(d, H[3]);
-			H[4] = safeAdd(e, H[4]);
-			H[5] = safeAdd(f, H[5]);
-			H[6] = safeAdd(g, H[6]);
-			H[7] = safeAdd(h, H[7]);
+			H[0] = safeAdd_2(a, H[0]);
+			H[1] = safeAdd_2(b, H[1]);
+			H[2] = safeAdd_2(c, H[2]);
+			H[3] = safeAdd_2(d, H[3]);
+			H[4] = safeAdd_2(e, H[4]);
+			H[5] = safeAdd_2(f, H[5]);
+			H[6] = safeAdd_2(g, H[6]);
+			H[7] = safeAdd_2(h, H[7]);
 		}
 
 		switch (variant) {
@@ -690,7 +843,8 @@ function jsSHA(srcString) {
 	};
 
 	/*
-	 * Returns the desired SHA hash of the string specified at instantiation using the specified parameters
+	 * Returns the desired SHA hash of the string specified at instantiation
+	 * using the specified parameters
 	 *
 	 * @param {String} variant The desired SHA variant (SHA-1, SHA-224, SHA-256, SHA-384, or SHA-512)
 	 * @param {String} format The desired output formatting (B64 or HEX)
@@ -698,6 +852,7 @@ function jsSHA(srcString) {
 	 */
 	this.getHash = function (variant, format) {
 		var formatFunc = null;
+		var message = strToHash.slice();
 
 		switch (format) {
 		case "HEX":
@@ -713,31 +868,145 @@ function jsSHA(srcString) {
 		switch (variant) {
 		case "SHA-1":
 			if (sha1 === null) {
-				sha1 = coreSHA1();
+				sha1 = coreSHA1(message, strBinLen);
 			}
 			return formatFunc(sha1);
 		case "SHA-224":
 			if (sha224 === null) {
-				sha224 = coreSHA2(variant);
+				sha224 = coreSHA2(message, strBinLen, variant);
 			}
 			return formatFunc(sha224);
 		case "SHA-256":
 			if (sha256 === null) {
-				sha256 = coreSHA2(variant);
+				sha256 = coreSHA2(message, strBinLen, variant);
 			}
 			return formatFunc(sha256);
 		case "SHA-384":
 			if (sha384 === null) {
-				sha384 = coreSHA2(variant);
+				sha384 = coreSHA2(message, strBinLen, variant);
 			}
 			return formatFunc(sha384);
 		case "SHA-512":
 			if (sha512 === null) {
-				sha512 = coreSHA2(variant);
+				sha512 = coreSHA2(message, strBinLen, variant);
 			}
 			return formatFunc(sha512);
 		default:
 			return "HASH NOT RECOGNIZED";
 		}
+	};
+
+	/*
+	 * Returns the desired HMAC of the string specified at instantiation using
+	 * the key and variant param.
+	 *
+	 * @param {String} key The key used to calculate the HMAC
+	 * @param {String} inputFormat The format of key, ASCII or HEX
+	 * @param {String} variant The desired SHA variant (SHA-1, SHA-224, SHA-256, SHA-384, or SHA-512)
+	 * @param {String} outputFormat The desired output formatting (B64 or HEX)
+	 * @return The string representation of the hash in the format specified
+	 */
+	this.getHMAC = function (key, inputFormat, variant, outputFormat) {
+		var formatFunc = null;
+		var keyToUse = null;
+		var blockByteSize = null;
+		var blockBitSize = null;
+		var keyWithIPad = [];
+		var keyWithOPad = [];
+		var lastArrayIndex = null;
+		var retVal = null;
+		var keyBinLen = null;
+		var hashBitSize = null;
+
+		// Validate the output format selection
+		switch (outputFormat) {
+		case "HEX":
+			formatFunc = binb2hex;
+			break;
+		case "B64":
+			formatFunc = binb2b64;
+			break;
+		default:
+			return "FORMAT NOT RECOGNIZED";
+		}
+
+		// Validate the hash variant selection and set needed variables
+		switch (variant) {
+		case "SHA-1":
+			blockByteSize = 64;
+			hashBitSize = 160;
+			break;
+		case "SHA-224":
+			blockByteSize = 64;
+			hashBitSize = 224;
+			break;
+		case "SHA-256":
+			blockByteSize = 64;
+			hashBitSize = 256;
+			break;
+		case "SHA-384":
+			blockByteSize = 128;
+			hashBitSize = 384;
+			break;
+		case "SHA-512":
+			blockByteSize = 128;
+			hashBitSize = 512;
+			break;
+		default:
+			return "HASH NOT RECOGNIZED";
+		}
+
+		// Validate input format selection
+		if ("HEX" === inputFormat) {
+			// Nibbles must come in pairs
+			if (0 !== (key.length % 2)) {
+				return "KEY MUST BE IN BYTE INCREMENTS";
+			}
+			keyToUse = hex2binb(key);
+			keyBinLen = key.length * 4;
+		} else if ("ASCII" === inputFormat) {
+			keyToUse = str2binb(key);
+			keyBinLen = key.length * jsSHA.charSize;
+		} else {
+			return "UNKNOWN KEY INPUT TYPE";
+		}
+
+		// These are used multiple times, calculate and store them
+		blockBitSize = blockByteSize * 8;
+		lastArrayIndex = (blockByteSize / 4) - 1;
+
+		// Figure out what to do with the key based on its size relative to
+		// the hash's block size
+		if (blockByteSize < (keyBinLen / 8)) {
+			if ("SHA-1" === variant) {
+				keyToUse = coreSHA1(keyToUse, keyBinLen);
+			} else {
+				keyToUse = coreSHA2(keyToUse, keyBinLen, variant);
+			}
+			// For all variants, the block size is bigger than the output size
+			// so there will never be a useful byte at the end of the string
+			keyToUse[lastArrayIndex] &= 0xFFFFFF00;
+		} else if (blockByteSize > (keyBinLen / 8)) {
+			// If the blockByteSize is greater than the key length, there will
+			// always be at LEAST one "useless" byte at the end of the string
+			keyToUse[lastArrayIndex] &= 0xFFFFFF00;
+		}
+
+		// Create ipad and opad
+		for (var i = 0; i <= lastArrayIndex; i++) {
+			keyWithIPad[i] = keyToUse[i] ^ 0x36363636;
+			keyWithOPad[i] = keyToUse[i] ^ 0x5C5C5C5C;
+		}
+
+		// Calculate the HMAC
+		if ("SHA-1" === variant) {
+			retVal = coreSHA1(keyWithIPad.concat(strToHash), blockBitSize + strBinLen);
+			retVal = coreSHA1(keyWithOPad.concat(retVal), blockBitSize + hashBitSize);
+		} else {
+			retVal = coreSHA2(keyWithIPad.concat(strToHash), blockBitSize + strBinLen, variant);
+			retVal = coreSHA2(keyWithOPad.concat(retVal), blockBitSize + hashBitSize, variant);
+		}
+
+		return (formatFunc(retVal));
 	};
 }

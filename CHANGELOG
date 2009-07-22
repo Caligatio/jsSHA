@@ -2,6 +2,14 @@
     jsSHA - ChangeLog
 -------------------------
 
+1.2 (2009-07-22)
+=========================
+- Added the HMAC algorithm for all supported hashes (using both ASCII and hex keys)
+- As a result of adding HMAC, added support for hash input text to be hex (ASCII representation of hex)
+- Added multiple variants of safeAdd functions, resulting in a significant performance gain
+- Removed wrapper.js file
+- Used a different JavaScript compressor resulting in smaller file sizes
+
 1.11 (2008-12-07)
 =========================
 - Fixed a base-64 encoding issue resulting from a missing capital 'X'
