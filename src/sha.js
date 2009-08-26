@@ -158,11 +158,7 @@ function jsSHA(srcString, inputFormat) {
 	 * @return The x shifted circularly by n bits
 	 */
 	var rotl_32 = function (x, n) {
-		if (n < 32) {
-			return (x <<  n) | (x >>> (32 - n));
-		} else {
-			return x;
-		}
+		return (x <<  n) | (x >>> (32 - n));
 	};
 
 	/*
@@ -174,11 +170,7 @@ function jsSHA(srcString, inputFormat) {
 	 * @return The x shifted circularly by n bits
 	 */
 	var rotr_32 = function (x, n) {
-		if (n < 32) {
-			return (x >>> n) | (x << (32 - n));
-		} else {
-			return x;
-		}
+		return (x >>> n) | (x << (32 - n));
 	};
 
 	/*
@@ -190,15 +182,16 @@ function jsSHA(srcString, inputFormat) {
 	 * @return The x shifted circularly by n bits
 	 */
 	var rotr_64 = function (x, n) {
-		if (n < 32) {
+		if (n <= 32) {
 			return new Int_64(
 					(x.highOrder >>> n) | (x.lowOrder << (32 - n)),
 					(x.lowOrder >>> n) | (x.highOrder << (32 - n))
 				);
-		} else if (n === 32) { // Apparently in JS, shifting a 32-bit value by 32 yields original value
-			return new Int_64(x.lowOrder, x.highOrder);
 		} else {
-			return rotr_64(rotr_64(x, 32), n - 32);
+			return new Int_64(
+					(x.lowOrder >>> n) | (x.highOrder << (32 - n)),
+					(x.highOrder >>> n) | (x.lowOrder << (32 - n))
+				);
 		}
 	};
 
@@ -211,11 +204,7 @@ function jsSHA(srcString, inputFormat) {
 	 * @return The x shifted by n bits
 	 */
 	var shr_32 = function (x, n) {
-		if (n < 32) {
-			return x >>> n;
-		} else {
-			return 0;
-		}
+		return x >>> n;
 	};
 
 	/*
@@ -227,15 +216,16 @@ function jsSHA(srcString, inputFormat) {
 	 * @return The x shifted by n bits
 	 */
 	var shr_64 = function (x, n) {
-		if (n < 32) {
+		if (n <= 32) {
 			return new Int_64(
 					x.highOrder >>> n,
 					x.lowOrder >>> n | (x.highOrder << (32 - n))
 				);
-		} else if (n === 32) { // Apparently in JS, shifting a 32-bit value by 32 yields original value
-			return new Int_64(0, x.highOrder);
 		} else {
-			return shr_64(shr_64(x, 32), n - 32);
+			return new Int_64(
+					0,
+					x.highOrder << (32 - n)
+				);
 		}
 	};
 
