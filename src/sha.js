@@ -7,20 +7,12 @@
  * Several functions taken from Paul Johnson
  */
 
-/*
- * jsSHA is the workhorse of the library.  Instantiate it with the string to be hashed
- * as the parameter
- *
- * @constructor
- * @param {String} srcString The string to be hashed
- * @param {String} inputFormat The format of srcString, ASCII or HEX
- */
-(function() {
+(function () {
 	/*
 	 * Configurable variables. Defaults typically work
 	 */
 	var charSize = 8; // Number of Bits Per character (8 for ASCII, 16 for Unicode)
-	var b64pad  = ""; // base-64 pad character. "=" for strict RFC compliance
+	var b64pad = ""; // base-64 pad character. "=" for strict RFC compliance
 	var hexCase = 0; // hex output format. 0 - lowercase; 1 - uppercase
 
 	/*
@@ -30,10 +22,10 @@
 	 * @param {Number} msint_32 The most significant 32-bits of a 64-bit number
 	 * @param {Number} lsint_32 The least significant 32-bits of a 64-bit number
 	 */
-	var Int_64 = function(msint_32, lsint_32) {
+	var Int_64 = function (msint_32, lsint_32) {
 		this.highOrder = msint_32;
 		this.lowOrder = lsint_32;
-	}
+	};
 
 	/*
 	 * Convert a string to an array of big-endian words
@@ -85,11 +77,11 @@
 	 * @return Hexidecimal representation of the parameter in String form
 	 */
 	var binb2hex = function (binarray) {
-		var hex_tab = jsSHA.hexCase ? "0123456789ABCDEF" : "0123456789abcdef";
+		var hex_tab = (hexCase) ? "0123456789ABCDEF" : "0123456789abcdef";
 		var str = "";
 		var length = binarray.length * 4;
 
-		for (var i = 0; i < length; i++) {
+		for (var i = 0; i < length; i += 1) {
 			str += hex_tab.charAt((binarray[i >> 2] >> ((3 - i % 4) * 8 + 4)) & 0xF) +
 				hex_tab.charAt((binarray[i >> 2] >> ((3 - i % 4) * 8)) & 0xF);
 		}
@@ -113,11 +105,11 @@
 			var triplet = (((binarray[i >> 2] >> 8 * (3 - i % 4)) & 0xFF) << 16) |
 				(((binarray[i + 1 >> 2] >> 8 * (3 - (i + 1) % 4)) & 0xFF) << 8) |
 				((binarray[i + 2 >> 2] >> 8 * (3 - (i + 2) % 4)) & 0xFF);
-			for (var j = 0; j < 4; j++) {
-				if (i * 8 + j * 6 > binarray.length * 32) {
-					str += jsSHA.b64pad;
-				} else {
+			for (var j = 0; j < 4; j += 1) {
+				if (i * 8 + j * 6 <= binarray.length * 32) {
 					str += tab.charAt((triplet >> 6 * (3 - j)) & 0x3F);
+				} else {
+					str += b64pad;
 				}
 			}
 		}
@@ -575,7 +567,7 @@
 			d = H[3];
 			e = H[4];
 
-			for (var t = 0; t < 80; t++) {
+			for (var t = 0; t < 80; t += 1) {
 				if (t < 16) {
 					W[t] = message[t + i];
 				} else {
@@ -744,7 +736,7 @@
 			g = H[6];
 			h = H[7];
 
-			for (var t = 0; t < numRounds; t++) {
+			for (var t = 0; t < numRounds; t += 1) {
 				if (t < 16) {
 					// Bit of a hack - for 32-bit, the second term is ignored
 					W[t] = new Int(message[t * binaryStringMult + i], message[t * binaryStringMult + i + 1]);
@@ -807,7 +799,15 @@
 		}
 	};
 
-	var jsSHA = function(srcString, inputFormat) {
+	/*
+	 * jsSHA is the workhorse of the library.  Instantiate it with the string to be hashed
+	 * as the parameter
+	 *
+	 * @constructor
+	 * @param {String} srcString The string to be hashed
+	 * @param {String} inputFormat The format of srcString, ASCII or HEX
+	 */
+	var jsSHA = function (srcString, inputFormat) {
 
 		this.sha1 = null;
 		this.sha224 = null;
@@ -832,7 +832,7 @@
 		} else {
 			return "UNKNOWN TEXT INPUT TYPE";
 		}
-	}
+	};
 
 	jsSHA.prototype = {
 		/*
@@ -860,30 +860,30 @@
 
 			switch (variant) {
 			case "SHA-1":
-				if (this.sha1 === null) {
-					sha1 = coreSHA1(message, this.strBinLen);
+				if (null === this.sha1) {
+					this.sha1 = coreSHA1(message, this.strBinLen);
 				}
-				return formatFunc(sha1);
+				return formatFunc(this.sha1);
 			case "SHA-224":
-				if (this.sha224 === null) {
-					sha224 = coreSHA2(message, this.strBinLen, variant);
+				if (null === this.sha224) {
+					this.sha224 = coreSHA2(message, this.strBinLen, variant);
 				}
-				return formatFunc(sha224);
+				return formatFunc(this.sha224);
 			case "SHA-256":
-				if (this.sha256 === null) {
-					sha256 = coreSHA2(message, this.strBinLen, variant);
+				if (null === this.sha256) {
+					this.sha256 = coreSHA2(message, this.strBinLen, variant);
 				}
-				return formatFunc(sha256);
+				return formatFunc(this.sha256);
 			case "SHA-384":
-				if (this.sha384 === null) {
-					sha384 = coreSHA2(message, this.strBinLen, variant);
+				if (null === this.sha384) {
+					this.sha384 = coreSHA2(message, this.strBinLen, variant);
 				}
-				return formatFunc(sha384);
+				return formatFunc(this.sha384);
 			case "SHA-512":
-				if (this.sha512 === null) {
-					sha512 = coreSHA2(message, this.strBinLen, variant);
+				if (null === this.sha512) {
+					this.sha512 = coreSHA2(message, this.strBinLen, variant);
 				}
-				return formatFunc(sha512);
+				return formatFunc(this.sha512);
 			default:
 				return "HASH NOT RECOGNIZED";
 			}
@@ -986,7 +986,7 @@
 			}
 
 			// Create ipad and opad
-			for (var i = 0; i <= lastArrayIndex; i++) {
+			for (var i = 0; i <= lastArrayIndex; i += 1) {
 				keyWithIPad[i] = keyToUse[i] ^ 0x36363636;
 				keyWithOPad[i] = keyToUse[i] ^ 0x5C5C5C5C;
 			}
@@ -1004,5 +1004,5 @@
 		}
 	};
 
-	window.jsSHA = jsSHA
-})()
+	window.jsSHA = jsSHA;
+}());
