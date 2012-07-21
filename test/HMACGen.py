@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 '''
 	jsSHA HMAC Test Result Generator
-	Version 1.0 Copyright Brian Turek 2009
+	Version 1.0 Copyright Brian Turek 2009-2012
 	Distributed under the BSD License
 	See http://caligatio.github.com/jsSHA/ for more information
 '''

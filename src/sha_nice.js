@@ -2,7 +2,7 @@
  * PUB 180-2 as well as the corresponding HMAC implementation as defined in
  * FIPS PUB 198a
  *
- * Version 1.3 Copyright Brian Turek 2008-2012
+ * Version 1.31 Copyright Brian Turek 2008-2012
  * Distributed under the BSD License
  * See http://caligatio.github.com/jsSHA/ for more information
  *
@@ -14,11 +14,11 @@
 	 * Configurable variables. Defaults typically work
 	 */
 	/* Number of Bits Per character (8 for ASCII, 16 for Unicode) */
-	var charSize = 8, 
+	var charSize = 8,
 	/* base-64 pad character. "=" for strict RFC compliance */
-	b64pad = "", 
+	b64pad = "",
 	/* hex output format. 0 - lowercase; 1 - uppercase */
-	hexCase = 0, 
+	hexCase = 0,
 
 	/*
 	 * Int_64 is a object for 2 32-bit numbers emulating a 64-bit number
@@ -690,7 +690,7 @@
 			gamma0, gamma1, sigma0, sigma1, ch, maj, Int, K, W = [],
 			appendedMessageLength;
 
-		/* Set up the various function handles and variable for the specific 
+		/* Set up the various function handles and variable for the specific
 		 * variant */
 		if (variant === "SHA-224" || variant === "SHA-256")
 		{
@@ -912,7 +912,7 @@
 			];
 		default:
 			/* This should never be reached */
-			return []; 
+			return [];
 		}
 	},
 
@@ -1162,4 +1162,3 @@
 
 	window.jsSHA = jsSHA;
 }());
-

@@ -2,7 +2,7 @@
  * PUB 180-2 as well as the corresponding HMAC implementation as defined in
  * FIPS PUB 198a
  *
- * Version 1.3 Copyright Brian Turek 2008-2012
+ * Version 1.31 Copyright Brian Turek 2008-2012
  * Distributed under the BSD License
  * See http://caligatio.github.com/jsSHA/ for more information
  *
@@ -10,9 +10,9 @@
  */
 (function ()
 {
-	var charSize = 8, 
-	b64pad = "", 
-	hexCase = 0, 
+	var charSize = 8,
+	b64pad = "",
+	hexCase = 0,
 
 	Int_64 = function (msint_32, lsint_32)
 	{
@@ -394,7 +394,7 @@
 				H[7].highOrder, H[7].lowOrder
 			];
 		default:
-			return []; 
+			return [];
 		}
 	},
 
@@ -541,4 +541,3 @@
 
 	window.jsSHA = jsSHA;
 }());
-

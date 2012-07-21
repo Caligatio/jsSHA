@@ -2,6 +2,11 @@
     jsSHA - ChangeLog
 -------------------------
 
+1.31 (2012-07-21)
+=========================
+- Updated project URL to point to new GitHub repository
+- Added a compressed version of sha.js
+
 1.3 (2010-09-01)
 =========================
 - Changed method of declaring objects/classes
@@ -39,4 +44,3 @@
 0.1 (2008-02-21)
 =========================
 - Initial public release
-

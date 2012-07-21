@@ -21,17 +21,29 @@ on 25 February 2004 so it was also included in this package.
 
 Files
 -------------------------
+src/sha_nice.js
+A commented implementation of the entire SHA family of hashes
+
 src/sha.js
-The complete SHA implementation
+A compressed version of sha_nice.js
+
+src/sha1_nice.js
+An implementation of only SHA-1.
 
 src/sha1.js
-A smaller/web friendly implementation of only SHA-1.
+A compressed version of sha1_nice.js
+
+src/sha256_nice.js
+An implementation of only SHA-224 and SHA-256.
 
 src/sha256.js
-A smaller/web friendly implementation of only SHA-224 and SHA-256.
+A compressed version of sha256_nice.js
+
+src/sha512_nice.js
+An implementation of only SHA-384 and SHA-512.
 
 src/sha512.js
-A smaller/web friendly implementation of only SHA-384 and SHA-512.
+A compressed version of sha512_nice.js
 
 test/test.html
 A test page that calculates various hashes and has their correct values.
@@ -64,4 +76,3 @@ one option.
 Contact Info
 -------------------------
 The project's website is located at http://caligatio.github.com/jsSHA/
-
