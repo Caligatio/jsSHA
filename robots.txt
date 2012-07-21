@@ -1,0 +1,7 @@
+# robots.txt for http://caligatio.github.com/jsSHA/
+
+Sitemap: http://caligatio.github.com/jsSHA/sitemap.xml
+
+User-agent: *
+Allow: /
+

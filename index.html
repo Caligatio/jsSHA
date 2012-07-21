@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>jsSHA - SHA Hashes in JavaScript</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta name="keywords" content="SHA, SHA-1, SHA-2, SHA-224, SHA-256, SHA-384, SHA-512, HMAC, javascript, JS, Secure Hash Standard, hash, security, cryptography, FIPS 180-2" />
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<script type="text/javascript" src="sha.js"></script>
+	<script type="text/javascript">
+		var hashObj;
+		var hmacObj;
+		function newHash() {
+			var inputTypeSelectBox = document.getElementById("hashInputType");
+			hashObj = new jsSHA(document.getElementById("hashInputText").value, inputTypeSelectBox.options[inputTypeSelectBox.selectedIndex].text);
+			calcHash();
+		}
+		function calcHash() {
+			var hashVariantSelectBox = document.getElementById("hashVariant");
+			try {
+				document.getElementById("hashOutputText").value = hashObj.getHash(hashVariantSelectBox.options[hashVariantSelectBox.selectedIndex].text, "HEX");
+			} catch(e) {
+			}
+		}
+
+		function newHMAC() {
+			var inputTypeSelectBox = document.getElementById("hmacTextType");
+			hmacObj = new jsSHA(document.getElementById("hmacInputText").value, inputTypeSelectBox.options[inputTypeSelectBox.selectedIndex].text);
+			calcHMAC();
+		}
+		function calcHMAC() {
+			var keyTypeSelectBox = document.getElementById("hmacKeyType");
+			var hashVariantSelectBox = document.getElementById("hmacVariant");
+			var hmac = hmacObj.getHMAC(document.getElementById("hmacInputKey").value,
+				keyTypeSelectBox.options[keyTypeSelectBox.selectedIndex].text,
+				hashVariantSelectBox.options[hashVariantSelectBox.selectedIndex].text,
+				"HEX");
+			try {
+
+				document.getElementById("hmacOutputText").value = hmac
+			} catch(e){
+			}
+		}
+	</script>
+</head>
+<body onload="newHash();newHMAC()">
+	<div id="container">
+		<div>
+			<img src="logo.png" alt="jsSHA" style="margin: 0px auto" />
+			<h1>About</h1>
+			<p>
+				jsSHA is a JavaScript implementation of the entire family of SHA hashes as defined in FIPS 180-2 (SHA-1, SHA-224, SHA-256,
+				SHA-384, and SHA-512) as well as HMAC.  Despite JavaScript not natively supporting 64-bit operations, SHA-384 and SHA-512 are even implemented!
+				jsSHA is also 100% cross-browser compatible.
+			</p>
+		</div>
+		<div>
+			<h1>Newest Release / Download</h1>
+			<p>
+				As of 1 September 2010, the newest release is v1.3 and can be found at <a href="https://sourceforge.net/projects/jssha/files/">SourceForge</a>
+			</p>
+		</div>
+		<div>
+			<h1>Demo</h1>
+			<p>
+				Be aware that if JavaScript is disabled in your browser there is the possibility that information entered into the below fields may be transmitted to the GitHub web servers.  Ensure that JavaScript is enabled to prevent this possibility.
+			</p>
+			<form action="#" method="get">
+				<fieldset>
+					<legend>Hashing Demo</legend>
+					<p>
+						Simply insert your text to be hashed, input type, and the SHA variant you wish to use.<br />
+						<span style="font-size: 12px">Note: You may have to scroll the output text for longer length hashes</span>
+					</p>
+					<div>
+						<label for="hashInputText">Input Text:</label><input type="text" size="75" name="hashInputText" id="hashInputText" onkeyup="newHash()" />
+					</div>
+					<div>
+						<label for="hashInputType">Input Type:</label>
+						<select name="hashInputType" id="hashInputType" onchange="newHash()">
+							<option>ASCII</option>
+							<option>HEX</option>
+						</select>
+					</div>
+					<div>
+						<label for="hashVariant">SHA Variant:</label>
+						<select name="hashVariant" id="hashVariant" onchange="calcHash()">
+							<option>SHA-1</option>
+							<option>SHA-224</option>
+							<option>SHA-256</option>
+							<option>SHA-384</option>
+							<option>SHA-512</option>
+						</select>
+					</div>
+					<div>
+						<label for="hashOutputText">Output Hash:</label>
+						<input type="text" size="75" name="hashOutputText" id="hashOutputText" style="background-color: #b1ceed" />
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>HMAC Demo</legend>
+					<p>
+						Simply insert your text to be hashed, text type, key, key type, and the SHA variant you wish to use.<br />
+						<span style="font-size: 12px">Note: You may have to scroll the output text for longer length hashes</span>
+					</p>
+					<div>
+						<label for="hmacInputText">Input Text:</label><input type="text" size="75" name="hmacInputText" id="hmacInputText" onkeyup="newHMAC()" />
+					</div>
+					<div>
+						<label for="hmacTextType">Input Type:</label>
+						<select name="hmacTextType" id="hmacTextType" onchange="newHMAC()">
+							<option>ASCII</option>
+							<option>HEX</option>
+						</select>
+					</div>
+					<div>
+						<label for="hmacInputKey">Key:</label><input type="text" size="75" name="hmacInputKey" id="hmacInputKey" onkeyup="calcHMAC()" />
+					</div>
+					<div>
+						<label for="hmacKeyType">Key Type:</label>
+						<select name="hmacKeyType" id="hmacKeyType" onchange="calcHMAC()">
+							<option>ASCII</option>
+							<option>HEX</option>
+						</select>
+					</div>
+					<div>
+						<label for="hmacVariant">SHA Variant:</label>
+						<select name="hmacVariant" id="hmacVariant" onchange="calcHMAC()">
+							<option>SHA-1</option>
+							<option>SHA-224</option>
+							<option>SHA-256</option>
+							<option>SHA-384</option>
+							<option>SHA-512</option>
+						</select>
+					</div>
+					<div>
+						<label for="hmacOutputText">Output Hash:</label>
+						<input type="text" size="75" name="hmacOutputText" id="hmacOutputText" style="background-color: #b1ceed" />
+					</div>
+				</fieldset>
+			</form>
+		</div>
+				<div id="copyright">
+			Copyright &copy; 2008-2012 <a href="https://github.com/Caligatio/">Brian Turek</a>
+		</div>
+	</div>
+	<script type="text/javascript">
+		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	<script type="text/javascript">
+		var pageTracker = _gat._getTracker("UA-2442290-5");
+		pageTracker._initData();
+		pageTracker._trackPageview();
+	</script>
+</body>
+</html>

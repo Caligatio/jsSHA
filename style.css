@@ -1,0 +1,39 @@
+body {
+	background-color: #f1f0ec;
+	margin: 0px;
+}
+#container {
+	background-color: #FFFFFF;
+	color: #000000;
+	width: 1004px;
+	margin: 5px auto;
+	padding: 10px;
+	border: 1px solid #000000;
+}
+h1 {
+	font-size: 24px;
+	color: #a00101;
+    background-color: #FFFFFF;
+}
+p {
+	margin: 5px;
+}
+label {
+	width: 150px;
+	display: block;
+	float: left;
+	text-align: right;
+	padding-right: 10px;
+}
+fieldset {
+	margin: 3px 0px;
+}
+#copyright {
+	font-size: 10px;
+	text-align: center;
+}
+img {
+	display: block;
+	margin: 0px auto;
+	border: 0px;
+}
