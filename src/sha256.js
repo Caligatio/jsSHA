@@ -2,9 +2,9 @@
  * PUB 180-2 as well as the corresponding HMAC implementation as defined in
  * FIPS PUB 198a
  *
- * Version 1.3 Copyright Brian Turek 2008-2010
+ * Version 1.3 Copyright Brian Turek 2008-2012
  * Distributed under the BSD License
- * See http://jssha.sourceforge.net/ for more information
+ * See http://caligatio.github.com/jsSHA/ for more information
  *
  * Several functions taken from Paul Johnson
  */

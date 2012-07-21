@@ -3,7 +3,7 @@
 	jsSHA HMAC Test Result Generator
 	Version 1.0 Copyright Brian Turek 2009
 	Distributed under the BSD License
-	See http://jssha.sourceforge.net/ for more information
+	See http://caligatio.github.com/jsSHA/ for more information
 '''
 import hashlib
 import hmac
