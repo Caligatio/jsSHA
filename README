@@ -7,8 +7,8 @@ About
 jsSHA is a javaScript implementation of the complete Secure Hash Algorithm
 family as defined by FIPS PUB 180-2
 (http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf).
-It also includes the HMAC algorithm with SHA support as defined by FIPS PUB 198a
-(http://csrc.nist.gov/publications/fips/fips198/fips-198a.pdf)
+It also includes the HMAC algorithm with SHA support as defined by FIPS PUB 198-1
+(http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf)
 
 With the slow phasing out of MD5 as the standard hash to use in web
 applications, a client-side implementation of the complete Secure Hash Standard
@@ -65,6 +65,14 @@ algorithm SHA-512 was calculated.
 var shaObj = new jsSHA("This is a Test", "ASCII");
 var hash = shaObj.getHash("SHA-512", "HEX");
 var hmac = shaObj.getHMAC("SecretKey", "ASCII", "SHA-512", "HEX");
+
+The constructor takes an optional parameter, charSize, that specifies the
+bit width of a character of text. By default, charSize = 8.
+
+Both getHash and getHMAC also take an optional associative array parameter,
+outputFormatOpts, that dictates some formatting options for the output.  By
+default, outputFormatOpts = {"outputUpper" : false, "b64Pad" : "="}.  These
+options are intelligently interpreted based upon the chosen output format.
 
 Contact Info
 -------------------------
