@@ -21,8 +21,9 @@ on 25 February 2004 so it was also included in this package.
 
 Files
 -------------------------
-src/sha_nice.js
-A commented implementation of the entire SHA family of hashes
+src/sha_dev.js
+A commented implementation of the entire SHA family of hashes. Not to be used
+in production.
 
 src/sha.js
 A compressed version of sha_nice.js
@@ -48,11 +49,6 @@ A compressed version of sha512_nice.js
 test/test.html
 A test page that calculates various hashes and has their correct values.
 
-test/HMACGen.py
-A Python 3.X script that generates the correct HMAC hashes as the specification
-did not provide hashes for algorithms other than SHA-1
-
-
 Usage
 -------------------------
 Include the desired JavaScript file (sha.js, sha1.js, sha256.js, or sha512.js)
@@ -69,9 +65,6 @@ algorithm SHA-512 was calculated.
 var shaObj = new jsSHA("This is a Test", "ASCII");
 var hash = shaObj.getHash("SHA-512", "HEX");
 var hmac = shaObj.getHMAC("SecretKey", "ASCII", "SHA-512", "HEX");
-
-NOTE: If you are using sha1.js, omit the SHA variant parameter as there is only
-one option.
 
 Contact Info
 -------------------------
