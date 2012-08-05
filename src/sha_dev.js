@@ -20,11 +20,11 @@
 	 * @param {number} msint_32 The most significant 32-bits of a 64-bit number
 	 * @param {number} lsint_32 The least significant 32-bits of a 64-bit number
 	 */
-	function Int_64(msint_32, lsint_32)
+	var Int_64 = function (msint_32, lsint_32)
 	{
 		this.highOrder = msint_32;
 		this.lowOrder = lsint_32;
-	}
+	},
 
 	/**
 	 * Convert a string to an array of big-endian words
@@ -37,7 +37,7 @@
 	 *   8 or 16)
 	 * @return {Array.<number>} Number array representation of the parameter
 	 */
-	function str2binb(str, charSize)
+	str2binb = function (str, charSize)
 	{
 		var bin = [], mask = (1 << charSize) - 1,
 			length = str.length * charSize, i;
@@ -49,7 +49,7 @@
 		}
 
 		return bin;
-	}
+	},
 
 	/**
 	 * Convert a hex string to an array of big-endian words
@@ -58,7 +58,7 @@
 	 * @param {string} str String to be converted to binary representation
 	 * @return {Array.<number>} Number array representation of the parameter
 	 */
-	function hex2binb(str)
+	hex2binb = function (str)
 	{
 		var bin = [], length = str.length, i, num;
 
@@ -76,7 +76,7 @@
 		}
 
 		return bin;
-	}
+	},
 
 	/**
 	 * Convert an array of big-endian words to a hex string.
@@ -89,7 +89,7 @@
 	 * @return {string} Hexidecimal representation of the parameter in String
 	 *   form
 	 */
-	function binb2hex(binarray, formatOpts)
+	binb2hex = function (binarray, formatOpts)
 	{
 		var hex_tab = "0123456789abcdef", str = "",
 			length = binarray.length * 4, i, srcByte;
@@ -102,7 +102,7 @@
 		}
 
 		return (formatOpts["outputUpper"]) ? str.toUpperCase() : str;
-	}
+	},
 
 	/**
 	 * Convert an array of big-endian words to a base-64 string
@@ -115,7 +115,7 @@
 	 * @return {string} Base-64 encoded representation of the parameter in
 	 *   String form
 	 */
-	function binb2b64(binarray, formatOpts)
+	binb2b64 = function (binarray, formatOpts)
 	{
 		var tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
 			str = "", length = binarray.length * 4, i, j, triplet;
@@ -138,7 +138,7 @@
 			}
 		}
 		return str;
-	}
+	},
 
 	/**
 	 * Validate dictionary containing output formatting options, ensuring
@@ -150,7 +150,7 @@
 	 * @return {Object.<string, {string|boolean}> Validated dictionary
 	 *    containing put formatting options
 	 */
-	function getOutputOpts(outputOpts)
+	getOutputOpts = function (outputOpts)
 	{
 		var retVal = {"outputUpper" : false, "b64Pad" : "="};
 
@@ -180,7 +180,7 @@
 		}
 
 		return retVal;
-	}
+	},
 
 	/**
 	 * The 32-bit implementation of circular rotate left
@@ -190,10 +190,10 @@
 	 * @param {number} n The number of bits to shift
 	 * @return {number} The x shifted circularly by n bits
 	 */
-	function rotl_32(x, n)
+	rotl_32 = function (x, n)
 	{
 		return (x << n) | (x >>> (32 - n));
-	}
+	},
 
 	/**
 	 * The 32-bit implementation of circular rotate right
@@ -203,10 +203,10 @@
 	 * @param {number} n The number of bits to shift
 	 * @return {number} The x shifted circularly by n bits
 	 */
-	function rotr_32(x, n)
+	rotr_32 = function (x, n)
 	{
 		return (x >>> n) | (x << (32 - n));
-	}
+	},
 
 	/**
 	 * The 64-bit implementation of circular rotate right
@@ -216,7 +216,7 @@
 	 * @param {number} n The number of bits to shift
 	 * @return {Int_64} The x shifted circularly by n bits
 	 */
-	function rotr_64(x, n)
+	rotr_64 = function (x, n)
 	{
 		var retVal = null;
 	
@@ -236,7 +236,7 @@
 		}
 		
 		return retVal;
-	}
+	},
 
 	/**
 	 * The 32-bit implementation of shift right
@@ -246,10 +246,10 @@
 	 * @param {number} n The number of bits to shift
 	 * @return {Int_64} The x shifted by n bits
 	 */
-	function shr_32(x, n)
+	shr_32 = function (x, n)
 	{
 		return x >>> n;
-	}
+	},
 
 	/**
 	 * The 64-bit implementation of shift right
@@ -259,7 +259,7 @@
 	 * @param {number} n The number of bits to shift
 	 * @return {Int_64} The x shifted by n bits
 	 */
-	function shr_64(x, n)
+	shr_64 = function (x, n)
 	{
 		var retVal = null;
 		
@@ -279,7 +279,7 @@
 		}
 		
 		return retVal;
-	}
+	},
 
 	/**
 	 * The 32-bit implementation of the NIST specified Parity function
@@ -290,10 +290,10 @@
 	 * @param {number} z The third 32-bit integer argument
 	 * @return {number} The NIST specified output of the function
 	 */
-	function parity_32(x, y, z)
+	parity_32 = function (x, y, z)
 	{
 		return x ^ y ^ z;
-	}
+	},
 
 	/**
 	 * The 32-bit implementation of the NIST specified Ch function
@@ -304,10 +304,10 @@
 	 * @param {number} z The third 32-bit integer argument
 	 * @return {number} The NIST specified output of the function
 	 */
-	function ch_32(x, y, z)
+	ch_32 = function (x, y, z)
 	{
 		return (x & y) ^ (~x & z);
-	}
+	},
 
 	/**
 	 * The 64-bit implementation of the NIST specified Ch function
@@ -318,13 +318,13 @@
 	 * @param {Int_64} z The third 64-bit integer argument
 	 * @return {Int_64} The NIST specified output of the function
 	 */
-	function ch_64(x, y, z)
+	ch_64 = function (x, y, z)
 	{
 		return new Int_64(
 				(x.highOrder & y.highOrder) ^ (~x.highOrder & z.highOrder),
 				(x.lowOrder & y.lowOrder) ^ (~x.lowOrder & z.lowOrder)
 			);
-	}
+	},
 
 	/**
 	 * The 32-bit implementation of the NIST specified Maj function
@@ -335,10 +335,10 @@
 	 * @param {number} z The third 32-bit integer argument
 	 * @return {number} The NIST specified output of the function
 	 */
-	function maj_32(x, y, z)
+	maj_32 = function (x, y, z)
 	{
 		return (x & y) ^ (x & z) ^ (y & z);
-	}
+	},
 
 	/**
 	 * The 64-bit implementation of the NIST specified Maj function
@@ -349,7 +349,7 @@
 	 * @param {Int_64} z The third 64-bit integer argument
 	 * @return {Int_64} The NIST specified output of the function
 	 */
-	function maj_64(x, y, z)
+	maj_64 = function (x, y, z)
 	{
 		return new Int_64(
 				(x.highOrder & y.highOrder) ^
@@ -359,7 +359,7 @@
 				(x.lowOrder & z.lowOrder) ^
 				(y.lowOrder & z.lowOrder)
 			);
-	}
+	},
 
 	/**
 	 * The 32-bit implementation of the NIST specified Sigma0 function
@@ -368,10 +368,10 @@
 	 * @param {number} x The 32-bit integer argument
 	 * @return {number} The NIST specified output of the function
 	 */
-	function sigma0_32(x)
+	sigma0_32 = function (x)
 	{
 		return rotr_32(x, 2) ^ rotr_32(x, 13) ^ rotr_32(x, 22);
-	}
+	},
 
 	/**
 	 * The 64-bit implementation of the NIST specified Sigma0 function
@@ -380,7 +380,7 @@
 	 * @param {Int_64} x The 64-bit integer argument
 	 * @return {Int_64} The NIST specified output of the function
 	 */
-	function sigma0_64(x)
+	sigma0_64 = function (x)
 	{
 		var rotr28 = rotr_64(x, 28), rotr34 = rotr_64(x, 34),
 			rotr39 = rotr_64(x, 39);
@@ -388,7 +388,7 @@
 		return new Int_64(
 				rotr28.highOrder ^ rotr34.highOrder ^ rotr39.highOrder,
 				rotr28.lowOrder ^ rotr34.lowOrder ^ rotr39.lowOrder);
-	}
+	},
 
 	/**
 	 * The 32-bit implementation of the NIST specified Sigma1 function
@@ -397,10 +397,10 @@
 	 * @param {number} x The 32-bit integer argument
 	 * @return {number} The NIST specified output of the function
 	 */
-	function sigma1_32(x)
+	sigma1_32 = function (x)
 	{
 		return rotr_32(x, 6) ^ rotr_32(x, 11) ^ rotr_32(x, 25);
-	}
+	},
 
 	/**
 	 * The 64-bit implementation of the NIST specified Sigma1 function
@@ -409,7 +409,7 @@
 	 * @param {Int_64} x The 64-bit integer argument
 	 * @return {Int_64} The NIST specified output of the function
 	 */
-	function sigma1_64(x)
+	sigma1_64 = function (x)
 	{
 		var rotr14 = rotr_64(x, 14), rotr18 = rotr_64(x, 18),
 			rotr41 = rotr_64(x, 41);
@@ -417,7 +417,7 @@
 		return new Int_64(
 				rotr14.highOrder ^ rotr18.highOrder ^ rotr41.highOrder,
 				rotr14.lowOrder ^ rotr18.lowOrder ^ rotr41.lowOrder);
-	}
+	},
 
 	/**
 	 * The 32-bit implementation of the NIST specified Gamma0 function
@@ -426,10 +426,10 @@
 	 * @param {number} x The 32-bit integer argument
 	 * @return {number} The NIST specified output of the function
 	 */
-	function gamma0_32(x)
+	gamma0_32 = function (x)
 	{
 		return rotr_32(x, 7) ^ rotr_32(x, 18) ^ shr_32(x, 3);
-	}
+	},
 
 	/**
 	 * The 64-bit implementation of the NIST specified Gamma0 function
@@ -438,7 +438,7 @@
 	 * @param {Int_64} x The 64-bit integer argument
 	 * @return {Int_64} The NIST specified output of the function
 	 */
-	function gamma0_64(x)
+	gamma0_64 = function (x)
 	{
 		var rotr1 = rotr_64(x, 1), rotr8 = rotr_64(x, 8), shr7 = shr_64(x, 7);
 
@@ -446,7 +446,7 @@
 				rotr1.highOrder ^ rotr8.highOrder ^ shr7.highOrder,
 				rotr1.lowOrder ^ rotr8.lowOrder ^ shr7.lowOrder
 			);
-	}
+	},
 
 	/**
 	 * The 32-bit implementation of the NIST specified Gamma1 function
@@ -455,10 +455,10 @@
 	 * @param {number} x The 32-bit integer argument
 	 * @return {number} The NIST specified output of the function
 	 */
-	function gamma1_32(x)
+	gamma1_32 = function (x)
 	{
 		return rotr_32(x, 17) ^ rotr_32(x, 19) ^ shr_32(x, 10);
-	}
+	},
 
 	/**
 	 * The 64-bit implementation of the NIST specified Gamma1 function
@@ -467,7 +467,7 @@
 	 * @param {Int_64} x The 64-bit integer argument
 	 * @return {Int_64} The NIST specified output of the function
 	 */
-	function gamma1_64(x)
+	gamma1_64 = function (x)
 	{
 		var rotr19 = rotr_64(x, 19), rotr61 = rotr_64(x, 61),
 			shr6 = shr_64(x, 6);
@@ -476,7 +476,7 @@
 				rotr19.highOrder ^ rotr61.highOrder ^ shr6.highOrder,
 				rotr19.lowOrder ^ rotr61.lowOrder ^ shr6.lowOrder
 			);
-	}
+	},
 
 	/**
 	 * Add two 32-bit integers, wrapping at 2^32. This uses 16-bit operations
@@ -487,13 +487,13 @@
 	 * @param {number} y The second 32-bit integer argument to be added
 	 * @return {number} The sum of x + y
 	 */
-	function safeAdd_32_2(x, y)
+	safeAdd_32_2 = function (x, y)
 	{
 		var lsw = (x & 0xFFFF) + (y & 0xFFFF),
 			msw = (x >>> 16) + (y >>> 16) + (lsw >>> 16);
 
 		return ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
-	}
+	},
 
 	/**
 	 * Add four 32-bit integers, wrapping at 2^32. This uses 16-bit operations
@@ -506,14 +506,14 @@
 	 * @param {number} d The fourth 32-bit integer argument to be added
 	 * @return {number} The sum of a + b + c + d
 	 */
-	function safeAdd_32_4(a, b, c, d)
+	safeAdd_32_4 = function (a, b, c, d)
 	{
 		var lsw = (a & 0xFFFF) + (b & 0xFFFF) + (c & 0xFFFF) + (d & 0xFFFF),
 			msw = (a >>> 16) + (b >>> 16) + (c >>> 16) + (d >>> 16) +
 				(lsw >>> 16);
 
 		return ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
-	}
+	},
 
 	/**
 	 * Add five 32-bit integers, wrapping at 2^32. This uses 16-bit operations
@@ -527,7 +527,7 @@
 	 * @param {number} e The fifth 32-bit integer argument to be added
 	 * @return {number} The sum of a + b + c + d + e
 	 */
-	function safeAdd_32_5(a, b, c, d, e)
+	safeAdd_32_5 = function (a, b, c, d, e)
 	{
 		var lsw = (a & 0xFFFF) + (b & 0xFFFF) + (c & 0xFFFF) + (d & 0xFFFF) +
 				(e & 0xFFFF),
@@ -535,7 +535,7 @@
 				(e >>> 16) + (lsw >>> 16);
 
 		return ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
-	}
+	},
 
 	/**
 	 * Add two 64-bit integers, wrapping at 2^64. This uses 16-bit operations
@@ -546,7 +546,7 @@
 	 * @param {Int_64} y The second 64-bit integer argument to be added
 	 * @return {Int_64} The sum of x + y
 	 */
-	function safeAdd_64_2(x, y)
+	safeAdd_64_2 = function (x, y)
 	{
 		var lsw, msw, lowOrder, highOrder;
 
@@ -559,7 +559,7 @@
 		highOrder = ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
 
 		return new Int_64(highOrder, lowOrder);
-	}
+	},
 
 	/**
 	 * Add four 64-bit integers, wrapping at 2^64. This uses 16-bit operations
@@ -572,7 +572,7 @@
 	 * @param {Int_64} d The fouth 64-bit integer argument to be added
 	 * @return {Int_64} The sum of a + b + c + d
 	 */
-	function safeAdd_64_4(a, b, c, d)
+	safeAdd_64_4 = function (a, b, c, d)
 	{
 		var lsw, msw, lowOrder, highOrder;
 
@@ -589,7 +589,7 @@
 		highOrder = ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
 
 		return new Int_64(highOrder, lowOrder);
-	}
+	},
 
 	/**
 	 * Add five 64-bit integers, wrapping at 2^64. This uses 16-bit operations
@@ -603,7 +603,7 @@
 	 * @param {Int_64} e The fouth 64-bit integer argument to be added
 	 * @return {Int_64} The sum of a + b + c + d + e
 	 */
-	function safeAdd_64_5(a, b, c, d, e)
+	safeAdd_64_5 = function (a, b, c, d, e)
 	{
 		var lsw, msw, lowOrder, highOrder;
 
@@ -624,7 +624,7 @@
 		highOrder = ((msw & 0xFFFF) << 16) | (lsw & 0xFFFF);
 
 		return new Int_64(highOrder, lowOrder);
-	}
+	},
 
 	/**
 	 * Calculates the SHA-1 hash of the string set at instantiation
@@ -636,7 +636,7 @@
 	 * @return {Array.<number>} The array of integers representing the SHA-1
 	 *    hash of message
 	 */
-	function coreSHA1(message, messageLen)
+	coreSHA1 = function (message, messageLen)
 	{
 		var W = [], a, b, c, d, e, T, ch = ch_32, parity = parity_32,
 			maj = maj_32, rotl = rotl_32, safeAdd_2 = safeAdd_32_2, i, t,
@@ -725,7 +725,7 @@
 		}
 
 		return H;
-	}
+	},
 
 	/**
 	 * Calculates the desired SHA-2 hash of the string set at instantiation
@@ -738,7 +738,7 @@
 	 * @return {Array.<number>} The array of integers representing the SHA-2
 	 *   hash of message
 	 */
-	function coreSHA2(message, messageLen, variant)
+	coreSHA2 = function (message, messageLen, variant)
 	{
 		var a, b, c, d, e, f, g, h, T1, T2, H, numRounds, lengthPosition, i, t,
 			binaryStringInc, binaryStringMult, safeAdd_2, safeAdd_4, safeAdd_5,
@@ -969,7 +969,7 @@
 			/* This should never be reached */
 			return [];
 		}
-	}
+	},
 
 	/**
 	 * jsSHA is the workhorse of the library.  Instantiate it with the string to
@@ -980,7 +980,7 @@
 	 * @param {string} inputFormat The format of srcString, ASCII or HEX
 	 * @param {number=} charSize The size, in bits, of each text character
 	 */
-	var jsSHA = function(srcString, inputFormat, charSize)
+	jsSHA = function(srcString, inputFormat, charSize)
 	{
 		var sha1 = null, sha224 = null, sha256 = null, sha384 = null,
 			sha512 = null, strBinLen = null, strToHash = null, charWidth = null;
