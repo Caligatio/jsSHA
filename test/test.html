@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 	<head>
 		<title>jsSHA (http://caligatio.github.com/jsSHA/) - Test</title>
-		<script type="text/javascript" src="../src/sha.js"></script>
+		<script type="text/javascript" src="../src/sha_dev.js"></script>
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 		<style type="text/css">
 			table
@@ -48,7 +48,7 @@
 			function supportedAlgs()
 			{
 				var supportedAlgs = [];
-				var hashObj = new jsSHA("abc", "ASCII");
+				var hashObj = new jsSHA("abc", "TEXT");
 
 				try
 				{
@@ -56,7 +56,12 @@
 					supportedAlgs.push("SHA-1");
 				}
 				catch(e)
-				{}
+				{
+					if (e != "Chosen SHA variant is not supported")
+					{
+						throw "Testing presence of SHA-1 failed";
+					}
+				}
 
 				try
 				{
@@ -65,7 +70,12 @@
 					supportedAlgs.push("SHA-256");
 				}
 				catch(e)
-				{}
+				{
+					if (e != "Chosen SHA variant is not supported")
+					{
+						throw "Testing presence of SHA-256 failed";
+					}
+				}
 
 				try
 				{
@@ -74,7 +84,12 @@
 					supportedAlgs.push("SHA-512");
 				}
 				catch(e)
-				{}
+								{
+					if (e != "Chosen SHA variant is not supported")
+					{
+						throw "Testing presence of SHA-512 failed";
+					}
+				}
 
 				return supportedAlgs;
 			}
@@ -193,8 +208,8 @@
 
 					for (var i = 0; i < data[hashType].length; i++)
 					{
-						/* Grab the ASCII input for a given hash and test case */
-						var shaObj = new jsSHA(data[hashType][i]['textIn'], 'ASCII');
+						/* Grab the TEXT input for a given hash and test case */
+						var shaObj = new jsSHA(data[hashType][i]['textIn'], 'TEXT');
 
 						/* Test the Hex output */
 						if (data[hashType][i]['hexOut'] == shaObj.getHash(hashType, "HEX"))
@@ -256,21 +271,21 @@
 				var data = {
 					"SHA-1" : [
 						{
-							"textASCII" : "Sample message for keylen=blocklen",
+							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
 							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
 							"hexOut" : "5fd596ee78d5553c8ff4e72d266dfd192366da29",
 							"b64Out" : "X9WW7njVVTyP9OctJm39GSNm2ik="
 						},
 						{
-							"textASCII" : "Sample message for keylen<blocklen",
+							"text" : "Sample message for keylen<blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E",
 							"key" :  "000102030405060708090A0B0C0D0E0F10111213",
 							"hexOut" : "4c99ff0cb1b31bd33f8431dbaf4d17fcd356a807",
 							"b64Out" : "TJn/DLGzG9M/hDHbr00X/NNWqAc="
 						},
 						{
-							"textASCII" : "Sample message for keylen=blocklen",
+							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
 							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263",
 							"hexOut" : "2d51b2f7750e410584662e38f133435f4c4fd42a",
@@ -279,21 +294,21 @@
 					],
 					"SHA-224" : [
 						{
-							"textASCII" : "Sample message for keylen=blocklen",
+							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
 							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
 							"hexOut" : "c7405e3ae058e8cd30b08b4140248581ed174cb34e1224bcc1efc81b",
 							"b64Out" : "x0BeOuBY6M0wsItBQCSFge0XTLNOEiS8we/IGw=="
 						},
 						{
-							"textASCII" : "Sample message for keylen<blocklen",
+							"text" : "Sample message for keylen<blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E",
 							"key" :  "000102030405060708090A0B0C0D0E0F101112131415161718191A1B",
 							"hexOut" : "e3d249a8cfb67ef8b7a169e9a0a599714a2cecba65999a51beb8fbbe",
 							"b64Out" : "49JJqM+2fvi3oWnpoKWZcUos7LplmZpRvrj7vg=="
 						},
 						{
-							"textASCII" : "Sample message for keylen=blocklen",
+							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
 							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263",
 							"hexOut" : "91c52509e5af8531601ae6230099d90bef88aaefb961f4080abc014d",
@@ -302,21 +317,21 @@
 					],
 					"SHA-256" : [
 						{
-							"textASCII" : "Sample message for keylen=blocklen",
+							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
 							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
 							"hexOut" : "8bb9a1db9806f20df7f77b82138c7914d174d59e13dc4d0169c9057b133e1d62",
 							"b64Out" : "i7mh25gG8g3393uCE4x5FNF01Z4T3E0BackFexM+HWI="
 						},
 						{
-							"textASCII" : "Sample message for keylen<blocklen",
+							"text" : "Sample message for keylen<blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E",
 							"key" :  "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F",
 							"hexOut" : "a28cf43130ee696a98f14a37678b56bcfcbdd9e5cf69717fecf5480f0ebdf790",
 							"b64Out" : "ooz0MTDuaWqY8Uo3Z4tWvPy92eXPaXF/7PVIDw6995A="
 						},
 						{
-							"textASCII" : "Sample message for keylen=blocklen",
+							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
 							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263",
 							"hexOut" : "bdccb6c72ddeadb500ae768386cb38cc41c63dbb0878ddb9c7a38a431b78378d",
@@ -325,21 +340,21 @@
 					],
 					"SHA-384" : [
 						{
-							"textASCII" : "Sample message for keylen=blocklen",
+							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
 							"key":"000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F",
 							"hexOut" : "63c5daa5e651847ca897c95814ab830bededc7d25e83eef9195cd45857a37f448947858f5af50cc2b1b730ddf29671a9",
 							"b64Out" : "Y8XapeZRhHyol8lYFKuDC+3tx9Jeg+75GVzUWFejf0SJR4WPWvUMwrG3MN3ylnGp"
 						},
 						{
-							"textASCII" : "Sample message for keylen<blocklen",
+							"text" : "Sample message for keylen<blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E",
 							"key" :  "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F",
 							"hexOut" : "6eb242bdbb582ca17bebfa481b1e23211464d2b7f8c20b9ff2201637b93646af5ae9ac316e98db45d9cae773675eeed0",
 							"b64Out" : "brJCvbtYLKF76/pIGx4jIRRk0rf4wguf8iAWN7k2Rq9a6awxbpjbRdnK53NnXu7Q"
 						},
 						{
-							"textASCII" : "Sample message for keylen=blocklen",
+							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
 							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F808182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9FA0A1A2A3A4A5A6A7A8A9AAABACADAEAFB0B1B2B3B4B5B6B7B8B9BABBBCBDBEBFC0C1C2C3C4C5C6C7",
 							"hexOut" : "5b664436df69b0ca22551231a3f0a3d5b4f97991713cfa84bff4d0792eff96c27dccbbb6f79b65d548b40e8564cef594",
@@ -348,21 +363,21 @@
 					],
 					"SHA-512" : [
 						{
-							"textASCII" : "Sample message for keylen=blocklen",
+							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
 							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F",
 							"hexOut" : "fc25e240658ca785b7a811a8d3f7b4ca48cfa26a8a366bf2cd1f836b05fcb024bd36853081811d6cea4216ebad79da1cfcb95ea4586b8a0ce356596a55fb1347",
 							"b64Out" : "/CXiQGWMp4W3qBGo0/e0ykjPomqKNmvyzR+DawX8sCS9NoUwgYEdbOpCFuutedoc/LlepFhrigzjVllqVfsTRw=="
 						},
 						{
-							"textASCII" : "Sample message for keylen<blocklen",
+							"text" : "Sample message for keylen<blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E",
 							"key" :  "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
 							"hexOut" : "fd44c18bda0bb0a6ce0e82b031bf2818f6539bd56ec00bdc10a8a2d730b3634de2545d639b0f2cf710d0692c72a1896f1f211c2b922d1a96c392e07e7ea9fedc",
 							"b64Out" : "/UTBi9oLsKbODoKwMb8oGPZTm9VuwAvcEKii1zCzY03iVF1jmw8s9xDQaSxyoYlvHyEcK5ItGpbDkuB+fqn+3A=="
 						},
 						{
-							"textASCII" : "Sample message for keylen=blocklen",
+							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
 							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F808182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9FA0A1A2A3A4A5A6A7A8A9AAABACADAEAFB0B1B2B3B4B5B6B7B8B9BABBBCBDBEBFC0C1C2C3C4C5C6C7",
 							"hexOut" : "d93ec8d2de1ad2a9957cb9b83f14e76ad6b5e0cce285079a127d3b14bccb7aa7286d4ac0d4ce64215f2bc9e6870b33d97438be4aaa20cda5c5a912b48b8e27f3",
@@ -378,8 +393,8 @@
 
 					for (var i = 0; i < data[hashType].length; i++)
 					{
-						/* Grab the ASCII input for a given hash and test case */
-						var shaObj = new jsSHA(data[hashType][i]['textASCII'], 'ASCII');
+						/* Grab the TEXT input for a given hash and test case */
+						var shaObj = new jsSHA(data[hashType][i]['text'], 'TEXT');
 
 						/* Test the Hex output */
 						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['key'], "HEX", hashType, "HEX"))
@@ -459,11 +474,11 @@
 				</tr>
 				<tr>
 					<th></th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
 				</tr>
 			</thead>
@@ -500,11 +515,11 @@
 				</tr>
 				<tr>
 					<th></th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
 				</tr>
 			</thead>
@@ -541,11 +556,11 @@
 				</tr>
 				<tr>
 					<th></th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
 				</tr>
 			</thead>
@@ -582,11 +597,11 @@
 				</tr>
 				<tr>
 					<th></th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
 				</tr>
 			</thead>
@@ -623,11 +638,11 @@
 				</tr>
 				<tr>
 					<th></th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
-					<th>ASCII-In</th>
+					<th>Text-In</th>
 					<th>Hex-In</th>
 				</tr>
 			</thead>
@@ -669,11 +684,11 @@
 				</tr>
 				<tr>
 					<th></th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
 				</tr>
 			</thead>
@@ -710,11 +725,11 @@
 				</tr>
 				<tr>
 					<th></th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
 				</tr>
 			</thead>
@@ -751,11 +766,11 @@
 				</tr>
 				<tr>
 					<th></th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
 				</tr>
 			</thead>
@@ -792,11 +807,11 @@
 				</tr>
 				<tr>
 					<th></th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
 				</tr>
 			</thead>
@@ -823,7 +838,7 @@
 		</table>
 
 		<table id="SHA-512_hmac">
-			<caption>SHA-512 MAC Tests</caption>
+			<caption>SHA-512 HMAC Tests</caption>
 			<thead>
 				<tr>
 					<th></th>
@@ -833,11 +848,11 @@
 				</tr>
 				<tr>
 					<th></th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
-					<th>Text ASCII-In</th>
+					<th>Text Text-In</th>
 					<th>Text Hex-In</th>
 				</tr>
 			</thead>

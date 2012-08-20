@@ -2,6 +2,33 @@
     jsSHA - ChangeLog
 -------------------------
 
+1.4 (XXXX-XX-XX)
+=========================
+- Added new input type, TEXT, that is functionally identical to ASCII*
+- Added new input and output formatting parameters
+  - getHash and getHMAC take an optional parameter, outputFormatOpts,
+    that is a hash list containing the keys "outputUpper" (boolean, only
+	applicable to HEX output) and "b64Pad" (string, only applicable to Base-64
+	output) that have default values of false and "=", respectively
+  - jsSHA constructor takes an optional parameter, charSize (8 or 16) that
+    specifies the character width of the input (TEXT and ASCII input only)
+- Modified comments to be Google Closure Compiler compliant
+- Added a SUPPORTED_ALGS flag that, when used with the Google Closure Compiler,
+  will remove unused functions/function portions
+  - Removed all src/*_nice.js files as the SUPPORTED_ALGS flag renders them
+    obsolete
+- All production-ready files are now produced using the Google Closure Compiler
+  with ADVANCED_OPTIMIZATIONS resulting in further reduced filesizes
+- The SHA-1 only implementation now requires that that "SHA-1" be specified as
+  the variant when using getHash and getHMAC
+- Removed test/HMAC.py as new NIST tests made the need for it obsolete
+- Significantly changed the test/test.html to make it easier to understand and
+  to allow for easier adding of test cases
+- Replaced previous error returning code with thrown exceptions
+
+* This library misused the term ASCII so input type of TEXT was added with the
+  intention of deprecating ASCII
+
 1.31 (2012-07-21)
 =========================
 - Updated project URL to point to new GitHub repository
