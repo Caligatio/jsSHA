@@ -40,7 +40,11 @@ A Google Closure Compiler optimized version the library with non SHA-384/SHA-512
 functionality removed
 
 test/test.html
-A test page that calculates various hashes and has their correct values.
+A test page that calculates various hashes and has their correct values
+
+build/make-release
+A Bash script that runs the various Google Closure Compiler commands to build
+a release
 
 Usage
 -------------------------

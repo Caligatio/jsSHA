@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 	<head>
 		<title>jsSHA (http://caligatio.github.com/jsSHA/) - Test</title>
-		<script type="text/javascript" src="../src/sha_dev.js"></script>
+		<script type="text/javascript" src="../src/sha.js"></script>
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 		<style type="text/css">
 			table
@@ -97,23 +97,27 @@
 			function calcHashes(algs)
 			{
 				/* Object that contains the small/medium/large test case inputs and outputs for all the hashes */
-				var data = {
+				var millionaAscii = "a".repeat(1000000), millionaHex = "61".repeat(1000000),
+					millionaB64 = "YWFh".repeat(333333) + 'YQ==', data = {
 					"SHA-1" : [
 						{
 							"textIn" : "abc",
 							"hexIn" : "616263",
+							"b64In" : "YWJj",
 							"hexOut" : "a9993e364706816aba3e25717850c26c9cd0d89d",
 							"b64Out" : "qZk+NkcGgWq6PiVxeFDCbJzQ2J0="
 						},
 						{
 							"textIn" : "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
 							"hexIn" : "6162636462636465636465666465666765666768666768696768696A68696A6B696A6B6C6A6B6C6D6B6C6D6E6C6D6E6F6D6E6F706E6F7071",
+							"b64In" : "YWJjZGJjZGVjZGVmZGVmZ2VmZ2hmZ2hpZ2hpamhpamtpamtsamtsbWtsbW5sbW5vbW5vcG5vcHE=",
 							"hexOut" : "84983e441c3bd26ebaae4aa1f95129e5e54670f1",
 							"b64Out" : "hJg+RBw70m66rkqh+VEp5eVGcPE="
 						},
 						{
-							"textIn" : "a".repeat(1000000),
-							"hexIn" : "61".repeat(1000000),
+							"textIn" : millionaAscii,
+							"hexIn" : millionaHex,
+							"b64In" : millionaB64,
 							"hexOut" : "34aa973cd4c4daa4f61eeb2bdbad27316534016f",
 							"b64Out" : "NKqXPNTE2qT2Husr260nMWU0AW8="
 						}
@@ -123,18 +127,21 @@
 						{
 							"textIn" : "abc",
 							"hexIn" : "616263",
+							"b64In" : "YWJj",
 							"hexOut" : "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7",
 							"b64Out" : "Iwl9IjQF2CKGQqR3vaJVsyqtvOS9oLP342ydpw=="
 						},
 						{
 							"textIn" : "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
 							"hexIn" : "6162636462636465636465666465666765666768666768696768696A68696A6B696A6B6C6A6B6C6D6B6C6D6E6C6D6E6F6D6E6F706E6F7071",
+							"b64In" : "YWJjZGJjZGVjZGVmZGVmZ2VmZ2hmZ2hpZ2hpamhpamtpamtsamtsbWtsbW5sbW5vbW5vcG5vcHE=",
 							"hexOut" : "75388b16512776cc5dba5da1fd890150b0c6455cb4f58b1952522525",
 							"b64Out" : "dTiLFlEndsxdul2h/YkBULDGRVy09YsZUlIlJQ=="
 						},
 						{
-							"textIn" : "a".repeat(1000000),
-							"hexIn" : "61".repeat(1000000),
+							"textIn" : millionaAscii,
+							"hexIn" : millionaHex,
+							"b64In" : millionaB64,
 							"hexOut" : "20794655980c91d8bbb4c1ea97618a4bf03f42581948b2ee4ee7ad67",
 							"b64Out" : "IHlGVZgMkdi7tMHql2GKS/A/QlgZSLLuTuetZw=="
 						}
@@ -143,18 +150,21 @@
 						{
 							"textIn" : "abc",
 							"hexIn" : "616263",
+							"b64In" : "YWJj",
 							"hexOut" : "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
 							"b64Out" : "ungWv48Bz+pBQUDeXa4iI7ADYaOWF3qctBD/YfIAFa0="
 						},
 						{
 							"textIn" : "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
 							"hexIn" : "6162636462636465636465666465666765666768666768696768696A68696A6B696A6B6C6A6B6C6D6B6C6D6E6C6D6E6F6D6E6F706E6F7071",
+							"b64In" : "YWJjZGJjZGVjZGVmZGVmZ2VmZ2hmZ2hpZ2hpamhpamtpamtsamtsbWtsbW5sbW5vbW5vcG5vcHE=",
 							"hexOut" : "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1",
 							"b64Out" : "JI1qYdIGOLjlwCaTDD5gOaM85Flk/yFn9uzt1BnbBsE="
 						},
 						{
-							"textIn" : "a".repeat(1000000),
-							"hexIn" : "61".repeat(1000000),
+							"textIn" : millionaAscii,
+							"hexIn" : millionaHex,
+							"b64In" : millionaB64,
 							"hexOut" : "cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0",
 							"b64Out" : "zcduXJkU+5KBocfihNc+Z/GAmkiklyAOBG05zMcRLNA="
 						}
@@ -163,18 +173,21 @@
 						{
 							"textIn" : "abc",
 							"hexIn" : "616263",
+							"b64In" : "YWJj",
 							"hexOut" : "cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7",
 							"b64Out" : "ywB1P0WjXou1oD1pmsZQBycsMqsO3tFjGotgWkP/W+2AhgcroefMI1i67KE0yCWn"
 						},
 						{
 							"textIn" : "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
 							"hexIn" : "61626364656667686263646566676869636465666768696A6465666768696A6B65666768696A6B6C666768696A6B6C6D6768696A6B6C6D6E68696A6B6C6D6E6F696A6B6C6D6E6F706A6B6C6D6E6F70716B6C6D6E6F7071726C6D6E6F707172736D6E6F70717273746E6F707172737475",
+							"b64In" : "YWJjZGVmZ2hiY2RlZmdoaWNkZWZnaGlqZGVmZ2hpamtlZmdoaWprbGZnaGlqa2xtZ2hpamtsbW5oaWprbG1ub2lqa2xtbm9wamtsbW5vcHFrbG1ub3Bxcmxtbm9wcXJzbW5vcHFyc3Rub3BxcnN0dQ==",
 							"hexOut" : "09330c33f71147e83d192fc782cd1b4753111b173b3b05d22fa08086e3b0f712fcc7c71a557e2db966c3e9fa91746039",
 							"b64Out" : "CTMMM/cRR+g9GS/Hgs0bR1MRGxc7OwXSL6CAhuOw9xL8x8caVX4tuWbD6fqRdGA5"
 						},
 						{
-							"textIn" : "a".repeat(1000000),
-							"hexIn" : "61".repeat(1000000),
+							"textIn" : millionaAscii,
+							"hexIn" : millionaHex,
+							"b64In" : millionaB64,
 							"hexOut" : "9d0e1809716474cb086e834e310a4a1ced149e9c00f248527972cec5704c2a5b07b8b3dc38ecc4ebae97ddd87f3d8985",
 							"b64Out" : "nQ4YCXFkdMsIboNOMQpKHO0UnpwA8khSeXLOxXBMKlsHuLPcOOzE666X3dh/PYmF"
 						}
@@ -183,18 +196,21 @@
 						{
 							"textIn" : "abc",
 							"hexIn" : "616263",
+							"b64In" : "YWJj",
 							"hexOut" : "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f",
 							"b64Out" : "3a81oZNherrMQXNJriBBMRLm+k6JqX6iCp7u5ktV05ohkpkqJ0/BqDa6PCOj/uu9RU1EI2Q86A4qmslPpUyknw=="
 						},
 						{
 							"textIn" : "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
 							"hexIn" : "61626364656667686263646566676869636465666768696A6465666768696A6B65666768696A6B6C666768696A6B6C6D6768696A6B6C6D6E68696A6B6C6D6E6F696A6B6C6D6E6F706A6B6C6D6E6F70716B6C6D6E6F7071726C6D6E6F707172736D6E6F70717273746E6F707172737475",
+							"b64In" : "YWJjZGVmZ2hiY2RlZmdoaWNkZWZnaGlqZGVmZ2hpamtlZmdoaWprbGZnaGlqa2xtZ2hpamtsbW5oaWprbG1ub2lqa2xtbm9wamtsbW5vcHFrbG1ub3Bxcmxtbm9wcXJzbW5vcHFyc3Rub3BxcnN0dQ==",
 							"hexOut" : "8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909",
 							"b64Out" : "jpWbddrjE9qM9PcoFPwUP493ecbrn3+hcpmurbaIkBhQHSieSQD35DMbmd7EtUM6x9Mp7rbdJlReluVbh0vpCQ=="
 						},
 						{
-							"textIn" : "a".repeat(1000000),
-							"hexIn" : "61".repeat(1000000),
+							"textIn" : millionaAscii,
+							"hexIn" : millionaHex,
+							"b64In" : millionaB64,
 							"hexOut" : "e718483d0ce769644e2e42c7bc15b4638e1f98b13b2044285632a803afa973ebde0ff244877ea60a4cb0432ce577c31beb009c5c2c49aa2e4eadb217ad8cc09b",
 							"b64Out" : "5xhIPQznaWROLkLHvBW0Y44fmLE7IEQoVjKoA6+pc+veD/JEh36mCkywQyzld8Mb6wCcXCxJqi5OrbIXrYzAmw=="
 						}
@@ -214,25 +230,25 @@
 						/* Test the Hex output */
 						if (data[hashType][i]['hexOut'] == shaObj.getHash(hashType, "HEX"))
 						{
-							table.rows[2].cells[2*i+1].innerHTML = "PASS";
-							table.rows[2].cells[2*i+1].className= "correct";
+							table.rows[2].cells[3*i+1].innerHTML = "PASS";
+							table.rows[2].cells[3*i+1].className= "correct";
 						}
 						else
 						{
-							table.rows[2].cells[2*i+1].innerHTML = "FAIL";
-							table.rows[2].cells[2*i+1].className= "incorrect";
+							table.rows[2].cells[3*i+1].innerHTML = "FAIL";
+							table.rows[2].cells[3*i+1].className= "incorrect";
 						}
 
 						/* Test the Base-64 output */
 						if (data[hashType][i]['b64Out'] == shaObj.getHash(hashType, "B64"))
 						{
-							table.rows[3].cells[2*i+1].innerHTML = "PASS";
-							table.rows[3].cells[2*i+1].className= "correct";
+							table.rows[3].cells[3*i+1].innerHTML = "PASS";
+							table.rows[3].cells[3*i+1].className= "correct";
 						}
 						else
 						{
-							table.rows[3].cells[2*i+1].innerHTML = "FAIL";
-							table.rows[3].cells[2*i+1].className= "incorrect";
+							table.rows[3].cells[3*i+1].innerHTML = "FAIL";
+							table.rows[3].cells[3*i+1].className= "incorrect";
 						}
 
 						/* Grab the Hex input for a given hash and test case */
@@ -241,25 +257,52 @@
 						/* Test the Hex output */
 						if (data[hashType][i]['hexOut'] == shaObj.getHash(hashType, "HEX"))
 						{
-							table.rows[2].cells[2*i+2].innerHTML = "PASS";
-							table.rows[2].cells[2*i+2].className= "correct";
+							table.rows[2].cells[3*i+2].innerHTML = "PASS";
+							table.rows[2].cells[3*i+2].className= "correct";
 						}
 						else
 						{
-							table.rows[2].cells[2*i+2].innerHTML = "FAIL";
-							table.rows[2].cells[2*i+2].className= "incorrect";
+							table.rows[2].cells[3*i+2].innerHTML = "FAIL";
+							table.rows[2].cells[3*i+2].className= "incorrect";
 						}
 
 						/* Test the Base-64 output */
 						if (data[hashType][i]['b64Out'] == shaObj.getHash(hashType, "B64"))
 						{
-							table.rows[3].cells[2*i+2].innerHTML = "PASS";
-							table.rows[3].cells[2*i+2].className= "correct";
+							table.rows[3].cells[3*i+2].innerHTML = "PASS";
+							table.rows[3].cells[3*i+2].className= "correct";
 						}
 						else
 						{
-							table.rows[3].cells[2*i+2].innerHTML = "FAIL";
-							table.rows[3].cells[2*i+2].className= "incorrect";
+							table.rows[3].cells[3*i+2].innerHTML = "FAIL";
+							table.rows[3].cells[3*i+2].className= "incorrect";
+						}
+
+						/* Grab the B64 input for a given hash and test case */
+						shaObj = new jsSHA(data[hashType][i]['b64In'], 'B64');
+
+						/* Test the Hex output */
+						if (data[hashType][i]['hexOut'] == shaObj.getHash(hashType, "HEX"))
+						{
+							table.rows[2].cells[3*i+3].innerHTML = "PASS";
+							table.rows[2].cells[3*i+3].className= "correct";
+						}
+						else
+						{
+							table.rows[2].cells[3*i+3].innerHTML = "FAIL";
+							table.rows[2].cells[3*i+3].className= "incorrect";
+						}
+
+						/* Test the Base-64 output */
+						if (data[hashType][i]['b64Out'] == shaObj.getHash(hashType, "B64"))
+						{
+							table.rows[3].cells[3*i+3].innerHTML = "PASS";
+							table.rows[3].cells[3*i+3].className= "correct";
+						}
+						else
+						{
+							table.rows[3].cells[3*i+3].innerHTML = "FAIL";
+							table.rows[3].cells[3*i+3].className= "incorrect";
 						}
 					}
 				}
@@ -273,21 +316,27 @@
 						{
 							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
-							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg==",
+							"keyHex" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+Pw==",
 							"hexOut" : "5fd596ee78d5553c8ff4e72d266dfd192366da29",
 							"b64Out" : "X9WW7njVVTyP9OctJm39GSNm2ik="
 						},
 						{
 							"text" : "Sample message for keylen<blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E",
-							"key" :  "000102030405060708090A0B0C0D0E0F10111213",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbjxibG9ja2xlbg==",
+							"keyHex" :  "000102030405060708090A0B0C0D0E0F10111213",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhM=",
 							"hexOut" : "4c99ff0cb1b31bd33f8431dbaf4d17fcd356a807",
 							"b64Out" : "TJn/DLGzG9M/hDHbr00X/NNWqAc="
 						},
 						{
 							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
-							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg==",
+							"keyHex" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiYw==",
 							"hexOut" : "2d51b2f7750e410584662e38f133435f4c4fd42a",
 							"b64Out" : "LVGy93UOQQWEZi448TNDX0xP1Co="
 						}
@@ -296,21 +345,27 @@
 						{
 							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
-							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg==",
+							"keyHex" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+Pw==",
 							"hexOut" : "c7405e3ae058e8cd30b08b4140248581ed174cb34e1224bcc1efc81b",
 							"b64Out" : "x0BeOuBY6M0wsItBQCSFge0XTLNOEiS8we/IGw=="
 						},
 						{
 							"text" : "Sample message for keylen<blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E",
-							"key" :  "000102030405060708090A0B0C0D0E0F101112131415161718191A1B",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbjxibG9ja2xlbg==",
+							"keyHex" :  "000102030405060708090A0B0C0D0E0F101112131415161718191A1B",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGw==",
 							"hexOut" : "e3d249a8cfb67ef8b7a169e9a0a599714a2cecba65999a51beb8fbbe",
 							"b64Out" : "49JJqM+2fvi3oWnpoKWZcUos7LplmZpRvrj7vg=="
 						},
 						{
 							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
-							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg==",
+							"keyHex" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiYw==",
 							"hexOut" : "91c52509e5af8531601ae6230099d90bef88aaefb961f4080abc014d",
 							"b64Out" : "kcUlCeWvhTFgGuYjAJnZC++Iqu+5YfQICrwBTQ=="
 						}
@@ -319,21 +374,27 @@
 						{
 							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
-							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg==",
+							"keyHex" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+Pw==",
 							"hexOut" : "8bb9a1db9806f20df7f77b82138c7914d174d59e13dc4d0169c9057b133e1d62",
 							"b64Out" : "i7mh25gG8g3393uCE4x5FNF01Z4T3E0BackFexM+HWI="
 						},
 						{
 							"text" : "Sample message for keylen<blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E",
-							"key" :  "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbjxibG9ja2xlbg==",
+							"keyHex" :  "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
 							"hexOut" : "a28cf43130ee696a98f14a37678b56bcfcbdd9e5cf69717fecf5480f0ebdf790",
 							"b64Out" : "ooz0MTDuaWqY8Uo3Z4tWvPy92eXPaXF/7PVIDw6995A="
 						},
 						{
 							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
-							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg==",
+							"keyHex" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiYw==",
 							"hexOut" : "bdccb6c72ddeadb500ae768386cb38cc41c63dbb0878ddb9c7a38a431b78378d",
 							"b64Out" : "vcy2xy3erbUArnaDhss4zEHGPbsIeN25x6OKQxt4N40="
 						}
@@ -342,21 +403,27 @@
 						{
 							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
-							"key":"000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg==",
+							"keyHex":"000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn8=",
 							"hexOut" : "63c5daa5e651847ca897c95814ab830bededc7d25e83eef9195cd45857a37f448947858f5af50cc2b1b730ddf29671a9",
 							"b64Out" : "Y8XapeZRhHyol8lYFKuDC+3tx9Jeg+75GVzUWFejf0SJR4WPWvUMwrG3MN3ylnGp"
 						},
 						{
 							"text" : "Sample message for keylen<blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E",
-							"key" :  "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbjxibG9ja2xlbg==",
+							"keyHex" :  "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4v",
 							"hexOut" : "6eb242bdbb582ca17bebfa481b1e23211464d2b7f8c20b9ff2201637b93646af5ae9ac316e98db45d9cae773675eeed0",
 							"b64Out" : "brJCvbtYLKF76/pIGx4jIRRk0rf4wguf8iAWN7k2Rq9a6awxbpjbRdnK53NnXu7Q"
 						},
 						{
 							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
-							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F808182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9FA0A1A2A3A4A5A6A7A8A9AAABACADAEAFB0B1B2B3B4B5B6B7B8B9BABBBCBDBEBFC0C1C2C3C4C5C6C7",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg==",
+							"keyHex" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F808182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9FA0A1A2A3A4A5A6A7A8A9AAABACADAEAFB0B1B2B3B4B5B6B7B8B9BABBBCBDBEBFC0C1C2C3C4C5C6C7",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsc=",
 							"hexOut" : "5b664436df69b0ca22551231a3f0a3d5b4f97991713cfa84bff4d0792eff96c27dccbbb6f79b65d548b40e8564cef594",
 							"b64Out" : "W2ZENt9psMoiVRIxo/Cj1bT5eZFxPPqEv/TQeS7/lsJ9zLu295tl1Ui0DoVkzvWU"
 						}
@@ -365,21 +432,27 @@
 						{
 							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
-							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg==",
+							"keyHex" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn8=",
 							"hexOut" : "fc25e240658ca785b7a811a8d3f7b4ca48cfa26a8a366bf2cd1f836b05fcb024bd36853081811d6cea4216ebad79da1cfcb95ea4586b8a0ce356596a55fb1347",
 							"b64Out" : "/CXiQGWMp4W3qBGo0/e0ykjPomqKNmvyzR+DawX8sCS9NoUwgYEdbOpCFuutedoc/LlepFhrigzjVllqVfsTRw=="
 						},
 						{
 							"text" : "Sample message for keylen<blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E",
-							"key" :  "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbjxibG9ja2xlbg==",
+							"keyHex" :  "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+Pw==",
 							"hexOut" : "fd44c18bda0bb0a6ce0e82b031bf2818f6539bd56ec00bdc10a8a2d730b3634de2545d639b0f2cf710d0692c72a1896f1f211c2b922d1a96c392e07e7ea9fedc",
 							"b64Out" : "/UTBi9oLsKbODoKwMb8oGPZTm9VuwAvcEKii1zCzY03iVF1jmw8s9xDQaSxyoYlvHyEcK5ItGpbDkuB+fqn+3A=="
 						},
 						{
 							"text" : "Sample message for keylen=blocklen",
 							"textHex" : "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E",
-							"key" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F808182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9FA0A1A2A3A4A5A6A7A8A9AAABACADAEAFB0B1B2B3B4B5B6B7B8B9BABBBCBDBEBFC0C1C2C3C4C5C6C7",
+							"textB64" : "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg==",
+							"keyHex" : "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F808182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9FA0A1A2A3A4A5A6A7A8A9AAABACADAEAFB0B1B2B3B4B5B6B7B8B9BABBBCBDBEBFC0C1C2C3C4C5C6C7",
+							"keyB64" : "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsc=",
 							"hexOut" : "d93ec8d2de1ad2a9957cb9b83f14e76ad6b5e0cce285079a127d3b14bccb7aa7286d4ac0d4ce64215f2bc9e6870b33d97438be4aaa20cda5c5a912b48b8e27f3",
 							"b64Out" : "2T7I0t4a0qmVfLm4PxTnata14MzihQeaEn07FLzLeqcobUrA1M5kIV8ryeaHCzPZdDi+SqogzaXFqRK0i44n8w=="
 						}
@@ -396,55 +469,154 @@
 						/* Grab the TEXT input for a given hash and test case */
 						var shaObj = new jsSHA(data[hashType][i]['text'], 'TEXT');
 
-						/* Test the Hex output */
-						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['key'], "HEX", hashType, "HEX"))
+						/* Test Text-Text/Key-Hex/Out-Hex */
+						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['keyHex'], "HEX", hashType, "HEX"))
 						{
-							table.rows[2].cells[2*i+1].innerHTML = "PASS"
-							table.rows[2].cells[2*i+1].className= "correct";
+							table.rows[2].cells[3*i+2].innerHTML = "PASS"
+							table.rows[2].cells[3*i+2].className= "correct";
 						}
 						else
 						{
-							table.rows[2].cells[2*i+1].innerHTML = "FAIL"
-							table.rows[2].cells[2*i+1].className= "incorrect";
+							table.rows[2].cells[3*i+2].innerHTML = "FAIL"
+							table.rows[2].cells[3*i+2].className= "incorrect";
 						}
 
-						/* Test the Base-64 output */
-						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['key'], "HEX", hashType, "B64"))
+						/* Test Text-Text/Key-B64/Out-Hex */
+						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['keyB64'], "B64", hashType, "HEX"))
 						{
-							table.rows[3].cells[2*i+1].innerHTML = "PASS"
-							table.rows[3].cells[2*i+1].className= "correct";
+							table.rows[3].cells[3*i+1].innerHTML = "PASS"
+							table.rows[3].cells[3*i+1].className= "correct";
 						}
 						else
 						{
-							table.rows[3].cells[2*i+1].innerHTML = "FAIL"
-							table.rows[3].cells[2*i+1].className= "incorrect";
+							table.rows[3].cells[3*i+1].innerHTML = "FAIL"
+							table.rows[3].cells[3*i+1].className= "incorrect";
+						}
+
+						/* Test Text-Text/Key-Hex/Out-B64 */
+						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['keyHex'], "HEX", hashType, "B64"))
+						{
+							table.rows[4].cells[3*i+2].innerHTML = "PASS"
+							table.rows[4].cells[3*i+2].className= "correct";
+						}
+						else
+						{
+							table.rows[4].cells[3*i+2].innerHTML = "FAIL"
+							table.rows[4].cells[3*i+2].className= "incorrect";
+						}
+
+						/* Test Text-Text/Key-B64/Out-B64 */
+						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['keyB64'], "B64", hashType, "B64"))
+						{
+							table.rows[5].cells[3*i+1].innerHTML = "PASS"
+							table.rows[5].cells[3*i+1].className= "correct";
+						}
+						else
+						{
+							table.rows[5].cells[3*i+1].innerHTML = "FAIL"
+							table.rows[5].cells[3*i+1].className= "incorrect";
 						}
 
 						/* Grab the Hex input for a given hash and test case */
 						shaObj = new jsSHA(data[hashType][i]['textHex'], 'HEX');
 
-						/* Test the Hex output */
-						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['key'], "HEX", hashType, "HEX"))
+						/* Test Text-Hex/Key-Hex/Out-Hex */
+						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['keyHex'], "HEX", hashType, "HEX"))
 						{
-							table.rows[2].cells[2*i+2].innerHTML = "PASS"
-							table.rows[2].cells[2*i+2].className= "correct";
+							table.rows[2].cells[3*i+3].innerHTML = "PASS"
+							table.rows[2].cells[3*i+3].className= "correct";
 						}
 						else
 						{
-							table.rows[2].cells[2*i+2].innerHTML = "FAIL"
-							table.rows[2].cells[2*i+2].className= "incorrect";
+							table.rows[2].cells[3*i+3].innerHTML = "FAIL"
+							table.rows[2].cells[3*i+3].className= "incorrect";
 						}
 
-						/* Test the Base-64 output */
-						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['key'], "HEX", hashType, "B64"))
+						/* Test Text-Hex/Key-B64/Out-Hex */
+						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['keyB64'], "B64", hashType, "HEX"))
 						{
-							table.rows[3].cells[2*i+2].innerHTML = "PASS"
-							table.rows[3].cells[2*i+2].className= "correct";
+							table.rows[3].cells[3*i+2].innerHTML = "PASS"
+							table.rows[3].cells[3*i+2].className= "correct";
 						}
 						else
 						{
-							table.rows[3].cells[2*i+2].innerHTML = "FAIL"
-							table.rows[3].cells[2*i+2].className= "incorrect";
+							table.rows[3].cells[3*i+2].innerHTML = "FAIL"
+							table.rows[3].cells[3*i+2].className= "incorrect";
+						}
+
+						/* Test Text-Hex/Key-Hex/Out-B64 */
+						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['keyHex'], "HEX", hashType, "B64"))
+						{
+							table.rows[4].cells[3*i+3].innerHTML = "PASS"
+							table.rows[4].cells[3*i+3].className= "correct";
+						}
+						else
+						{
+							table.rows[4].cells[3*i+3].innerHTML = "FAIL"
+							table.rows[4].cells[3*i+3].className= "incorrect";
+						}
+
+						/* Test Text-Hex/Key-B64/Out-B64 */
+						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['keyB64'], "B64", hashType, "B64"))
+						{
+							table.rows[5].cells[3*i+2].innerHTML = "PASS"
+							table.rows[5].cells[3*i+2].className= "correct";
+						}
+						else
+						{
+							table.rows[5].cells[3*i+2].innerHTML = "FAIL"
+							table.rows[5].cells[3*i+2].className= "incorrect";
+						}
+
+						/* Grab the B64 input for a given hash and test case */
+						shaObj = new jsSHA(data[hashType][i]['textB64'], 'B64');
+
+						/* Test Text-B64/Key-Hex/Out-Hex */
+						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['keyHex'], "HEX", hashType, "HEX"))
+						{
+							table.rows[2].cells[3*i+4].innerHTML = "PASS"
+							table.rows[2].cells[3*i+4].className= "correct";
+						}
+						else
+						{
+							table.rows[2].cells[3*i+4].innerHTML = "FAIL"
+							table.rows[2].cells[3*i+4].className= "incorrect";
+						}
+
+						/* Test Text-B64/Key-B64/Out-Hex */
+						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['keyB64'], "B64", hashType, "HEX"))
+						{
+							table.rows[3].cells[3*i+3].innerHTML = "PASS"
+							table.rows[3].cells[3*i+3].className= "correct";
+						}
+						else
+						{
+							table.rows[3].cells[3*i+3].innerHTML = "FAIL"
+							table.rows[3].cells[3*i+3].className= "incorrect";
+						}
+
+						/* Test Text-B64/Key-Hex/Out-B64 */
+						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['keyHex'], "HEX", hashType, "B64"))
+						{
+							table.rows[4].cells[3*i+4].innerHTML = "PASS"
+							table.rows[4].cells[3*i+4].className= "correct";
+						}
+						else
+						{
+							table.rows[4].cells[3*i+4].innerHTML = "FAIL"
+							table.rows[4].cells[3*i+4].className= "incorrect";
+						}
+
+						/* Test Text-B64/Key-B64/Out-B64 */
+						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['keyB64'], "B64", hashType, "B64"))
+						{
+							table.rows[5].cells[3*i+3].innerHTML = "PASS"
+							table.rows[5].cells[3*i+3].className= "correct";
+						}
+						else
+						{
+							table.rows[5].cells[3*i+3].innerHTML = "FAIL"
+							table.rows[5].cells[3*i+3].className= "incorrect";
 						}
 					}
 				}
@@ -458,7 +630,7 @@
 		<p>
 			For the hashes without HMAC, all of the <a href="http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf">FIPS 180-2</a> test cases will be executed and the results noted in their respective tables.
 		</p>
-		
+
 		<p>
 			Note that the "Long" test involves hashing a 1,000,000 character string and can take quite a while depending on the browser and machine.
 		</p>
@@ -468,18 +640,21 @@
 			<thead>
 				<tr>
 					<th></th>
-					<th colspan="2">Short</th>
-					<th colspan="2">Medium</th>
-					<th colspan="2">Long</th>
+					<th colspan="3">Short</th>
+					<th colspan="3">Medium</th>
+					<th colspan="3">Long</th>
 				</tr>
 				<tr>
 					<th></th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -491,9 +666,15 @@
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 				</tr>
 				<tr>
 					<th>B64-Out</th>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -509,18 +690,21 @@
 			<thead>
 				<tr>
 					<th></th>
-					<th colspan="2">Short</th>
-					<th colspan="2">Medium</th>
-					<th colspan="2">Long</th>
+					<th colspan="3">Short</th>
+					<th colspan="3">Medium</th>
+					<th colspan="3">Long</th>
 				</tr>
 				<tr>
 					<th></th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -532,9 +716,15 @@
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 				</tr>
 				<tr>
 					<th>B64-Out</th>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -550,18 +740,21 @@
 			<thead>
 				<tr>
 					<th></th>
-					<th colspan="2">Short</th>
-					<th colspan="2">Medium</th>
-					<th colspan="2">Long</th>
+					<th colspan="3">Short</th>
+					<th colspan="3">Medium</th>
+					<th colspan="3">Long</th>
 				</tr>
 				<tr>
 					<th></th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -573,9 +766,15 @@
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 				</tr>
 				<tr>
 					<th>B64-Out</th>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -591,18 +790,21 @@
 			<thead>
 				<tr>
 					<th></th>
-					<th colspan="2">Short</th>
-					<th colspan="2">Medium</th>
-					<th colspan="2">Long</th>
+					<th colspan="3">Short</th>
+					<th colspan="3">Medium</th>
+					<th colspan="3">Long</th>
 				</tr>
 				<tr>
 					<th></th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -614,9 +816,15 @@
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 				</tr>
 				<tr>
 					<th>B64-Out</th>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -632,18 +840,21 @@
 			<thead>
 				<tr>
 					<th></th>
-					<th colspan="2">Short</th>
-					<th colspan="2">Medium</th>
-					<th colspan="2">Long</th>
+					<th colspan="3">Short</th>
+					<th colspan="3">Medium</th>
+					<th colspan="3">Long</th>
 				</tr>
 				<tr>
 					<th></th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 					<th>Text-In</th>
 					<th>Hex-In</th>
+					<th>B64-In</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -655,9 +866,15 @@
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 				</tr>
 				<tr>
 					<th>B64-Out</th>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -677,24 +894,31 @@
 			<caption>SHA-1 HMAC Tests</caption>
 			<thead>
 				<tr>
-					<th></th>
-					<th colspan="2">Short</th>
-					<th colspan="2">Medium</th>
-					<th colspan="2">Long</th>
+					<th colspan="2"></th>
+					<th colspan="3">Short</th>
+					<th colspan="3">Medium</th>
+					<th colspan="3">Long</th>
 				</tr>
 				<tr>
-					<th></th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
+					<th colspan="2"></th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-					<th>Hex-Out</th>
+					<th rowspan="2">Hex-Out</th>
+					<th>Key-Hex</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -703,7 +927,35 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>B64-Out</th>
+					<th>Key-B64</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+				</tr>
+				<tr>
+					<th rowspan="2">B64-Out</th>
+					<th>Key-Hex</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+				</tr>
+				<tr>
+					<th>Key-B64</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -718,24 +970,31 @@
 			<caption>SHA-224 HMAC Tests</caption>
 			<thead>
 				<tr>
-					<th></th>
-					<th colspan="2">Short</th>
-					<th colspan="2">Medium</th>
-					<th colspan="2">Long</th>
+					<th colspan="2"></th>
+					<th colspan="3">Short</th>
+					<th colspan="3">Medium</th>
+					<th colspan="3">Long</th>
 				</tr>
 				<tr>
-					<th></th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
+					<th colspan="2"></th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-					<th>Hex-Out</th>
+					<th rowspan="2">Hex-Out</th>
+					<th>Key-Hex</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -744,7 +1003,35 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>B64-Out</th>
+					<th>Key-B64</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+				</tr>
+				<tr>
+					<th rowspan="2">B64-Out</th>
+					<th>Key-Hex</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+				</tr>
+				<tr>
+					<th>Key-B64</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -759,24 +1046,31 @@
 			<caption>SHA-256 HMAC Tests</caption>
 			<thead>
 				<tr>
-					<th></th>
-					<th colspan="2">Short</th>
-					<th colspan="2">Medium</th>
-					<th colspan="2">Long</th>
+					<th colspan="2"></th>
+					<th colspan="3">Short</th>
+					<th colspan="3">Medium</th>
+					<th colspan="3">Long</th>
 				</tr>
 				<tr>
-					<th></th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
+					<th colspan="2"></th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-					<th>Hex-Out</th>
+					<th rowspan="2">Hex-Out</th>
+					<th>Key-Hex</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -785,7 +1079,35 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>B64-Out</th>
+					<th>Key-B64</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+				</tr>
+				<tr>
+					<th rowspan="2">B64-Out</th>
+					<th>Key-Hex</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+				</tr>
+				<tr>
+					<th>Key-B64</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -800,24 +1122,31 @@
 			<caption>SHA-384 HMAC Tests</caption>
 			<thead>
 				<tr>
-					<th></th>
-					<th colspan="2">Short</th>
-					<th colspan="2">Medium</th>
-					<th colspan="2">Long</th>
+					<th colspan="2"></th>
+					<th colspan="3">Short</th>
+					<th colspan="3">Medium</th>
+					<th colspan="3">Long</th>
 				</tr>
 				<tr>
-					<th></th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
+					<th colspan="2"></th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-					<th>Hex-Out</th>
+					<th rowspan="2">Hex-Out</th>
+					<th>Key-Hex</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -826,7 +1155,35 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>B64-Out</th>
+					<th>Key-B64</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+				</tr>
+				<tr>
+					<th rowspan="2">B64-Out</th>
+					<th>Key-Hex</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+				</tr>
+				<tr>
+					<th>Key-B64</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -841,24 +1198,31 @@
 			<caption>SHA-512 HMAC Tests</caption>
 			<thead>
 				<tr>
-					<th></th>
-					<th colspan="2">Short</th>
-					<th colspan="2">Medium</th>
-					<th colspan="2">Long</th>
+					<th colspan="2"></th>
+					<th colspan="3">Short</th>
+					<th colspan="3">Medium</th>
+					<th colspan="3">Long</th>
 				</tr>
 				<tr>
-					<th></th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
-					<th>Text Text-In</th>
-					<th>Text Hex-In</th>
+					<th colspan="2"></th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
+					<th>Text-Text</th>
+					<th>Text-Hex</th>
+					<th>Text-B64</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-					<th>Hex-Out</th>
+					<th rowspan="2">Hex-Out</th>
+					<th>Key-Hex</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -867,7 +1231,35 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>B64-Out</th>
+					<th>Key-B64</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+				</tr>
+				<tr>
+					<th rowspan="2">B64-Out</th>
+					<th>Key-Hex</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
+				</tr>
+				<tr>
+					<th>Key-B64</td>
+					<td>?</td>
+					<td>?</td>
+					<td>?</td>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>

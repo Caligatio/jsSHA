@@ -47,7 +47,9 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @param {string} str String to be converted to binary representation
 	 * @param {number} charSize The length, in bits, of a character (typically
 	 *   8 or 16)
-	 * @return {Array.<number>} Number array representation of the parameter
+	 * @return {{value : Array.<number>, binLen : number}} Hash list where
+	 *   "value" contains the output number array and "binLen" is the binary
+	 *   length of "value"
 	 */
 	function str2binb(str, charSize)
 	{
@@ -60,7 +62,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				(32 - charSize - (i % 32));
 		}
 
-		return bin;
+		return {"value" : bin, "binLen" : length};
 	}
 
 	/**
@@ -68,11 +70,18 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 *
 	 * @private
 	 * @param {string} str String to be converted to binary representation
-	 * @return {Array.<number>} Number array representation of the parameter
+	 * @return {{value : Array.<number>, binLen : number}} Hash list where
+	 *   "value" contains the output number array and "binLen" is the binary
+	 *   length of "value"
 	 */
 	function hex2binb(str)
 	{
 		var bin = [], length = str.length, i, num;
+
+		if (0 !== (length % 2))
+		{
+			throw "String of HEX type must be in byte increments";
+		}
 
 		for (i = 0; i < length; i += 2)
 		{
@@ -87,7 +96,53 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 		}
 
-		return bin;
+		return {"value" : bin, "binLen" : length * 4};
+	}
+
+	/**
+	 * Convert a base-64 string to an array of big-endian words
+	 *
+	 * @private
+	 * @param {string} str String to be converted to binary representation
+	 * @return {{value : Array.<number>, binLen : number}} Hash list where
+	 *   "value" contains the output number array and "binLen" is the binary
+	 *   length of "value"
+	 */
+	function b642binb(str)
+	{
+		var retVal = [], byteCnt = 0, index, i, j, tmpInt, strPart, firstEqual,
+			b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+		if (-1 === str.search(/^[a-zA-Z0-9=+\/]+$/))
+		{
+			throw "Invalid character in base-64 string";
+		}
+		firstEqual = str.indexOf('=');
+		str = str.replace(/\=/g, '');
+		if ((-1 !== firstEqual) && (firstEqual < str.length))
+		{
+			throw "Invalid '=' found in base-64 string";
+		}
+
+		for (i = 0; i < str.length; i += 4)
+		{
+			strPart = str.substr(i, 4);
+			tmpInt = 0;
+
+			for (j = 0; j < strPart.length; j += 1)
+			{
+				index = b64Tab.indexOf(strPart[j]);
+				tmpInt |= index << (18 - (6 * j));
+			}
+
+			for (j = 0; j < strPart.length - 1; j += 1)
+			{
+				retVal[byteCnt >> 2] |= ((tmpInt >>> (16 - (j * 8))) & 0xFF) << (24 - (8 * (byteCnt % 4)));
+				byteCnt += 1;
+			}
+		}
+
+		return {"value" : retVal, "binLen" : byteCnt * 8};
 	}
 
 	/**
@@ -96,7 +151,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @private
 	 * @param {Array.<number>} binarray Array of integers to be converted to
 	 *   hexidecimal representation
-	 * @param {Object.<string, (string|boolean)>} formatOpts Hash list
+	 * @param {{outputUpper : boolean, b64Pad : string}} formatOpts Hash list
 	 *   containing validated output formatting options
 	 * @return {string} Hexidecimal representation of the parameter in String
 	 *   form
@@ -122,15 +177,15 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @private
 	 * @param {Array.<number>} binarray Array of integers to be converted to
 	 *   base-64 representation
-	 * @param {Object.<string, (string|boolean)>} formatOpts Hash list
+	 * @param {{outputUpper : boolean, b64Pad : string}} formatOpts Hash list
 	 *   containing validated output formatting options
 	 * @return {string} Base-64 encoded representation of the parameter in
 	 *   String form
 	 */
 	function binb2b64(binarray, formatOpts)
 	{
-		var tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
-			str = "", length = binarray.length * 4, i, j, triplet;
+		var str = "", length = binarray.length * 4, i, j, triplet,
+			b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 		for (i = 0; i < length; i += 3)
 		{
@@ -141,7 +196,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			{
 				if (i * 8 + j * 6 <= binarray.length * 32)
 				{
-					str += tab.charAt((triplet >>> 6 * (3 - j)) & 0x3F);
+					str += b64Tab.charAt((triplet >>> 6 * (3 - j)) & 0x3F);
 				}
 				else
 				{
@@ -157,9 +212,9 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * presence of every option or adding the default value
 	 *
 	 * @private
-	 * @param {Object.<string, (string|boolean)>|undefined} outputOpts
+	 * @param {{outputUpper : boolean, b64Pad : string}|undefined} outputOpts
 	 *   Hash list of output formatting options
-	 * @return {Object.<string, (string|boolean)>} Validated hash list
+	 * @return {{outputUpper : boolean, b64Pad : string}} Validated hash list
 	 *   containing output formatting options
 	 */
 	function getOutputOpts(outputOpts)
@@ -1011,7 +1066,8 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	var jsSHA = function(srcString, inputFormat, charSize)
 	{
 		var sha1 = null, sha224 = null, sha256 = null, sha384 = null,
-			sha512 = null, strBinLen = 0, strToHash = [0], charWidth = 0;
+			sha512 = null, strBinLen = 0, strToHash = [0], charWidth = 0,
+			convertRet = null;
 
 		/* Need to get charWidth before validating inputFormat since its used
 		 * in that validation */
@@ -1029,17 +1085,25 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			{
 				throw "srcString of HEX type must be in byte increments";
 			}
-			strBinLen = srcString.length * 4;
-			strToHash = hex2binb(srcString);
+			convertRet = hex2binb(srcString);
+			strBinLen = convertRet["binLen"];
+			strToHash = convertRet["value"];
 		}
 		else if (("ASCII" === inputFormat) || ("TEXT" === inputFormat))
 		{
-			strBinLen = srcString.length * charWidth;
-			strToHash = str2binb(srcString, charWidth);
+			convertRet = str2binb(srcString, charWidth);
+			strBinLen = convertRet["binLen"];
+			strToHash = convertRet["value"];
+		}
+		else if ("B64" === inputFormat)
+		{
+			convertRet = b642binb(srcString);
+			strBinLen = convertRet["binLen"];
+			strToHash = convertRet["value"];
 		}
 		else
 		{
-			throw "inputFormat must be HEX, TEXT, or ASCII";
+			throw "inputFormat must be HEX, TEXT, ASCII, or B64";
 		}
 
 		/**
@@ -1050,7 +1114,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		 * @param {string} variant The desired SHA variant (SHA-1, SHA-224,
 		 *	 SHA-256, SHA-384, or SHA-512)
 		 * @param {string} format The desired output formatting (B64 or HEX)
-		 * @param {Object.<string, (string|boolean)>=} outputFormatOpts
+		 * @param {{outputUpper : boolean, b64Pad : string}=} outputFormatOpts
 		 *   Hash list of output formatting options
 		 * @return {string} The string representation of the hash in the format
 		 *   specified
@@ -1130,7 +1194,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		 *	 SHA-256, SHA-384, or SHA-512)
 		 * @param {string} outputFormat The desired output formatting
 		 *   (B64 or HEX)
-		 * @param {Object.<string, (string|boolean)>=} outputFormatOpts
+		 * @param {{outputUpper : boolean, b64Pad : string}=} outputFormatOpts
 		 *   associative array of output formatting options
 		 * @return {string} The string representation of the hash in the format
 		 *   specified
@@ -1140,7 +1204,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		{
 			var formatFunc, keyToUse, blockByteSize, blockBitSize, i,
 				retVal, lastArrayIndex, keyBinLen, hashBitSize,
-				keyWithIPad = [], keyWithOPad = [];
+				keyWithIPad = [], keyWithOPad = [], convertRet = null;
 
 			/* Validate the output format selection */
 			switch (outputFormat)
@@ -1189,22 +1253,25 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			/* Validate input format selection */
 			if ("HEX" === inputFormat)
 			{
-				/* Nibbles must come in pairs */
-				if (0 !== (key.length % 2))
-				{
-					throw "key of HEX type must be in byte increments";
-				}
-				keyToUse = hex2binb(key);
-				keyBinLen = key.length * 4;
+				convertRet = hex2binb(key);
+				keyBinLen = convertRet["binLen"];
+				keyToUse = convertRet["value"];
 			}
 			else if (("ASCII" === inputFormat) || ("TEXT" === inputFormat))
 			{
-				keyToUse = str2binb(key, charWidth);
-				keyBinLen = key.length * charWidth;
+				convertRet = str2binb(key, charWidth);
+				keyBinLen = convertRet["binLen"];
+				keyToUse = convertRet["value"];
+			}
+			else if ("B64" === inputFormat)
+			{
+				convertRet = b642binb(key);
+				keyBinLen = convertRet["binLen"];
+				keyToUse = convertRet["value"];
 			}
 			else
 			{
-				throw "inputFormat must be HEX, TEXT or ASCII";
+				throw "inputFormat must be HEX, TEXT, ASCII, or B64";
 			}
 
 			/* These are used multiple times, calculate and store them */

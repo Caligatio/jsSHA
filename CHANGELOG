@@ -5,6 +5,7 @@
 1.4 (XXXX-XX-XX)
 =========================
 - Added new input type, TEXT, that is functionally identical to ASCII*
+- Added new input type, B64, fpr base-64 encoded strings
 - Added new input and output formatting parameters
   - getHash and getHMAC take an optional parameter, outputFormatOpts,
     that is a hash list containing the keys "outputUpper" (boolean, only
