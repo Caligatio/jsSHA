@@ -26,6 +26,7 @@
 - Significantly changed the test/test.html to make it easier to understand and
   to allow for easier adding of test cases
 - Replaced previous error returning code with thrown exceptions
+- Possible fix for 64-bit Safari issue (thanks Ron Garret!)
 
 * This library misused the term ASCII so input type of TEXT was added with the
   intention of deprecating ASCII
