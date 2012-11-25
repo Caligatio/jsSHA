@@ -5,7 +5,7 @@
 1.4 (XXXX-XX-XX)
 =========================
 - Added new input type, TEXT, that is functionally identical to ASCII*
-- Added new input type, B64, fpr base-64 encoded strings
+- Added new input type, B64, for base-64 encoded strings
 - Added new input and output formatting parameters
   - getHash and getHMAC take an optional parameter, outputFormatOpts,
     that is a hash list containing the keys "outputUpper" (boolean, only
@@ -26,7 +26,7 @@
 - Significantly changed the test/test.html to make it easier to understand and
   to allow for easier adding of test cases
 - Replaced previous error returning code with thrown exceptions
-- Possible fix for 64-bit Safari issue (thanks Ron Garret!)
+- Possible fix for 64-bit Safari issue (thanks Ron Garret and Chris Warren-Smith!)
 
 * This library misused the term ASCII so input type of TEXT was added with the
   intention of deprecating ASCII
