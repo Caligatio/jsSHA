@@ -2,15 +2,15 @@
     jsSHA - ChangeLog
 -------------------------
 
-1.4 (XXXX-XX-XX)
+1.4 (2012-12-08)
 =========================
 - Added new input type, TEXT, that is functionally identical to ASCII*
 - Added new input type, B64, for base-64 encoded strings
 - Added new input and output formatting parameters
   - getHash and getHMAC take an optional parameter, outputFormatOpts,
     that is a hash list containing the keys "outputUpper" (boolean, only
-	applicable to HEX output) and "b64Pad" (string, only applicable to Base-64
-	output) that have default values of false and "=", respectively
+    applicable to HEX output) and "b64Pad" (string, only applicable to Base-64
+    output) that have default values of false and "=", respectively
   - jsSHA constructor takes an optional parameter, charSize (8 or 16) that
     specifies the character width of the input (TEXT and ASCII input only)
 - Modified comments to be Google Closure Compiler compliant
@@ -26,7 +26,9 @@
 - Significantly changed the test/test.html to make it easier to understand and
   to allow for easier adding of test cases
 - Replaced previous error returning code with thrown exceptions
-- Possible fix for 64-bit Safari issue (thanks Ron Garret and Chris Warren-Smith!)
+- Fix for 64-bit Safari issue (thanks Ron Garret and Chris Warren-Smith!)
+  - NOTE: While this fix works, it is merely a workaround for a WebKit JavaScript
+   optimizer bug, see https://bugs.webkit.org/show_bug.cgi?id=88673 for more detail
 
 * This library misused the term ASCII so input type of TEXT was added with the
   intention of deprecating ASCII
