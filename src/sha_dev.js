@@ -285,20 +285,20 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	function rotr_64(x, n)
 	{
-		var retVal = null, tmp = new Int_64(x.highOrder, x.lowOrder);
+		var retVal = null;
 
 		if (32 >= n)
 		{
 			retVal = new Int_64(
-					(tmp.highOrder >>> n) | (tmp.lowOrder << (32 - n)),
-					(tmp.lowOrder >>> n) | (tmp.highOrder << (32 - n))
+					(x.highOrder >>> n) | ((x.lowOrder << (32 - n)) & 0xFFFFFFFF),
+					(x.lowOrder >>> n) | ((x.highOrder << (32 - n)) & 0xFFFFFFFF)
 				);
 		}
 		else
 		{
 			retVal = new Int_64(
-					(tmp.lowOrder >>> (n - 32)) | (tmp.highOrder << (64 - n)),
-					(tmp.highOrder >>> (n - 32)) | (tmp.lowOrder << (64 - n))
+					(x.lowOrder >>> (n - 32)) | ((x.highOrder << (64 - n)) & 0xFFFFFFFF),
+					(x.highOrder >>> (n - 32)) | ((x.lowOrder << (64 - n)) & 0xFFFFFFFF)
 				);
 		}
 
@@ -334,7 +334,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		{
 			retVal = new Int_64(
 					x.highOrder >>> n,
-					x.lowOrder >>> n | (x.highOrder << (32 - n))
+					x.lowOrder >>> n | ((x.highOrder << (32 - n)) & 0xFFFFFFFF)
 				);
 		}
 		else
@@ -1318,25 +1318,25 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
 			{
 				retVal = coreSHA1(
-							keyWithOPad.concat(
-								coreSHA1(
-									keyWithIPad.concat(strToHash),
-									blockBitSize + strBinLen
-								)
-							),
-							blockBitSize + hashBitSize);
+					keyWithOPad.concat(
+						coreSHA1(
+							keyWithIPad.concat(strToHash),
+							blockBitSize + strBinLen
+						)
+					),
+					blockBitSize + hashBitSize);
 			}
 			else if (6 & SUPPORTED_ALGS)
 			{
 				retVal = coreSHA2(
-							keyWithOPad.concat(
-								coreSHA2(
-									keyWithIPad.concat(strToHash),
-									blockBitSize + strBinLen,
-									variant
-								)
-							),
-							blockBitSize + hashBitSize, variant);
+					keyWithOPad.concat(
+						coreSHA2(
+							keyWithIPad.concat(strToHash),
+							blockBitSize + strBinLen,
+							variant
+						)
+					),
+					blockBitSize + hashBitSize, variant);
 			}
 			else
 			{
