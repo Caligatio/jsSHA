@@ -2,6 +2,10 @@
     jsSHA - ChangeLog
 -------------------------
 
+1.42 (XXXX-XX-XX)
+=========================
+- Readded v1.4 Safari patch to support older versions
+
 1.41 (2012-12-23)
 =========================
 - Fixed incorrect hash issue with Chrome x64 v25 (Dev channel), also provides

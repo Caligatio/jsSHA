@@ -285,20 +285,20 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	function rotr_64(x, n)
 	{
-		var retVal = null;
+		var retVal = null, tmp = new Int_64(x.highOrder, x.lowOrder);
 
 		if (32 >= n)
 		{
 			retVal = new Int_64(
-					(x.highOrder >>> n) | ((x.lowOrder << (32 - n)) & 0xFFFFFFFF),
-					(x.lowOrder >>> n) | ((x.highOrder << (32 - n)) & 0xFFFFFFFF)
+					(tmp.highOrder >>> n) | ((tmp.lowOrder << (32 - n)) & 0xFFFFFFFF),
+					(tmp.lowOrder >>> n) | ((tmp.highOrder << (32 - n)) & 0xFFFFFFFF)
 				);
 		}
 		else
 		{
 			retVal = new Int_64(
-					(x.lowOrder >>> (n - 32)) | ((x.highOrder << (64 - n)) & 0xFFFFFFFF),
-					(x.highOrder >>> (n - 32)) | ((x.lowOrder << (64 - n)) & 0xFFFFFFFF)
+					(tmp.lowOrder >>> (n - 32)) | ((tmp.highOrder << (64 - n)) & 0xFFFFFFFF),
+					(tmp.highOrder >>> (n - 32)) | ((tmp.lowOrder << (64 - n)) & 0xFFFFFFFF)
 				);
 		}
 
