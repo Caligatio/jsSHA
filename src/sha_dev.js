@@ -3,7 +3,7 @@
  * PUB 180-2 as well as the corresponding HMAC implementation as defined in
  * FIPS PUB 198a
  *
- * Copyright Brian Turek 2008-2012
+ * Copyright Brian Turek 2008-2013
  * Distributed under the BSD License
  * See http://caligatio.github.com/jsSHA/ for more information
  *
@@ -40,29 +40,60 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 	/**
 	 * Convert a string to an array of big-endian words
-	 * If charSize is 8, characters >255 have their hi-byte silently
-	 * ignored.
 	 *
 	 * @private
 	 * @param {string} str String to be converted to binary representation
-	 * @param {number} charSize The length, in bits, of a character (typically
-	 *   8 or 16)
+	 * @param {string} utfType The Unicode type, UTF8 or UTF16, to use to
+	 *   encode the source string
 	 * @return {{value : Array.<number>, binLen : number}} Hash list where
 	 *   "value" contains the output number array and "binLen" is the binary
 	 *   length of "value"
 	 */
-	function str2binb(str, charSize)
+	function str2binb(str, utfType)
 	{
-		var bin = [], mask = (1 << charSize) - 1,
-			length = str.length * charSize, i;
-
-		for (i = 0; i < length; i += charSize)
+		var bin = [], codePnt, binArr = [], byteCnt = 0, i, j;
+		
+		if ("UTF8" == utfType)
 		{
-			bin[i >>> 5] |= (str.charCodeAt(i / charSize) & mask) <<
-				(32 - charSize - (i % 32));
-		}
+			for (i = 0; i < str.length; i += 1)
+			{
+				codePnt = str.charCodeAt(i);
+				binArr = [];
 
-		return {"value" : bin, "binLen" : length};
+				if (0x800 < codePnt)
+				{
+					binArr[0] = 0xE0 | ((codePnt & 0xF000) >>> 12);
+					binArr[1] = 0x80 | ((codePnt & 0xFC0) >>> 6);
+					binArr[2] = 0x80 | (codePnt & 0x3F);
+				}
+				else if (0x80 < codePnt)
+				{
+					binArr[0] = 0xC0 | ((codePnt & 0x7C0) >>> 6);
+					binArr[1] = 0x80 | (codePnt & 0x3F);
+				}
+				else
+				{
+					binArr[0] = codePnt;
+				}
+				
+				for (j = 0; j < binArr.length; j += 1)
+				{
+					bin[byteCnt >>> 2] |= binArr[j] << (24 - (8 * (byteCnt % 4)));
+					byteCnt += 1;
+				}
+			}
+		}
+		else if ("UTF16" == utfType)
+		{
+			for (i = 0; i < str.length; i += 1)
+			{
+				codePnt = str.charCodeAt(i);
+
+				bin[byteCnt >>> 2] |= str.charCodeAt(i) << (16 - (8 * (byteCnt % 4)));
+				byteCnt += 2;
+			}
+		}
+		return {"value" : bin, "binLen" : byteCnt * 8};
 	}
 
 	/**
@@ -1061,21 +1092,20 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @this {jsSHA}
 	 * @param {string} srcString The string to be hashed
 	 * @param {string} inputFormat The format of srcString, HEX, TEXT, or ASCII
-	 * @param {number=} charSize The size, in bits, of each text character
+	 * @param {string=} encoding The text encoding to use to encode the source
+	 *   string
 	 */
-	var jsSHA = function(srcString, inputFormat, charSize)
+	var jsSHA = function(srcString, inputFormat, encoding)
 	{
 		var sha1 = null, sha224 = null, sha256 = null, sha384 = null,
-			sha512 = null, strBinLen = 0, strToHash = [0], charWidth = 0,
+			sha512 = null, strBinLen = 0, strToHash = [0], utfType = '',
 			convertRet = null;
 
-		/* Need to get charWidth before validating inputFormat since its used
-		 * in that validation */
-		charWidth = ("undefined" !== typeof(charSize)) ? charSize : 8;
+		utfType = ("undefined" !== typeof(encoding)) ? encoding : "UTF8";
 
-		if (!((8 === charWidth) || (16 === charWidth)))
+		if (!(("UTF8" === utfType) || ("UTF16" === utfType)))
 		{
-			throw "charSize must be 8 or 16";
+			throw "encoding must be UTF8 or UTF16";
 		}
 
 		/* Convert the input string into the correct type */
@@ -1091,7 +1121,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		}
 		else if (("ASCII" === inputFormat) || ("TEXT" === inputFormat))
 		{
-			convertRet = str2binb(srcString, charWidth);
+			convertRet = str2binb(srcString, utfType);
 			strBinLen = convertRet["binLen"];
 			strToHash = convertRet["value"];
 		}
@@ -1259,7 +1289,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else if (("ASCII" === inputFormat) || ("TEXT" === inputFormat))
 			{
-				convertRet = str2binb(key, charWidth);
+				convertRet = str2binb(key, utfType);
 				keyBinLen = convertRet["binLen"];
 				keyToUse = convertRet["value"];
 			}

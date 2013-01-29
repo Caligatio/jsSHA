@@ -63,8 +63,9 @@ var shaObj = new jsSHA("This is a Test", "TEXT");
 var hash = shaObj.getHash("SHA-512", "HEX");
 var hmac = shaObj.getHMAC("SecretKey", "TEXT", "SHA-512", "HEX");
 
-The constructor takes an optional parameter, charSize, that specifies the
-bit width of a character of text. By default, charSize = 8.
+The constructor takes an optional parameter, encoding, that specifies the
+encoding used to encode TEXT-type inputs. Valid options are "UTF8" and "UTF16"
+and it defaults to "UTF8"
 
 Both getHash and getHMAC also take an optional has list parameter,
 outputFormatOpts, that dictates some formatting options for the output.  By

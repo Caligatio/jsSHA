@@ -2,6 +2,14 @@
     jsSHA - ChangeLog
 -------------------------
 
+1.5 (2013-XX-XX)
+=========================
+- Removed charSize input and replaced with encoding to handle Unicode.  NOTE:
+  Only Code points up to 0xFFFF are supported.
+  - charSize = 16 is effectively replaced by encoding = "UTF16"
+  - charSize = 8 was wrong in terms of handling UTF-8 and has been replaced by
+    encoding = "UTF8"
+
 1.42 (2012-12-28)
 =========================
 - Readded v1.4 Safari patch to support older versions
