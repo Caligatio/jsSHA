@@ -6,5 +6,5 @@ CLOSURE_COMPILER=${CLOSURE_COMPILER-"../compiler.jar"}
 
 for i in "${!releases[@]}"
 do
-	java -jar ${CLOSURE_COMPILER} --define="SUPPORTED_ALGS=${releases[$i]}" --output_wrapper "(function(window) {%output%})(this);" --warning_level VERBOSE --compilation_level ADVANCED_OPTIMIZATIONS --js ../src/sha_dev.js --js_output_file ../src/$i.js
+	java -jar ${CLOSURE_COMPILER} --define="SUPPORTED_ALGS=${releases[$i]}" --output_wrapper "(function(module) {%output%})(this);" --warning_level VERBOSE --compilation_level ADVANCED_OPTIMIZATIONS --js ../src/sha_dev.js --js_output_file ../src/$i.js
 done
