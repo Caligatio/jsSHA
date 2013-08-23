@@ -59,18 +59,21 @@ Usage
 -------------------------
 Include the desired JavaScript file (sha.js, sha1.js, sha256.js, or sha512.js)
 in your header (sha.js used below):
-<script type="text/javascript" src="/path/to/sha.js"></script>
+
+	<script type="text/javascript" src="/path/to/sha.js"></script>
 
 Instantiate a new jsSHA object with your string to be hashed and its format
 (HEX or TEXT) as the parameters.  Then, call getHash with the desired hash
 variant (SHA-1, SHA-224, SHA-256, SHA-384, or SHA-512) and output type
-(HEX or B64).  In the example below, "This is a Test" and "SHA-512" were used
+(HEX or B64).
+
+In the example below, "This is a Test" and "SHA-512" were used
 as the string to be hashed and variant respectively.  Also, the HMAC using TEXT
 key "SecretKey" and hashing algorithm SHA-512 was calculated.
 
-var shaObj = new jsSHA("This is a Test", "TEXT");
-var hash = shaObj.getHash("SHA-512", "HEX");
-var hmac = shaObj.getHMAC("SecretKey", "TEXT", "SHA-512", "HEX");
+	var shaObj = new jsSHA("This is a Test", "TEXT");
+	var hash = shaObj.getHash("SHA-512", "HEX");
+	var hmac = shaObj.getHMAC("SecretKey", "TEXT", "SHA-512", "HEX");
 
 The constructor takes an optional parameter, encoding, that specifies the
 encoding used to encode TEXT-type inputs. Valid options are "UTF8" and "UTF16"
@@ -78,7 +81,7 @@ and it defaults to "UTF8"
 
 Both getHash and getHMAC also take an optional has list parameter,
 outputFormatOpts, that dictates some formatting options for the output.  By
-default, outputFormatOpts = {"outputUpper" : false, "b64Pad" : "="}.  These
+default, `outputFormatOpts = {"outputUpper" : false, "b64Pad" : "="}`.  These
 options are intelligently interpreted based upon the chosen output format.
 
 Compiling
