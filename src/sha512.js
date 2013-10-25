@@ -7,7 +7,7 @@
  Distributed under the BSD License
  See http://caligatio.github.com/jsSHA/ for more information
 
- Several functions taken from Paul Johnson
+ Several functions taken from Paul Johnston
 */
 function p(a){throw a;}var r=null;function t(a,b){this.a=a;this.b=b}function v(a,b){var d=[],f,e=[],g=0,j;if("UTF8"==b)for(j=0;j<a.length;j+=1){f=a.charCodeAt(j);e=[];2048<f?(e[0]=224|(f&61440)>>>12,e[1]=128|(f&4032)>>>6,e[2]=128|f&63):128<f?(e[0]=192|(f&1984)>>>6,e[1]=128|f&63):e[0]=f;for(f=0;f<e.length;f+=1)d[g>>>2]|=e[f]<<24-8*(g%4),g+=1}else if("UTF16"==b)for(j=0;j<a.length;j+=1)d[g>>>2]|=a.charCodeAt(j)<<16-8*(g%4),g+=2;return{value:d,binLen:8*g}}
 function y(a){var b=[],d=a.length,f,e;0!==d%2&&p("String of HEX type must be in byte increments");for(f=0;f<d;f+=2)e=parseInt(a.substr(f,2),16),isNaN(e)&&p("String of HEX type contains invalid characters"),b[f>>>3]|=e<<24-4*(f%8);return{value:b,binLen:4*d}}

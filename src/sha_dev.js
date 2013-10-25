@@ -7,7 +7,7 @@
  * Distributed under the BSD License
  * See http://caligatio.github.com/jsSHA/ for more information
  *
- * Several functions taken from Paul Johnson
+ * Several functions taken from Paul Johnston
  */
 
  /**
