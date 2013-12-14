@@ -4,6 +4,8 @@
 
 1.5 (2013-XX-XX)
 =========================
+- Added optional numRounds argument to getHash
+  - Note: this necessitated removing the hash result caching functionality
 - Removed charSize input and replaced with encoding to handle Unicode.  NOTE:
   Only Code points up to 0xFFFF are supported.
   - charSize = 16 is effectively replaced by encoding = "UTF16"

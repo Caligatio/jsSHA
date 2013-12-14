@@ -42,6 +42,7 @@
 				var algs = supportedAlgs();
 
 				calcHashes(algs);
+				calcHashesMulti(algs);
 				calcHMACs(algs);
 			}
 
@@ -308,6 +309,80 @@
 				}
 			}
 
+			function calcHashesMulti(algs)
+			{
+				/* Object that contains the case inputs and outputs for all the multi round hashes */
+				var data = {
+					"SHA-1" : {
+						"textIn" : "abc",
+						"hexOut5" : "b5c64925eb9940259be55c005c9cecc7d9897ef9",
+						"hexOut10" : "94ebc0d3c81b61eb98670666f5fde68560c4e165"
+					},
+					"SHA-224" : {
+							"textIn" : "abc",
+							"hexOut5" : "5b4b17f720d52c6a864229e784fb636184ca48ce7dd848fdad986239",
+							"hexOut10" : "5230eb37afcc115f4f380a9f50c4743d457bbe586e6faa6bf21696f9"
+					},
+					"SHA-256" : {
+						"textIn" : "abc",
+						"hexOut5" : "184f6d6e82554c051b33f15e7ffffecb0cc0f461a29096c41c214e168e34c21d",
+						"hexOut10" : "10e286f907c0fe9f02cea3864cbaec04ae47e2c0a13b60473bc9968a4851b219"
+					},
+					"SHA-384" : {
+						"textIn" : "abc",
+						"hexOut5" : "a4aa4cd8534aecb2d07765f928303d1d2609835ea85d14312bcee264e99dc5d7dc08bb18ec694053fd7fe6906706d55f",
+						"hexOut10" : "b80c82979453f2f3dcf89ec4cef5c71e89837537de170e3942af8b37757cc790d4cc4ebe16a52164ad19f3a02d192f1c"
+					},
+					"SHA-512" : {
+						"textIn" : "abc",
+						"hexOut5" : "299b2e3ce932e4d0e9005345e37af5a4cc6be21e6b6e21231ce71ccde2a7aba4a6822cd7a9aaf9b13918db05ede70d3f1e6af65f8ad0bda1c4c4fa263e3cabdd",
+						"hexOut10" : "4c3ead8c83442fff47d4386702044f2a6c19730a806de541964b0fa9987cac08641611e02b2e0742ef2600ff82bfe3a711567c8e76dda16b4948f4c76e3c6e9c"
+					}
+				}
+
+				var table = document.getElementById("HashRounds");
+				var table_head = table.tHead
+				var table_body = table.tBodies[0];
+
+				for (var j = 0; j < algs.length; j++)
+				{
+					var hashType = algs[j];
+					
+					/* Dynamically build the table structure */
+					new_th = document.createElement('th');
+					new_th.innerHTML = hashType;
+					table_head.rows[0].appendChild(new_th);
+					table_body.rows[0].insertCell(-1);
+					table_body.rows[1].insertCell(-1);
+
+					/* Grab the TEXT input for a given hash and test case */
+					var shaObj = new jsSHA(data[hashType]['textIn'], 'TEXT');
+
+					/* Test the Hex output */
+					if (data[hashType]['hexOut5'] == shaObj.getHash(hashType, "HEX", 5))
+					{
+						table.rows[1].cells[j+1].innerHTML = "PASS";
+						table.rows[1].cells[j+1].className= "correct";
+					}
+					else
+					{
+						table.rows[1].cells[j+1].innerHTML = "FAIL";
+						table.rows[1].cells[j+1].className= "incorrect";
+					}
+					
+					if (data[hashType]['hexOut10'] == shaObj.getHash(hashType, "HEX", 10))
+					{
+						table.rows[2].cells[j+1].innerHTML = "PASS";
+						table.rows[2].cells[j+1].className= "correct";
+					}
+					else
+					{
+						table.rows[2].cells[j+1].innerHTML = "FAIL";
+						table.rows[2].cells[j+1].className= "incorrect";
+					}
+				}
+			}
+			
 			function calcHMACs(algs)
 			{
 				/* Object that contains the small/medium/large test case inputs and outputs for all the hashes */
@@ -884,6 +959,28 @@
 				</tr>
 			</tbody>
 		</table>
+		
+		<h2>Multiple Round Tests</h2>
+		<p>
+			Values for the multiple round tests can be generated using the included getHashRounds.py
+		</p>
+		
+		<table id="HashRounds">
+			<caption>Multiple Hash Rounds Tests</caption>
+			<thead>
+				<tr>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th>5 Rounds</th>
+				</tr>
+				<tr>
+					<th>10 Rounds</th>
+				</tr>
+			</tbody>
+		</table>
 
 		<h2>HMAC Tests</h2>
 		<p>
@@ -915,7 +1012,7 @@
 			<tbody>
 				<tr>
 					<th rowspan="2">Hex-Out</th>
-					<th>Key-Hex</td>
+					<th>KeyHex</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -927,7 +1024,7 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>Key-B64</td>
+					<th>Key-B64</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -940,7 +1037,7 @@
 				</tr>
 				<tr>
 					<th rowspan="2">B64-Out</th>
-					<th>Key-Hex</td>
+					<th>KeyHex</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -952,7 +1049,7 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>Key-B64</td>
+					<th>Key-B64</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -991,7 +1088,7 @@
 			<tbody>
 				<tr>
 					<th rowspan="2">Hex-Out</th>
-					<th>Key-Hex</td>
+					<th>KeyHex</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1003,7 +1100,7 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>Key-B64</td>
+					<th>Key-B64</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1016,7 +1113,7 @@
 				</tr>
 				<tr>
 					<th rowspan="2">B64-Out</th>
-					<th>Key-Hex</td>
+					<th>KeyHex</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1028,7 +1125,7 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>Key-B64</td>
+					<th>Key-B64</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1067,7 +1164,7 @@
 			<tbody>
 				<tr>
 					<th rowspan="2">Hex-Out</th>
-					<th>Key-Hex</td>
+					<th>Key-Hex</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1079,7 +1176,7 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>Key-B64</td>
+					<th>Key-B64</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1092,7 +1189,7 @@
 				</tr>
 				<tr>
 					<th rowspan="2">B64-Out</th>
-					<th>Key-Hex</td>
+					<th>Key-Hex</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1104,7 +1201,7 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>Key-B64</td>
+					<th>Key-B64</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1143,7 +1240,7 @@
 			<tbody>
 				<tr>
 					<th rowspan="2">Hex-Out</th>
-					<th>Key-Hex</td>
+					<th>KeyHex</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1155,7 +1252,7 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>Key-B64</td>
+					<th>Key-B64</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1168,7 +1265,7 @@
 				</tr>
 				<tr>
 					<th rowspan="2">B64-Out</th>
-					<th>Key-Hex</td>
+					<th>KeyHex</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1180,7 +1277,7 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>Key-B64</td>
+					<th>Key-B64</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1219,7 +1316,7 @@
 			<tbody>
 				<tr>
 					<th rowspan="2">Hex-Out</th>
-					<th>Key-Hex</td>
+					<th>KeyHex</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1231,7 +1328,7 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>Key-B64</td>
+					<th>Key-B64</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1244,7 +1341,7 @@
 				</tr>
 				<tr>
 					<th rowspan="2">B64-Out</th>
-					<th>Key-Hex</td>
+					<th>KeyHex</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>
@@ -1256,7 +1353,7 @@
 					<td>?</td>
 				</tr>
 				<tr>
-					<th>Key-B64</td>
+					<th>Key-B64</th>
 					<td>?</td>
 					<td>?</td>
 					<td>?</td>

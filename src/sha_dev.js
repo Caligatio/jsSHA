@@ -52,8 +52,8 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	function str2binb(str, utfType)
 	{
 		var bin = [], codePnt, binArr = [], byteCnt = 0, i, j;
-		
-		if ("UTF8" == utfType)
+
+		if ("UTF8" === utfType)
 		{
 			for (i = 0; i < str.length; i += 1)
 			{
@@ -75,7 +75,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				{
 					binArr[0] = codePnt;
 				}
-				
+
 				for (j = 0; j < binArr.length; j += 1)
 				{
 					bin[byteCnt >>> 2] |= binArr[j] << (24 - (8 * (byteCnt % 4)));
@@ -83,7 +83,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				}
 			}
 		}
-		else if ("UTF16" == utfType)
+		else if ("UTF16" === utfType)
 		{
 			for (i = 0; i < str.length; i += 1)
 			{
@@ -264,7 +264,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				retVal["b64Pad"] = outputOpts["b64Pad"];
 			}
 		}
-		catch(e)
+		catch(ignore)
 		{}
 
 		if ("boolean" !== typeof(retVal["outputUpper"]))
@@ -1097,11 +1097,9 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	var jsSHA = function(srcString, inputFormat, encoding)
 	{
-		var sha1 = null, sha224 = null, sha256 = null, sha384 = null,
-			sha512 = null, strBinLen = 0, strToHash = [0], utfType = '',
-			convertRet = null;
+		var strBinLen = 0, strToHash = [0], utfType = '', srcConvertRet = null;
 
-		utfType = ("undefined" !== typeof(encoding)) ? encoding : "UTF8";
+		utfType = encoding || "UTF8";
 
 		if (!(("UTF8" === utfType) || ("UTF16" === utfType)))
 		{
@@ -1115,21 +1113,21 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			{
 				throw "srcString of HEX type must be in byte increments";
 			}
-			convertRet = hex2binb(srcString);
-			strBinLen = convertRet["binLen"];
-			strToHash = convertRet["value"];
+			srcConvertRet = hex2binb(srcString);
+			strBinLen = srcConvertRet["binLen"];
+			strToHash = srcConvertRet["value"];
 		}
 		else if (("ASCII" === inputFormat) || ("TEXT" === inputFormat))
 		{
-			convertRet = str2binb(srcString, utfType);
-			strBinLen = convertRet["binLen"];
-			strToHash = convertRet["value"];
+			srcConvertRet = str2binb(srcString, utfType);
+			strBinLen = srcConvertRet["binLen"];
+			strToHash = srcConvertRet["value"];
 		}
 		else if ("B64" === inputFormat)
 		{
-			convertRet = b642binb(srcString);
-			strBinLen = convertRet["binLen"];
-			strToHash = convertRet["value"];
+			srcConvertRet = b642binb(srcString);
+			strBinLen = srcConvertRet["binLen"];
+			strToHash = srcConvertRet["value"];
 		}
 		else
 		{
@@ -1144,15 +1142,34 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		 * @param {string} variant The desired SHA variant (SHA-1, SHA-224,
 		 *	 SHA-256, SHA-384, or SHA-512)
 		 * @param {string} format The desired output formatting (B64 or HEX)
+		 * @param {number=} numRounds The number of rounds of hashing to be
+		 *   executed
 		 * @param {{outputUpper : boolean, b64Pad : string}=} outputFormatOpts
 		 *   Hash list of output formatting options
 		 * @return {string} The string representation of the hash in the format
 		 *   specified
 		 */
-		this.getHash = function (variant, format, outputFormatOpts)
+		this.getHash = function(variant, format, numRounds, outputFormatOpts)
 		{
-			var formatFunc = null, message = strToHash.slice(), retVal = "";
+			var formatFunc = null, message = strToHash.slice(),
+				messageBinLen = strBinLen, i;
 
+			/* Need to do argument patching since both numRounds and
+			   outputFormatOpts are optional */
+			if (3 === arguments.length)
+			{
+				if ("number" !== typeof(numRounds))
+				{
+					outputFormatOpts = numRounds;
+					numRounds = 1;
+				}
+			}
+			else if (2 === arguments.length)
+			{
+				numRounds = 1;
+			}
+
+			/* Validate the output format selection */
 			switch (format)
 			{
 			case "HEX":
@@ -1167,50 +1184,50 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 			if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
 			{
-				if (null === sha1)
+				for (i = 0; i < numRounds; i++)
 				{
-					sha1 = coreSHA1(message, strBinLen);
+					message = coreSHA1(message, messageBinLen);
+					messageBinLen = 160;
 				}
-				retVal = formatFunc(sha1, getOutputOpts(outputFormatOpts));
 			}
 			else if (("SHA-224" === variant) && (2 & SUPPORTED_ALGS))
 			{
-				if (null === sha224)
+				for (i = 0; i < numRounds; i++)
 				{
-					sha224 = coreSHA2(message, strBinLen, variant);
+					message = coreSHA2(message, messageBinLen, variant);
+					messageBinLen = 224;
 				}
-				retVal = formatFunc(sha224, getOutputOpts(outputFormatOpts));
 			}
 			else if (("SHA-256" === variant) && (2 & SUPPORTED_ALGS))
 			{
-				if (null === sha256)
+				for (i = 0; i < numRounds; i++)
 				{
-					sha256 = coreSHA2(message, strBinLen, variant);
+					message = coreSHA2(message, messageBinLen, variant);
+					messageBinLen = 256;
 				}
-				retVal = formatFunc(sha256, getOutputOpts(outputFormatOpts));
 			}
 			else if (("SHA-384" === variant) && (4 & SUPPORTED_ALGS))
 			{
-				if (null === sha384)
+				for (i = 0; i < numRounds; i++)
 				{
-					sha384 = coreSHA2(message, strBinLen, variant);
+					message = coreSHA2(message, messageBinLen, variant);
+					messageBinLen = 384;
 				}
-				retVal = formatFunc(sha384, getOutputOpts(outputFormatOpts));
 			}
 			else if (("SHA-512" === variant) && (4 & SUPPORTED_ALGS))
 			{
-				if (null === sha512)
+				for (i = 0; i < numRounds; i++)
 				{
-					sha512 = coreSHA2(message, strBinLen, variant);
+					message = coreSHA2(message, messageBinLen, variant);
+					messageBinLen = 512;
 				}
-				retVal = formatFunc(sha512, getOutputOpts(outputFormatOpts));
 			}
 			else
 			{
 				throw "Chosen SHA variant is not supported";
 			}
 
-			return retVal;
+			return formatFunc(message, getOutputOpts(outputFormatOpts));
 		};
 
 		/**
@@ -1234,7 +1251,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		{
 			var formatFunc, keyToUse, blockByteSize, blockBitSize, i,
 				retVal, lastArrayIndex, keyBinLen, hashBitSize,
-				keyWithIPad = [], keyWithOPad = [], convertRet = null;
+				keyWithIPad = [], keyWithOPad = [], keyConvertRet = null;
 
 			/* Validate the output format selection */
 			switch (outputFormat)
@@ -1283,21 +1300,21 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			/* Validate input format selection */
 			if ("HEX" === inputFormat)
 			{
-				convertRet = hex2binb(key);
-				keyBinLen = convertRet["binLen"];
-				keyToUse = convertRet["value"];
+				keyConvertRet = hex2binb(key);
+				keyBinLen = keyConvertRet["binLen"];
+				keyToUse = keyConvertRet["value"];
 			}
 			else if (("ASCII" === inputFormat) || ("TEXT" === inputFormat))
 			{
-				convertRet = str2binb(key, utfType);
-				keyBinLen = convertRet["binLen"];
-				keyToUse = convertRet["value"];
+				keyConvertRet = str2binb(key, utfType);
+				keyBinLen = keyConvertRet["binLen"];
+				keyToUse = keyConvertRet["value"];
 			}
 			else if ("B64" === inputFormat)
 			{
-				convertRet = b642binb(key);
-				keyBinLen = convertRet["binLen"];
-				keyToUse = convertRet["value"];
+				keyConvertRet = b642binb(key);
+				keyBinLen = keyConvertRet["binLen"];
+				keyToUse = keyConvertRet["value"];
 			}
 			else
 			{
