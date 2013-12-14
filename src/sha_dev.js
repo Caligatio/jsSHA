@@ -1,7 +1,7 @@
 /**
- * @preserve A JavaScript implementation of the SHA family of hashes, as defined in FIPS
- * PUB 180-2 as well as the corresponding HMAC implementation as defined in
- * FIPS PUB 198a
+ * @preserve A JavaScript implementation of the SHA family of hashes, as
+ * defined in FIPS PUB 180-2 as well as the corresponding HMAC implementation
+ * as defined in FIPS PUB 198a
  *
  * Copyright Brian Turek 2008-2013
  * Distributed under the BSD License
@@ -168,7 +168,8 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 			for (j = 0; j < strPart.length - 1; j += 1)
 			{
-				retVal[byteCnt >> 2] |= ((tmpInt >>> (16 - (j * 8))) & 0xFF) << (24 - (8 * (byteCnt % 4)));
+				retVal[byteCnt >> 2] |= ((tmpInt >>> (16 - (j * 8))) & 0xFF) <<
+					(24 - (8 * (byteCnt % 4)));
 				byteCnt += 1;
 			}
 		}
@@ -1158,7 +1159,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			   outputFormatOpts are optional */
 			if (3 === arguments.length)
 			{
-				if ("number" !== typeof(numRounds))
+				if ("number" !== typeof numRounds)
 				{
 					outputFormatOpts = numRounds;
 					numRounds = 1;
@@ -1167,6 +1168,12 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			else if (2 === arguments.length)
 			{
 				numRounds = 1;
+			}
+
+			/* Validate the numRounds argument */
+			if ((numRounds !== parseInt(numRounds, 10)) || (1 > numRounds))
+			{
+				throw "numRounds must a integer >= 1";
 			}
 
 			/* Validate the output format selection */
