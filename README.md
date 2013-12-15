@@ -48,12 +48,17 @@ functionality removed
 
 A test page that calculates various hashes and has their correct values
 
+**test/genHashRounds.py**
+
+A Python2 script that generates multi-round hash values
+
 **build/make-release**
 
 A Bash script that runs the various Google Closure Compiler commands to build
 a release
 
 **build/externs.js**
+
 File needed solely to make the Google Closure Compilter work
 
 ## Usage
