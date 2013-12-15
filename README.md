@@ -94,10 +94,10 @@ same way as above.
 ### Node.js
 jsSHA is available through NPM and be installed by simply doing
 
-	npm install jsSHA
+	npm install jssha
 To use the module, first require it using:
 
-	jsSHA = require("jsSHA");
+	jsSHA = require("jssha");
 
 The rest of the instructions are identical to the [Browser](#browser) section above.
 
@@ -113,9 +113,9 @@ a command like the following:
 		--js /path/to/sha_dev.js --js_output_file /path/to/sha.js
 		
 where <FLAG> is a bitwise OR of the following values:
-  - 4 for SHA-384/SHA-512
-  - 2 for SHA-224/256
-  - 1 for SHA-1
+* 4 for SHA-384/SHA-512
+* 2 for SHA-224/256
+* 1 for SHA-1
 
 ##Contact Info
 The project's website is located at [http://caligatio.github.com/jsSHA/](http://caligatio.github.com/jsSHA/)
