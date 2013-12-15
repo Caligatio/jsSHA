@@ -3,8 +3,7 @@ A JavaScript implementation of the complete Secure Hash Standard family
 		(SHA-1, SHA-224, SHA-256, SHA-384, and SHA-512) as well as HMAC by
 		Brian Turek
 
-About
--------------------------
+## About
 jsSHA is a javaScript implementation of the complete Secure Hash Algorithm
 family as defined by FIPS PUB 180-2
 (http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf).
@@ -20,8 +19,7 @@ these hashes.  As a result, a bit of hacking had to be done to make sure the
 values behaved themselves. SHA-224 was added to the Secure Hash Standard family
 on 25 February 2004 so it was also included in this package.
 
-Files
--------------------------
+## Files
 **src/sha_dev.js**
 
 A commented implementation of the entire SHA family of hashes. Not to be used
@@ -55,8 +53,12 @@ A test page that calculates various hashes and has their correct values
 A Bash script that runs the various Google Closure Compiler commands to build
 a release
 
-Usage
--------------------------
+**build/externs.js**
+File needed solely to make the Google Closure Compilter work
+
+## Usage
+
+### Browser
 Include the desired JavaScript file (sha.js, sha1.js, sha256.js, or sha512.js)
 in your header (sha.js used below):
 
@@ -79,27 +81,41 @@ The constructor takes an optional parameter, encoding, that specifies the
 encoding used to encode TEXT-type inputs. Valid options are "UTF8" and "UTF16"
 and it defaults to "UTF8"
 
-Both getHash and getHMAC also take an optional has list parameter,
-outputFormatOpts, that dictates some formatting options for the output.  By
-default, `outputFormatOpts = {"outputUpper" : false, "b64Pad" : "="}`.  These
+getHash takes two optional parameters, a numRounds integer and an outputFormatOpts
+hashlist.  numRounds controls the number of hashing iterations/rounds performed
+and defaults to a value of "1" if not specified. outputFormatOpts dictates
+some formatting options for the output.  By default,
+`outputFormatOpts = {"outputUpper" : false, "b64Pad" : "="}`.  These
 options are intelligently interpreted based upon the chosen output format.
 
-Compiling
--------------------------
+getHMAC also takes an optional outputFormatOpts hashlist which operates the exact
+same way as above.
+
+### Node.js
+jsSHA is available through NPM and be installed by simply doing
+
+	npm install jsSHA
+To use the module, first require it using:
+
+	jsSHA = require("jsSHA");
+
+The rest of the instructions are identical to the [Browser](#browser) section above.
+
+## Compiling
 This library makes use of the Google Closure Compiler
 (https://developers.google.com/closure/compiler) to both boost performance
 and reduce filesizes.  To compile sha_dev.js into a customized output file, use
 a command like the following:
 
-	java -jar compiler.jar --define="SUPPORTED_ALGS=<FLAG>"
-		--output_wrapper "(function() {%output%})();" --warning_level VERBOSE
-		--compilation_level ADVANCED_OPTIMIZATIONS --js sha_dev.js --js_output_file sha.js
+	java -jar compiler.jar --define="SUPPORTED_ALGS=<FLAG>" \
+		--externs /path/to/build/externs.js --warning_level VERBOSE \
+		--compilation_level ADVANCED_OPTIMIZATIONS \
+		--js /path/to/sha_dev.js --js_output_file /path/to/sha.js
 		
 where <FLAG> is a bitwise OR of the following values:
   - 4 for SHA-384/SHA-512
   - 2 for SHA-224/256
   - 1 for SHA-1
 
-Contact Info
--------------------------
+##Contact Info
 The project's website is located at [http://caligatio.github.com/jsSHA/](http://caligatio.github.com/jsSHA/)
