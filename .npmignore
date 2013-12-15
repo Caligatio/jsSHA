@@ -1,0 +1,6 @@
+build
+test
+src/sha_dev.js
+src/sha1.js
+src/sha256.js
+src/sha512.js
