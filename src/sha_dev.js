@@ -742,28 +742,6 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			safeAdd_5 = safeAdd_32_5, appendedMessageLength,
 			H = [
 				0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0
-			],
-			K = [
-				0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999,
-				0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999,
-				0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999,
-				0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999,
-				0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999,
-				0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1,
-				0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1,
-				0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1,
-				0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1,
-				0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1,
-				0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc,
-				0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc,
-				0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc,
-				0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc,
-				0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc,
-				0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6,
-				0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6,
-				0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6,
-				0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6,
-				0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6
 			];
 
 		/* Append '1' at the end of the binary string */
@@ -796,17 +774,17 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 				if (t < 20)
 				{
-					T = safeAdd_5(rotl(a, 5), ch(b, c, d), e, K[t], W[t]);
+					T = safeAdd_5(rotl(a, 5), ch(b, c, d), e, 0x5a827999, W[t]);
 				}
 				else if (t < 40)
 				{
-					T = safeAdd_5(rotl(a, 5), parity(b, c, d), e, K[t], W[t]);
+					T = safeAdd_5(rotl(a, 5), parity(b, c, d), e, 0x6ed9eba1, W[t]);
 				}
 				else if (t < 60)
 				{
-					T = safeAdd_5(rotl(a, 5), maj(b, c, d), e, K[t], W[t]);
+					T = safeAdd_5(rotl(a, 5), maj(b, c, d), e, 0x8f1bbcdc, W[t]);
 				} else {
-					T = safeAdd_5(rotl(a, 5), parity(b, c, d), e, K[t], W[t]);
+					T = safeAdd_5(rotl(a, 5), parity(b, c, d), e, 0xca62c1d6, W[t]);
 				}
 
 				e = d;
