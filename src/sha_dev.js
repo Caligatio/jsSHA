@@ -20,7 +20,7 @@
   */
 var SUPPORTED_ALGS = 4 | 2 | 1;
 
-(function (module)
+(function (global)
 {
 	"use strict";
 	/**
@@ -1381,5 +1381,22 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		};
 	};
 
-	module['jsSHA'] = jsSHA;
+	if (("function" === typeof define) && (typeof define["amd"])) /* AMD Support */
+	{
+		define(function()
+		{
+			return jsSHA;
+		});
+	} else if ("undefined" !== typeof exports) /* Node Support */
+	{
+		if (("undefined" !== typeof module) && module["exports"])
+		{
+		  module["exports"] = exports = jsSHA;
+		}
+		else {
+			exports = jsSHA;
+		}
+	} else { /* Browsers and Web Workers*/
+		global["jsSHA"] = jsSHA;
+	}
 }(this));
