@@ -1,7 +1,7 @@
 # jsSHA
 A JavaScript implementation of the complete Secure Hash Standard family
-		(SHA-1, SHA-224, SHA-256, SHA-384, and SHA-512) as well as HMAC by
-		Brian Turek
+	(SHA-1, SHA-224, SHA-256, SHA-384, and SHA-512) as well as HMAC by
+	Brian Turek
 
 ## About
 jsSHA is a javaScript implementation of the complete Secure Hash Algorithm
@@ -117,7 +117,8 @@ a command like the following:
 		--compilation_level ADVANCED_OPTIMIZATIONS \
 		--js /path/to/sha_dev.js --js_output_file /path/to/sha.js
 		
-where <FLAG> is a bitwise OR of the following values:
+where FLAG is a bitwise OR of the following values:
+
 * 4 for SHA-384/SHA-512
 * 2 for SHA-224/256
 * 1 for SHA-1
