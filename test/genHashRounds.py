@@ -10,7 +10,7 @@ def main():
         ('SHA-512', hashlib.sha512)]
 
     for (sha_type, sha_func) in hash_funcs:
-        digest = sha_func(abc).digest()
+        digest = sha_func('abc').digest()
 
         # Only loop 4 times since an iteration was done above
         for x in xrange(0, 4):
