@@ -1,6 +1,9 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
+1.5.1 (2013-12-15)
+=========================
+- Changed Google Closure Compiler options to produce "strict" compatible code
 
 1.5 (2013-12-15)
 =========================
