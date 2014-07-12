@@ -1381,7 +1381,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		};
 	};
 
-	if (("function" === typeof define) && (typeof define["amd"])) /* AMD Support */
+	if (("function" === typeof define) && (define["amd"])) /* AMD Support */
 	{
 		define(function()
 		{
