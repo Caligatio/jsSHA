@@ -90,6 +90,10 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 				for (j = 0; j < binArr.length; j += 1)
 				{
+					if (((byteCnt >>> 2) + 1) > bin.length)
+					{
+						bin.push(0);
+					}
 					bin[byteCnt >>> 2] |= binArr[j] << (24 - (8 * (byteCnt % 4)));
 					byteCnt += 1;
 				}
@@ -100,6 +104,11 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			for (i = 0; i < str.length; i += 1)
 			{
 				codePnt = str.charCodeAt(i);
+
+				if (((byteCnt >>> 2) + 1) > bin.length)
+				{
+					bin.push(0);
+				}
 
 				bin[byteCnt >>> 2] |= str.charCodeAt(i) << (16 - (8 * (byteCnt % 4)));
 				byteCnt += 2;
