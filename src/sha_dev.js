@@ -151,6 +151,34 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		return {"value" : bin, "binLen" : length * 4};
 	}
 
+		/**
+	 * Convert a string of raw bytes to an array of big-endian words
+	 *
+	 * @private
+	 * @param {string} str String of raw bytes to be converted to binary representation
+	 * @return {{value : Array.<number>, binLen : number}} Hash list where
+	 *   "value" contains the output number array and "binLen" is the binary
+	 *   length of "value"
+	 */
+	function bytes2binb(str)
+	{
+		var bin = [], codePnt, i;
+
+		for (i = 0; i < str.length; i += 1)
+		{
+			codePnt = str.charCodeAt(i);
+
+			if (((i >>> 2) + 1) > bin.length)
+			{
+				bin.push(0);
+			}
+
+			bin[i >>> 2] |= codePnt << (24 - (8 * (i % 4)));
+		}
+
+		return {"value" : bin, "binLen" : str.length * 8};
+	}
+
 	/**
 	 * Convert a base-64 string to an array of big-endian words
 	 *
@@ -206,7 +234,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 *   hexidecimal representation
 	 * @param {{outputUpper : boolean, b64Pad : string}} formatOpts Hash list
 	 *   containing validated output formatting options
-	 * @return {string} Hexidecimal representation of the parameter in String
+	 * @return {string} Hexidecimal representation of the parameter in string
 	 *   form
 	 */
 	function binb2hex(binarray, formatOpts)
@@ -216,6 +244,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 		for (i = 0; i < length; i += 1)
 		{
+			/* The below is more than a byte but it gets taken care of later */
 			srcByte = binarray[i >>> 2] >>> ((3 - (i % 4)) * 8);
 			str += hex_tab.charAt((srcByte >>> 4) & 0xF) +
 				hex_tab.charAt(srcByte & 0xF);
@@ -233,7 +262,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @param {{outputUpper : boolean, b64Pad : string}} formatOpts Hash list
 	 *   containing validated output formatting options
 	 * @return {string} Base-64 encoded representation of the parameter in
-	 *   String form
+	 *   string form
 	 */
 	function binb2b64(binarray, formatOpts)
 	{
@@ -257,6 +286,29 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				}
 			}
 		}
+		return str;
+	}
+
+	/**
+	 * Convert an array of big-endian words to raw bytes string
+	 *
+	 * @private
+	 * @param {Array.<number>} binarray Array of integers to be converted to
+	 *   a raw bytes string representation
+ 	 * @param {{}} formatOpts Unused Hash list
+	 * @return {string} Raw bytes representation of the parameter in string
+	 *   form
+	 */
+	function binb2bytes(binarray, formatOpts)
+	{
+		var str = "", length = binarray.length * 4, i, srcByte;
+
+		for (i = 0; i < length; i += 1)
+		{
+			srcByte = (binarray[i >>> 2] >>> ((3 - (i % 4)) * 8)) & 0xFF;
+			str += String.fromCharCode(srcByte);
+		}
+
 		return str;
 	}
 
@@ -1093,7 +1145,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @constructor
 	 * @this {jsSHA}
 	 * @param {string} srcString The string to be hashed
-	 * @param {string} inputFormat The format of srcString, HEX, TEXT, or ASCII
+	 * @param {string} inputFormat The format of srcString, HEX, TEXT, B64, or BYTES
 	 * @param {string=} encoding The text encoding to use to encode the source
 	 *   string
 	 */
@@ -1119,7 +1171,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			strBinLen = srcConvertRet["binLen"];
 			strToHash = srcConvertRet["value"];
 		}
-		else if (("ASCII" === inputFormat) || ("TEXT" === inputFormat))
+		else if ("TEXT" === inputFormat)
 		{
 			srcConvertRet = str2binb(srcString, utfType);
 			strBinLen = srcConvertRet["binLen"];
@@ -1131,9 +1183,15 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			strBinLen = srcConvertRet["binLen"];
 			strToHash = srcConvertRet["value"];
 		}
+		else if ("BYTES" === inputFormat)
+		{
+			srcConvertRet = bytes2binb(srcString);
+			strBinLen = srcConvertRet["binLen"];
+			strToHash = srcConvertRet["value"];
+		}
 		else
 		{
-			throw "inputFormat must be HEX, TEXT, ASCII, or B64";
+			throw "inputFormat must be HEX, TEXT, B64, or BYTES";
 		}
 
 		/**
@@ -1143,7 +1201,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		 * @expose
 		 * @param {string} variant The desired SHA variant (SHA-1, SHA-224,
 		 *	 SHA-256, SHA-384, or SHA-512)
-		 * @param {string} format The desired output formatting (B64 or HEX)
+		 * @param {string} format The desired output formatting (B64, HEX, or BYTES)
 		 * @param {number=} numRounds The number of rounds of hashing to be
 		 *   executed
 		 * @param {{outputUpper : boolean, b64Pad : string}=} outputFormatOpts
@@ -1186,8 +1244,11 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			case "B64":
 				formatFunc = binb2b64;
 				break;
+			case "BYTES":
+				formatFunc = binb2bytes;
+				break;
 			default:
-				throw "format must be HEX or B64";
+				throw "format must be HEX, B64, or BYTES";
 			}
 
 			if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
@@ -1244,11 +1305,11 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		 *
 		 * @expose
 		 * @param {string} key The key used to calculate the HMAC
-		 * @param {string} inputFormat The format of key, HEX or TEXT or ASCII
+		 * @param {string} inputFormat The format of key, HEX, TEXT, B64, or BYTES
 		 * @param {string} variant The desired SHA variant (SHA-1, SHA-224,
 		 *	 SHA-256, SHA-384, or SHA-512)
 		 * @param {string} outputFormat The desired output formatting
-		 *   (B64 or HEX)
+		 *   (B64, HEX, or BYTES)
 		 * @param {{outputUpper : boolean, b64Pad : string}=} outputFormatOpts
 		 *   associative array of output formatting options
 		 * @return {string} The string representation of the hash in the format
@@ -1270,8 +1331,11 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			case "B64":
 				formatFunc = binb2b64;
 				break;
+			case "BYTES":
+				formatFunc = binb2bytes;
+				break;
 			default:
-				throw "outputFormat must be HEX or B64";
+				throw "outputFormat must be HEX, B64, or BYTES";
 			}
 
 			/* Validate the hash variant selection and set needed variables */
@@ -1312,7 +1376,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				keyBinLen = keyConvertRet["binLen"];
 				keyToUse = keyConvertRet["value"];
 			}
-			else if (("ASCII" === inputFormat) || ("TEXT" === inputFormat))
+			else if ("TEXT" === inputFormat)
 			{
 				keyConvertRet = str2binb(key, utfType);
 				keyBinLen = keyConvertRet["binLen"];
@@ -1324,9 +1388,15 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				keyBinLen = keyConvertRet["binLen"];
 				keyToUse = keyConvertRet["value"];
 			}
+			else if ("BYTES" === inputFormat)
+			{
+				keyConvertRet = bytes2binb(key);
+				keyBinLen = keyConvertRet["binLen"];
+				keyToUse = keyConvertRet["value"];
+			}
 			else
 			{
-				throw "inputFormat must be HEX, TEXT, ASCII, or B64";
+				throw "inputFormat must be HEX, TEXT, B64, or BYTES";
 			}
 
 			/* These are used multiple times, calculate and store them */
