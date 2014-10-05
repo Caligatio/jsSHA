@@ -295,7 +295,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @private
 	 * @param {Array.<number>} binarray Array of integers to be converted to
 	 *   a raw bytes string representation
- 	 * @param {{}} formatOpts Unused Hash list
+	 * @param {!Object} formatOpts Unused Hash list
 	 * @return {string} Raw bytes representation of the parameter in string
 	 *   form
 	 */
