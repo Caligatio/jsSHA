@@ -3,7 +3,7 @@
  * defined in FIPS PUB 180-2 as well as the corresponding HMAC implementation
  * as defined in FIPS PUB 198a
  *
- * Copyright Brian Turek 2008-2013
+ * Copyright Brian Turek 2008-2014
  * Distributed under the BSD License
  * See http://caligatio.github.com/jsSHA/ for more information
  *
@@ -1192,7 +1192,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 			if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
 			{
-				for (i = 0; i < numRounds; i++)
+				for (i = 0; i < numRounds; i += 1)
 				{
 					message = coreSHA1(message, messageBinLen);
 					messageBinLen = 160;
@@ -1200,7 +1200,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else if (("SHA-224" === variant) && (2 & SUPPORTED_ALGS))
 			{
-				for (i = 0; i < numRounds; i++)
+				for (i = 0; i < numRounds; i += 1)
 				{
 					message = coreSHA2(message, messageBinLen, variant);
 					messageBinLen = 224;
@@ -1208,7 +1208,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else if (("SHA-256" === variant) && (2 & SUPPORTED_ALGS))
 			{
-				for (i = 0; i < numRounds; i++)
+				for (i = 0; i < numRounds; i += 1)
 				{
 					message = coreSHA2(message, messageBinLen, variant);
 					messageBinLen = 256;
@@ -1216,7 +1216,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else if (("SHA-384" === variant) && (4 & SUPPORTED_ALGS))
 			{
-				for (i = 0; i < numRounds; i++)
+				for (i = 0; i < numRounds; i += 1)
 				{
 					message = coreSHA2(message, messageBinLen, variant);
 					messageBinLen = 384;
@@ -1224,7 +1224,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else if (("SHA-512" === variant) && (4 & SUPPORTED_ALGS))
 			{
-				for (i = 0; i < numRounds; i++)
+				for (i = 0; i < numRounds; i += 1)
 				{
 					message = coreSHA2(message, messageBinLen, variant);
 					messageBinLen = 512;
