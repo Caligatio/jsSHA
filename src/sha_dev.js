@@ -60,20 +60,32 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				codePnt = str.charCodeAt(i);
 				binArr = [];
 
-				if (0x800 < codePnt)
+				if (0x80 > codePnt)
 				{
-					binArr[0] = 0xE0 | ((codePnt & 0xF000) >>> 12);
-					binArr[1] = 0x80 | ((codePnt & 0xFC0) >>> 6);
-					binArr[2] = 0x80 | (codePnt & 0x3F);
+					binArr.push(codePnt);
 				}
-				else if (0x80 < codePnt)
+				else if (0x800 > codePnt)
 				{
-					binArr[0] = 0xC0 | ((codePnt & 0x7C0) >>> 6);
-					binArr[1] = 0x80 | (codePnt & 0x3F);
+					binArr.push(0xC0 | (codePnt >>> 6));
+					binArr.push(0x80 | (codePnt & 0x3F));
+				}
+				else if ((0xd800 > codePnt) || (0xe000 <= codePnt)) {
+					binArr.push(
+						0xe0 | (codePnt >>> 12),
+						0x80 | ((codePnt >>> 6) & 0x3f),
+						0x80 | (codePnt & 0x3f)
+					);
 				}
 				else
 				{
-					binArr[0] = codePnt;
+					i += 1;
+					codePnt = 0x10000 + (((codePnt & 0x3ff) << 10) | (str.charCodeAt(i) & 0x3ff));
+					binArr.push(
+						0xf0 | (codePnt >>> 18),
+						0x80 | ((codePnt >>> 12) & 0x3f),
+						0x80 | ((codePnt >>> 6) & 0x3f),
+						0x80 | (codePnt & 0x3f)
+					);
 				}
 
 				for (j = 0; j < binArr.length; j += 1)
