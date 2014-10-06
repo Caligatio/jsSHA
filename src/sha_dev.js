@@ -51,7 +51,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	function str2binb(str, utfType)
 	{
-		var bin = [], codePnt, binArr = [], byteCnt = 0, i, j;
+		var bin = [], codePnt, binArr = [], byteCnt = 0, i, j, offset;
 
 		if ("UTF8" === utfType)
 		{
@@ -90,11 +90,12 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 				for (j = 0; j < binArr.length; j += 1)
 				{
-					if (((byteCnt >>> 2) + 1) > bin.length)
+					offset = byteCnt >>> 2;
+					while (bin.length <= offset)
 					{
 						bin.push(0);
 					}
-					bin[byteCnt >>> 2] |= binArr[j] << (24 - (8 * (byteCnt % 4)));
+					bin[offset] |= binArr[j] << (24 - (8 * (byteCnt % 4)));
 					byteCnt += 1;
 				}
 			}
@@ -105,12 +106,12 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			{
 				codePnt = str.charCodeAt(i);
 
-				if (((byteCnt >>> 2) + 1) > bin.length)
+				offset = byteCnt >>> 2;
+				while (bin.length <= offset)
 				{
 					bin.push(0);
 				}
-
-				bin[byteCnt >>> 2] |= str.charCodeAt(i) << (16 - (8 * (byteCnt % 4)));
+				bin[offset] |= str.charCodeAt(i) << (16 - (8 * (byteCnt % 4)));
 				byteCnt += 2;
 			}
 		}
@@ -128,7 +129,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	function hex2binb(str)
 	{
-		var bin = [], length = str.length, i, num;
+		var bin = [], length = str.length, i, num, offset;
 
 		if (0 !== (length % 2))
 		{
@@ -140,6 +141,11 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			num = parseInt(str.substr(i, 2), 16);
 			if (!isNaN(num))
 			{
+				offset = i >>> 3;
+				while (bin.length <= offset)
+				{
+					bin.push(0);
+				}
 				bin[i >>> 3] |= num << (24 - (4 * (i % 8)));
 			}
 			else
@@ -162,18 +168,18 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	function bytes2binb(str)
 	{
-		var bin = [], codePnt, i;
+		var bin = [], codePnt, i, offset;
 
 		for (i = 0; i < str.length; i += 1)
 		{
 			codePnt = str.charCodeAt(i);
 
-			if (((i >>> 2) + 1) > bin.length)
+			offset = i >>> 2;
+			if (bin.length <= offset)
 			{
 				bin.push(0);
 			}
-
-			bin[i >>> 2] |= codePnt << (24 - (8 * (i % 4)));
+			bin[offset] |= codePnt << (24 - (8 * (i % 4)));
 		}
 
 		return {"value" : bin, "binLen" : str.length * 8};
@@ -190,7 +196,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	function b642binb(str)
 	{
-		var retVal = [], byteCnt = 0, index, i, j, tmpInt, strPart, firstEqual,
+		var retVal = [], byteCnt = 0, index, i, j, tmpInt, strPart, firstEqual, offset,
 			b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 		if (-1 === str.search(/^[a-zA-Z0-9=+\/]+$/))
@@ -217,7 +223,12 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 			for (j = 0; j < strPart.length - 1; j += 1)
 			{
-				retVal[byteCnt >> 2] |= ((tmpInt >>> (16 - (j * 8))) & 0xFF) <<
+				offset = byteCnt >>> 2;
+				while (retVal.length <= offset)
+				{
+					retVal.push(0);
+				}
+				retVal[offset] |= ((tmpInt >>> (16 - (j * 8))) & 0xFF) <<
 					(24 - (8 * (byteCnt % 4)));
 				byteCnt += 1;
 			}
@@ -266,14 +277,18 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	function binb2b64(binarray, formatOpts)
 	{
-		var str = "", length = binarray.length * 4, i, j, triplet,
+		var str = "", length = binarray.length * 4, i, j, triplet, offset, int1, int2,
 			b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 		for (i = 0; i < length; i += 3)
 		{
+			offset = (i + 1) >>> 2;
+			int1 = (binarray.length <= offset) ? 0 : binarray[offset];
+			offset = (i + 2) >>> 2;
+			int2 = (binarray.length <= offset) ? 0 : binarray[offset];
 			triplet = (((binarray[i >>> 2] >>> 8 * (3 - i % 4)) & 0xFF) << 16) |
-				(((binarray[i + 1 >>> 2] >>> 8 * (3 - (i + 1) % 4)) & 0xFF) << 8) |
-				((binarray[i + 2 >>> 2] >>> 8 * (3 - (i + 2) % 4)) & 0xFF);
+				(((int1 >>> 8 * (3 - (i + 1) % 4)) & 0xFF) << 8) |
+				((int2 >>> 8 * (3 - (i + 2) % 4)) & 0xFF);
 			for (j = 0; j < 4; j += 1)
 			{
 				if (i * 8 + j * 6 <= binarray.length * 32)
@@ -812,17 +827,22 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	{
 		var W = [], a, b, c, d, e, T, ch = ch_32, parity = parity_32,
 			maj = maj_32, rotl = rotl_32, safeAdd_2 = safeAdd_32_2, i, t,
-			safeAdd_5 = safeAdd_32_5, appendedMessageLength,
+			safeAdd_5 = safeAdd_32_5, appendedMessageLength, offset,
 			H = [
 				0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0
 			];
 
+		offset = (((messageLen + 65) >>> 9) << 4) + 15;
+		while (message.length <= offset)
+		{
+			message.push(0);
+		}
 		/* Append '1' at the end of the binary string */
-		message[messageLen >>> 5] |= 0x80 << (24 - (messageLen % 32));
+        message[messageLen >>> 5] |= 0x80 << (24 - (messageLen % 32));
 		/* Append length of binary string in the position such that the new
 		length is a multiple of 512.  Logic does not work for even multiples
 		of 512 but there can never be even multiples of 512 */
-		message[(((messageLen + 65) >>> 9) << 4) + 15] = messageLen;
+		message[offset] = messageLen;
 
 		appendedMessageLength = message.length;
 
@@ -892,7 +912,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	{
 		var a, b, c, d, e, f, g, h, T1, T2, H, numRounds, lengthPosition, i, t,
 			binaryStringInc, binaryStringMult, safeAdd_2, safeAdd_4, safeAdd_5,
-			gamma0, gamma1, sigma0, sigma1, ch, maj, Int, W = [],
+			gamma0, gamma1, sigma0, sigma1, ch, maj, Int, W = [], int1, int2, offset,
 			appendedMessageLength, retVal,
 			K = [
 				0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5,
@@ -1037,6 +1057,10 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			throw "Unexpected error in SHA-2 implementation";
 		}
 
+		while (message.length <= lengthPosition)
+		{
+			message.push(0);
+		}
 		/* Append '1' at the end of the binary string */
 		message[messageLen >>> 5] |= 0x80 << (24 - messageLen % 32);
 		/* Append length of binary string in the position such that the new
@@ -1060,9 +1084,11 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			{
 				if (t < 16)
 				{
+					offset = t * binaryStringMult + i;
+					int1 = (message.length <= offset) ? 0 : message[offset];
+					int2 = (message.length <= offset + 1) ? 0 : message[offset + 1];
 					/* Bit of a hack - for 32-bit, the second term is ignored */
-					W[t] = new Int(message[t * binaryStringMult + i],
-							message[t * binaryStringMult + i + 1]);
+					W[t] = new Int(int1, int2);
 				}
 				else
 				{
@@ -1422,6 +1448,10 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				/* For all variants, the block size is bigger than the output
 				 * size so there will never be a useful byte at the end of the
 				 * string */
+				while (keyToUse.length <= lastArrayIndex)
+				{
+					keyToUse.push(0);
+				}
 				keyToUse[lastArrayIndex] &= 0xFFFFFF00;
 			}
 			else if (blockByteSize > (keyBinLen / 8))
@@ -1429,6 +1459,10 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				/* If the blockByteSize is greater than the key length, there
 				 * will always be at LEAST one "useless" byte at the end of the
 				 * string */
+				while (keyToUse.length <= lastArrayIndex)
+				{
+					keyToUse.push(0);
+				}
 				keyToUse[lastArrayIndex] &= 0xFFFFFF00;
 			}
 
