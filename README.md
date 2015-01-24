@@ -83,8 +83,8 @@ key "SecretKey" and hashing algorithm SHA-512 was calculated.
 	var hmac = shaObj.getHMAC("SecretKey", "TEXT", "SHA-512", "HEX");
 
 The constructor takes an optional parameter, encoding, that specifies the
-encoding used to encode TEXT-type inputs. Valid options are "UTF8" and "UTF16"
-and it defaults to "UTF8"
+encoding used to encode TEXT-type inputs. Valid options are "UTF8", "UTF16BE",
+and "UTF16LE", it defaults to "UTF8"
 
 getHash takes two optional parameters, a numRounds integer and an outputFormatOpts
 hashlist.  numRounds controls the number of hashing iterations/rounds performed

@@ -3,7 +3,7 @@
  * defined in FIPS PUB 180-2 as well as the corresponding HMAC implementation
  * as defined in FIPS PUB 198a
  *
- * Copyright Brian Turek 2008-2014
+ * Copyright Brian Turek 2008-2015
  * Distributed under the BSD License
  * See http://caligatio.github.com/jsSHA/ for more information
  *
@@ -43,8 +43,8 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 *
 	 * @private
 	 * @param {string} str String to be converted to binary representation
-	 * @param {string} utfType The Unicode type, UTF8 or UTF16, to use to
-	 *   encode the source string
+	 * @param {string} utfType The Unicode type, UTF8 or UTF16BE, UTF16LE, to
+	 *   use to encode the source string
 	 * @return {{value : Array.<number>, binLen : number}} Hash list where
 	 *   "value" contains the output number array and "binLen" is the binary
 	 *   length of "value"
@@ -100,18 +100,24 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				}
 			}
 		}
-		else if ("UTF16" === utfType)
+		else if (("UTF16BE" === utfType) || "UTF16LE" === utfType)
 		{
 			for (i = 0; i < str.length; i += 1)
 			{
 				codePnt = str.charCodeAt(i);
+				/* Internally strings are UTF-16BE so only change if UTF-16LE */
+				if ("UTF16LE" === utfType)
+				{
+					j = codePnt & 0xFF;
+					codePnt = (j << 8) | (codePnt >> 8);
+				}
 
 				offset = byteCnt >>> 2;
 				while (bin.length <= offset)
 				{
 					bin.push(0);
 				}
-				bin[offset] |= str.charCodeAt(i) << (16 - (8 * (byteCnt % 4)));
+				bin[offset] |= codePnt << (16 - (8 * (byteCnt % 4)));
 				byteCnt += 2;
 			}
 		}
@@ -838,7 +844,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			message.push(0);
 		}
 		/* Append '1' at the end of the binary string */
-        message[messageLen >>> 5] |= 0x80 << (24 - (messageLen % 32));
+		message[messageLen >>> 5] |= 0x80 << (24 - (messageLen % 32));
 		/* Append length of binary string in the position such that the new
 		length is a multiple of 512.  Logic does not work for even multiples
 		of 512 but there can never be even multiples of 512 */
@@ -1181,9 +1187,9 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 		utfType = encoding || "UTF8";
 
-		if (!(("UTF8" === utfType) || ("UTF16" === utfType)))
+		if (!(("UTF8" === utfType) || ("UTF16BE" === utfType) || ("UTF16LE" === utfType)))
 		{
-			throw "encoding must be UTF8 or UTF16";
+			throw "encoding must be UTF8, UTF16BE, or UTF16LE";
 		}
 
 		/* Convert the input string into the correct type */

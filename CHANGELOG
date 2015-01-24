@@ -1,13 +1,15 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
-2.0.0 (2014-10-XX)
+2.0.0 (2015-XX-XX)
 =========================
 - Removed ASCII as a valid input type (ASCII was deprecated in v1.4)
 - Added a BYTES input and output format that is a raw byte string
 - Fixed broken AMD support (thanks drewcovi!)
 - Fixed broken UTF-8 parsing on non-BMP Unicode characters
 - Changed array references to remove warnings on Icedove
+- Replaced "UTF16" encoding with "UTF16BE" (big endian) and "UTF16LE" (little
+  endian) to remove confusion
 
 1.5.1 (2013-12-15)
 =========================
