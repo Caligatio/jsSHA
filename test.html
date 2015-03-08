@@ -347,9 +347,9 @@
 				for (var j = 0; j < algs.length; j++)
 				{
 					var hashType = algs[j];
-					
+
 					/* Dynamically build the table structure */
-					new_th = document.createElement('th');
+					var new_th = document.createElement('th');
 					new_th.innerHTML = hashType;
 					table_head.rows[0].appendChild(new_th);
 					table_body.rows[0].insertCell(-1);
@@ -369,7 +369,7 @@
 						table.rows[1].cells[j+1].innerHTML = "FAIL";
 						table.rows[1].cells[j+1].className= "incorrect";
 					}
-					
+
 					if (data[hashType]['hexOut10'] == shaObj.getHash(hashType, "HEX", 10))
 					{
 						table.rows[2].cells[j+1].innerHTML = "PASS";
@@ -382,7 +382,7 @@
 					}
 				}
 			}
-			
+
 			function calcHMACs(algs)
 			{
 				/* Object that contains the small/medium/large test case inputs and outputs for all the hashes */
@@ -959,12 +959,12 @@
 				</tr>
 			</tbody>
 		</table>
-		
+
 		<h2>Multiple Round Tests</h2>
 		<p>
 			Values for the multiple round tests can be generated using the included getHashRounds.py
 		</p>
-		
+
 		<table id="HashRounds">
 			<caption>Multiple Hash Rounds Tests</caption>
 			<thead>
