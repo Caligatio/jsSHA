@@ -1,9 +1,12 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
-2.0.0 (2015-XX-XX)
+1.6.0 (2015-03-08)
 =========================
-- Removed ASCII as a valid input type (ASCII was deprecated in v1.4)
+This marks the last v1.X new feature release.  The API is changing
+significantly with upcoming v2.0 to support streaming and it will be too
+difficult to support the older API style with new features.
+
 - Added a BYTES input and output format that is a raw byte string
 - Fixed broken AMD support (thanks drewcovi!)
 - Fixed broken UTF-8 parsing on non-BMP Unicode characters
