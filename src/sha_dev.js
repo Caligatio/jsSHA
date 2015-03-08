@@ -1177,7 +1177,8 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @constructor
 	 * @this {jsSHA}
 	 * @param {string} srcString The string to be hashed
-	 * @param {string} inputFormat The format of srcString, HEX, TEXT, B64, or BYTES
+	 * @param {string} inputFormat The format of srcString, HEX, ASCII, TEXT,
+     *   B64, or BYTES
 	 * @param {string=} encoding The text encoding to use to encode the source
 	 *   string
 	 */
@@ -1203,7 +1204,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			strBinLen = srcConvertRet["binLen"];
 			strToHash = srcConvertRet["value"];
 		}
-		else if ("TEXT" === inputFormat)
+		else if (("TEXT" === inputFormat) || ("ASCII" === inputFormat))
 		{
 			srcConvertRet = str2binb(srcString, utfType);
 			strBinLen = srcConvertRet["binLen"];
@@ -1223,7 +1224,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		}
 		else
 		{
-			throw "inputFormat must be HEX, TEXT, B64, or BYTES";
+			throw "inputFormat must be HEX, TEXT, ASCII, B64, or BYTES";
 		}
 
 		/**
@@ -1337,7 +1338,8 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		 *
 		 * @expose
 		 * @param {string} key The key used to calculate the HMAC
-		 * @param {string} inputFormat The format of key, HEX, TEXT, B64, or BYTES
+		 * @param {string} inputFormat The format of key, HEX, TEXT, ASCII,
+         *   B64, or BYTES
 		 * @param {string} variant The desired SHA variant (SHA-1, SHA-224,
 		 *	 SHA-256, SHA-384, or SHA-512)
 		 * @param {string} outputFormat The desired output formatting
@@ -1408,7 +1410,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				keyBinLen = keyConvertRet["binLen"];
 				keyToUse = keyConvertRet["value"];
 			}
-			else if ("TEXT" === inputFormat)
+			else if (("TEXT" === inputFormat) || ("ASCII" === inputFormat))
 			{
 				keyConvertRet = str2binb(key, utfType);
 				keyBinLen = keyConvertRet["binLen"];
@@ -1428,7 +1430,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else
 			{
-				throw "inputFormat must be HEX, TEXT, B64, or BYTES";
+				throw "inputFormat must be HEX, TEXT, ASCII, B64, or BYTES";
 			}
 
 			/* These are used multiple times, calculate and store them */
