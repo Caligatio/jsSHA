@@ -409,6 +409,59 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	}
 
 	/**
+	 * Function that takes an input format and UTF encoding and returns the
+	 * appropriate function used to convert the input.
+	 *
+	 * @private
+	 * @param {string} format The string encoding to use (UTF8, UTF16BE,
+	 *	UTF16LE)
+	 * @return {function(string, Array.<number>, number): Array.<number>}
+	 *   Function that will convert an input string to a packed int array
+	 */
+	function getStrConverter(format, utfType)
+	{
+		var retVal;
+
+		/* Validate encoding */
+		switch (utfType)
+		{
+		case "UTF8":
+			/* Fallthrough */
+		case "UTF16BE":
+			/* Fallthrough */
+		case "UTF16LE":
+			/* Fallthrough */
+			break;
+		default:
+			throw "encoding must be UTF8, UTF16BE, or UTF16LE";
+		}
+
+		/* Map inputFormat to the appropriate converter */
+		switch (format)
+		{
+		case "HEX":
+			retVal = hex2binb;
+			break;
+		case "TEXT":
+			retVal = function(str, existingBin, existingBinLen)
+				{
+					return str2binb(str, utfType, existingBin, existingBinLen);
+				};
+			break;
+		case "B64":
+			retVal = b642binb;
+			break;
+		case "BYTES":
+			retVal = bytes2binb;
+			break;
+		default:
+			throw "format must be HEX, TEXT, B64, or BYTES";
+		}
+
+		return retVal;
+	}
+
+	/**
 	 * The 32-bit implementation of circular rotate left
 	 *
 	 * @private
@@ -1325,49 +1378,17 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	var jsSHA = function(variant, inputFormat, options)
 	{
-		var processedLen = 0, remainder, remainderLen, utfType, intermediateH,
-			converterFunc, shaVariant = variant, numRounds, outputBinLen,
-			variantBlockSize, roundFunc, finalizeFunc, finalized = false;
+		var processedLen = 0, remainder = [], remainderLen = 0, utfType,
+			intermediateH, converterFunc, shaVariant = variant, outputBinLen,
+			variantBlockSize, roundFunc, finalizeFunc, finalized = false,
+			hmacKeySet = false, keyWithIPad = [], keyWithOPad = [], numRounds,
+			updatedCalled = false;
 
 		options = options || {};
 		utfType = options["encoding"] || "UTF8";
 		numRounds = options["numRounds"] || 1;
 
-		/* Validate encoding */
-		switch (utfType)
-		{
-		case "UTF8":
-			/* Fallthrough */
-		case "UTF16BE":
-			/* Fallthrough */
-		case "UTF16LE":
-			/* Fallthrough */
-			break;
-		default:
-			throw "encoding must be UTF8, UTF16BE, or UTF16LE";
-		}
-
-		/* Map inputFormat to the appropriate converter */
-		switch (inputFormat)
-		{
-		case "HEX":
-			converterFunc = hex2binb;
-			break;
-		case "TEXT":
-			converterFunc = function(str, existingBin, existingBinLen)
-				{
-					return str2binb(str, utfType, existingBin, existingBinLen);
-				};
-			break;
-		case "B64":
-			converterFunc = b642binb;
-			break;
-		case "BYTES":
-			converterFunc = bytes2binb;
-			break;
-		default:
-			throw "inputFormat must be HEX, TEXT, B64, or BYTES";
-		}
+		converterFunc = getStrConverter(inputFormat, utfType);
 
 		if ((numRounds !== parseInt(numRounds, 10)) || (1 > numRounds))
 		{
@@ -1416,6 +1437,89 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		intermediateH = getH(shaVariant);
 
 		/**
+		 * Sets the HMAC key for an eventual getHMAC call.  Must be called
+		 * immediately after jsSHA object instantiation
+		 *
+		 * @expose
+		 * @param {string} key The key used to calculate the HMAC
+		 * @param {string} inputFormat The format of key, HEX, TEXT, B64, or BYTES
+		 * @param {{encoding : (string|undefined)}=} options Associative array
+		 *   of input format options
+		 */
+		this.setHMACKey = function(key, inputFormat, options)
+		{
+			var keyConverterFunc, convertRet, keyBinLen, keyToUse, blockByteSize,
+				i, lastArrayIndex;
+
+			if (true === hmacKeySet)
+			{
+				throw "HMAC key already set";
+			}
+
+			if (true === finalized)
+			{
+				throw "Cannot set HMAC key after finalizing hash";
+			}
+
+			if (true === updatedCalled)
+			{
+				throw "Cannot set HMAC key after calling update";
+			}
+
+			options = options || {};
+			utfType = options["encoding"] || "UTF8";
+
+			keyConverterFunc = getStrConverter(inputFormat, utfType);
+
+			convertRet = keyConverterFunc(key);
+			keyBinLen = convertRet["binLen"];
+			keyToUse = convertRet["value"];
+
+			blockByteSize = variantBlockSize >>> 3;
+
+			/* These are used multiple times, calculate and store them */
+			lastArrayIndex = (blockByteSize / 4) - 1;
+
+			/* Figure out what to do with the key based on its size relative to
+			 * the hash's block size */
+			if (blockByteSize < (keyBinLen / 8))
+			{
+				keyToUse = finalizeFunc(keyToUse, keyBinLen, 0, getH(shaVariant));
+				/* For all variants, the block size is bigger than the output
+				 * size so there will never be a useful byte at the end of the
+				 * string */
+				while (keyToUse.length <= lastArrayIndex)
+				{
+					keyToUse.push(0);
+				}
+				keyToUse[lastArrayIndex] &= 0xFFFFFF00;
+			}
+			else if (blockByteSize > (keyBinLen / 8))
+			{
+				/* If the blockByteSize is greater than the key length, there
+				 * will always be at LEAST one "useless" byte at the end of the
+				 * string */
+				while (keyToUse.length <= lastArrayIndex)
+				{
+					keyToUse.push(0);
+				}
+				keyToUse[lastArrayIndex] &= 0xFFFFFF00;
+			}
+
+			/* Create ipad and opad */
+			for (i = 0; i <= lastArrayIndex; i += 1)
+			{
+				keyWithIPad[i] = keyToUse[i] ^ 0x36363636;
+				keyWithOPad[i] = keyToUse[i] ^ 0x5C5C5C5C;
+			}
+
+			intermediateH = roundFunc(keyWithIPad, intermediateH);
+			processedLen = variantBlockSize;
+
+			hmacKeySet = true;
+		};
+
+		/**
 		 * Takes strString and hashes as many blocks as possible.  Stores the
 		 * rest for either a future update or getHash call.
 		 *
@@ -1446,6 +1550,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			processedLen += updateProcessedLen;
 			remainder = chunk.slice(updateProcessedLen >>> 5);
 			remainderLen = chunkBinLen % variantBlockSize;
+			updatedCalled = true;
 		};
 
 		/**
@@ -1462,6 +1567,11 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		this.getHash = function(format, options)
 		{
 			var formatFunc, i, outputOptions;
+
+			if (true === hmacKeySet)
+			{
+				throw "Cannot call getHash after setting HMAC key";
+			}
 
 			outputOptions = getOutputOpts(options);
 
@@ -1495,36 +1605,36 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		};
 
 		/**
-		 * Returns the desired HMAC of the string specified at instantiation
-		 * using the key and variant parameter
+		 * Returns the the HMAC in the specified format using the key given by
+		 * a previous setHMACKey call.
 		 *
 		 * @expose
-		 * @param {string} key The key used to calculate the HMAC
-		 * @param {string} inputFormat The format of key, HEX, TEXT, B64, or BYTES
-		 * @param {string} variant The desired SHA variant (SHA-1, SHA-224,
-		 *	 SHA-256, SHA-384, or SHA-512)
-		 * @param {string} outputFormat The desired output formatting
+		 * @param {string} format The desired output formatting
 		 *   (B64, HEX, or BYTES)
-		 * @param {{outputUpper : boolean, b64Pad : string}=} outputFormatOpts
-		 *   associative array of output formatting options
+		 * @param {{outputUpper : (boolean|undefined), b64Pad : (string|undefined)}=}
+		 *   options associative array of output formatting options
 		 * @return {string} The string representation of the hash in the format
 		 *   specified
 		 */
-		this.getHMAC = function(key, inputFormat, variant, outputFormat,
-			outputFormatOpts)
+		this.getHMAC = function(format, options)
 		{
-			var formatFunc, keyToUse, blockByteSize, blockBitSize, i,
-				retVal, lastArrayIndex, keyBinLen, hashBitSize,
-				keyWithIPad = [], keyWithOPad = [], keyConvertRet = null;
+			var formatFunc,	firstHash, outputOptions;
+
+			if (false === hmacKeySet)
+			{
+				throw "Cannot call getHMAC without first setting HMAC key";
+			}
+
+			outputOptions = getOutputOpts(options);
 
 			/* Validate the output format selection */
-			switch (outputFormat)
+			switch (format)
 			{
 			case "HEX":
-				formatFunc = binb2hex;
+				formatFunc = function(binarray) {return binb2hex(binarray, outputOptions);};
 				break;
 			case "B64":
-				formatFunc = binb2b64;
+				formatFunc = function(binarray) {return binb2b64(binarray, outputOptions);};
 				break;
 			case "BYTES":
 				formatFunc = binb2bytes;
@@ -1533,145 +1643,15 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				throw "outputFormat must be HEX, B64, or BYTES";
 			}
 
-			/* Validate the hash variant selection and set needed variables */
-			if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
+			if (false === finalized)
 			{
-				blockByteSize = 64;
-				hashBitSize = 160;
-			}
-			else if (("SHA-224" === variant) && (2 & SUPPORTED_ALGS))
-			{
-				blockByteSize = 64;
-				hashBitSize = 224;
-			}
-			else if (("SHA-256" === variant) && (2 & SUPPORTED_ALGS))
-			{
-				blockByteSize = 64;
-				hashBitSize = 256;
-			}
-			else if (("SHA-384" === variant) && (4 & SUPPORTED_ALGS))
-			{
-				blockByteSize = 128;
-				hashBitSize = 384;
-			}
-			else if (("SHA-512" === variant) && (4 & SUPPORTED_ALGS))
-			{
-				blockByteSize = 128;
-				hashBitSize = 512;
-			}
-			else
-			{
-				throw "Chosen SHA variant is not supported";
+				firstHash = finalizeFunc(remainder, remainderLen, processedLen, intermediateH);
+				intermediateH = roundFunc(keyWithOPad, getH(shaVariant));
+				intermediateH = finalizeFunc(firstHash, outputBinLen, variantBlockSize, intermediateH);
 			}
 
-			/* Validate input format selection */
-			if ("HEX" === inputFormat)
-			{
-				keyConvertRet = hex2binb(key);
-				keyBinLen = keyConvertRet["binLen"];
-				keyToUse = keyConvertRet["value"];
-			}
-			else if ("TEXT" === inputFormat)
-			{
-				keyConvertRet = str2binb(key, utfType);
-				keyBinLen = keyConvertRet["binLen"];
-				keyToUse = keyConvertRet["value"];
-			}
-			else if ("B64" === inputFormat)
-			{
-				keyConvertRet = b642binb(key);
-				keyBinLen = keyConvertRet["binLen"];
-				keyToUse = keyConvertRet["value"];
-			}
-			else if ("BYTES" === inputFormat)
-			{
-				keyConvertRet = bytes2binb(key);
-				keyBinLen = keyConvertRet["binLen"];
-				keyToUse = keyConvertRet["value"];
-			}
-			else
-			{
-				throw "inputFormat must be HEX, TEXT, B64, or BYTES";
-			}
-
-			/* These are used multiple times, calculate and store them */
-			blockBitSize = blockByteSize * 8;
-			lastArrayIndex = (blockByteSize / 4) - 1;
-
-			/* Figure out what to do with the key based on its size relative to
-			 * the hash's block size */
-			if (blockByteSize < (keyBinLen / 8))
-			{
-				if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
-				{
-					keyToUse = coreSHA1(keyToUse, keyBinLen);
-				}
-				else if (6 & SUPPORTED_ALGS)
-				{
-					keyToUse = coreSHA2(keyToUse, keyBinLen, variant);
-				}
-				else
-				{
-					throw "Unexpected error in HMAC implementation";
-				}
-				/* For all variants, the block size is bigger than the output
-				 * size so there will never be a useful byte at the end of the
-				 * string */
-				while (keyToUse.length <= lastArrayIndex)
-				{
-					keyToUse.push(0);
-				}
-				keyToUse[lastArrayIndex] &= 0xFFFFFF00;
-			}
-			else if (blockByteSize > (keyBinLen / 8))
-			{
-				/* If the blockByteSize is greater than the key length, there
-				 * will always be at LEAST one "useless" byte at the end of the
-				 * string */
-				while (keyToUse.length <= lastArrayIndex)
-				{
-					keyToUse.push(0);
-				}
-				keyToUse[lastArrayIndex] &= 0xFFFFFF00;
-			}
-
-			/* Create ipad and opad */
-			for (i = 0; i <= lastArrayIndex; i += 1)
-			{
-				keyWithIPad[i] = keyToUse[i] ^ 0x36363636;
-				keyWithOPad[i] = keyToUse[i] ^ 0x5C5C5C5C;
-			}
-
-			/* Calculate the HMAC */
-			if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
-			{
-				retVal = coreSHA1(
-					keyWithOPad.concat(
-						coreSHA1(
-							keyWithIPad.concat(strToHash),
-							blockBitSize + strBinLen
-						)
-					),
-					blockBitSize + hashBitSize);
-			}
-			else if (6 & SUPPORTED_ALGS)
-			{
-				retVal = coreSHA2(
-					keyWithOPad.concat(
-						coreSHA2(
-							keyWithIPad.concat(strToHash),
-							blockBitSize + strBinLen,
-							variant
-						)
-					),
-					blockBitSize + hashBitSize, variant);
-			}
-			else
-			{
-				throw "Unexpected error in HMAC implementation";
-			}
-
-			return formatFunc(retVal, getOutputOpts(outputFormatOpts));
+			finalized = true;
+			return formatFunc(intermediateH);
 		};
 	};
 
