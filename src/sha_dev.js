@@ -1409,15 +1409,18 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			finalizeFunc = finalizeSHA1;
 			outputBinLen = 160;
 		}
-		else if (6 & SUPPORTED_ALGS)
+		else
 		{
-			roundFunc = function (block, H) {
-				return roundSHA2(block, H, shaVariant);
-			};
-			finalizeFunc = function (remainder, remainderBinLen, processedBinLen, H)
+			if (6 & SUPPORTED_ALGS)
 			{
-				return finalizeSHA2(remainder, remainderBinLen, processedBinLen, H, shaVariant);
-			};
+				roundFunc = function (block, H) {
+					return roundSHA2(block, H, shaVariant);
+				};
+				finalizeFunc = function (remainder, remainderBinLen, processedBinLen, H)
+				{
+					return finalizeSHA2(remainder, remainderBinLen, processedBinLen, H, shaVariant);
+				};
+			}
 
 			if (("SHA-224" === shaVariant) && (2 & SUPPORTED_ALGS))
 			{
@@ -1444,10 +1447,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				throw "Chosen SHA variant is not supported";
 			}
 		}
-		else
-		{
-			throw "Chosen SHA variant is not supported";
-		}
+
 		intermediateH = getH(shaVariant);
 
 		/**
@@ -1463,7 +1463,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		this.setHMACKey = function(key, inputFormat, options)
 		{
 			var keyConverterFunc, convertRet, keyBinLen, keyToUse, blockByteSize,
-				i, lastArrayIndex, inputOptions;
+				i, lastArrayIndex, keyOptions;
 
 			if (true === hmacKeySet)
 			{
@@ -1480,8 +1480,8 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				throw "Cannot set HMAC key after calling update";
 			}
 
-			inputOptions = options || {};
-			utfType = inputOptions["encoding"] || "UTF8";
+			keyOptions = options || {};
+			utfType = keyOptions["encoding"] || "UTF8";
 
 			keyConverterFunc = getStrConverter(inputFormat, utfType);
 
