@@ -391,21 +391,23 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	function getOutputOpts(options)
 	{
-		options = options || {};
-		options["outputUpper"] = options["outputUpper"] || false;
-		options["b64Pad"] = options["b64Pad"] || "=";
+		var retVal = {"outputUpper" : false, "b64Pad" : "="}, outputOptions;
+		outputOptions = options || {};
 
-		if ("boolean" !== typeof(options["outputUpper"]))
+		retVal["outputUpper"] = outputOptions["outputUpper"] || false;
+		retVal["b64Pad"] = outputOptions["b64Pad"] || "=";
+
+		if ("boolean" !== typeof(retVal["outputUpper"]))
 		{
 			throw "Invalid outputUpper formatting option";
 		}
 
-		if ("string" !== typeof(options["b64Pad"]))
+		if ("string" !== typeof(retVal["b64Pad"]))
 		{
 			throw "Invalid b64Pad formatting option";
 		}
 
-		return options;
+		return retVal;
 	}
 
 	/**
@@ -413,10 +415,12 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * appropriate function used to convert the input.
 	 *
 	 * @private
-	 * @param {string} format The string encoding to use (UTF8, UTF16BE,
+	 * @param {string} format The format of the string to be converted
+	 * @param {string} utfType The string encoding to use (UTF8, UTF16BE,
 	 *	UTF16LE)
-	 * @return {function(string, Array.<number>, number): Array.<number>}
-	 *   Function that will convert an input string to a packed int array
+	 * @return {function(string, Array.<number>=, number=): {value :
+	 *   Array.<number>, binLen : number}} Function that will convert an input
+	 *   string to a packed int array
 	 */
 	function getStrConverter(format, utfType)
 	{
@@ -909,7 +913,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * Gets the H values for the specified SHA variant
 	 *
 	 * @param {string} variant The SHA variant
-	 * @return {Array.<number>} The initial H values
+	 * @return {Array.<number|Int_64>} The initial H values
 	 */
 	function getH(variant)
 	{
@@ -967,6 +971,10 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			default:
 				throw "Unknown SHA variant";
 			}
+		}
+		else
+		{
+			throw "No SHA variants supported";
 		}
 
 		return retVal;
@@ -1042,8 +1050,8 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @private
 	 * @param {Array.<number>} remainder Any leftover unprocessed packed ints
 	 *   that still need to be processed
-	 * @param {Array.<number>} remainderBinLen The number of bits in remainder
-	 * @param {Array.<number>} processedBinLen The number of bits already
+	 * @param {number} remainderBinLen The number of bits in remainder
+	 * @param {number} processedBinLen The number of bits already
 	 *   processed
 	 * @param {Array.<number>} H The intermediate H values from a previous
 	 *   round
@@ -1079,7 +1087,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		return H;
 	}
 
-	/* Put this here so the K arrays aren't but on the stack for every block */
+	/* Put this here so the K arrays aren't put on the stack for every block */
 	var K_sha2, K_sha512;
 	if (6 & SUPPORTED_ALGS)
 	{
@@ -1155,10 +1163,10 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @private
 	 * @param {Array.<number>} block The binary array representation of the
 	 *   block to hash
-	 * @param {Array.<number>} H The intermediate H values from a previous
+	 * @param {Array.<number|Int_64>} H The intermediate H values from a previous
 	 *   round
 	 * @param {string} variant The desired SHA-2 variant
-	 * @return {Array.<number>} The resulting H values
+	 * @return {Array.<number|Int_64>} The resulting H values
 	 */
 	function roundSHA2(block, H, variant)
 	{
@@ -1266,10 +1274,10 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @private
 	 * @param {Array.<number>} remainder Any leftover unprocessed packed ints
 	 *   that still need to be processed
-	 * @param {Array.<number>} remainderBinLen The number of bits in remainder
-	 * @param {Array.<number>} processedBinLen The number of bits already
+	 * @param {number} remainderBinLen The number of bits in remainder
+	 * @param {number} processedBinLen The number of bits already
 	 *   processed
-	 * @param {Array.<number>} H The intermediate H values from a previous
+	 * @param {Array.<number|Int_64>} H The intermediate H values from a previous
 	 *   round
 	 * @param {string} variant The desired SHA-2 variant
 	 * @return {Array.<number>} The array of integers representing the SHA-2
@@ -1369,7 +1377,6 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 *
 	 * @constructor
 	 * @this {jsSHA}
-	 * @param {string} srcString The string to be hashed
 	 * @param {string} variant The desired SHA variant (SHA-1, SHA-224, SHA-256,
 	 *   SHA-384, or SHA-512)
 	 * @param {string} inputFormat The format of srcString, HEX, TEXT, B64, or BYTES
@@ -1382,11 +1389,11 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			intermediateH, converterFunc, shaVariant = variant, outputBinLen,
 			variantBlockSize, roundFunc, finalizeFunc, finalized = false,
 			hmacKeySet = false, keyWithIPad = [], keyWithOPad = [], numRounds,
-			updatedCalled = false;
+			updatedCalled = false, inputOptions;
 
-		options = options || {};
-		utfType = options["encoding"] || "UTF8";
-		numRounds = options["numRounds"] || 1;
+		inputOptions = options || {};
+		utfType = inputOptions["encoding"] || "UTF8";
+		numRounds = inputOptions["numRounds"] || 1;
 
 		converterFunc = getStrConverter(inputFormat, utfType);
 
@@ -1412,27 +1419,34 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				return finalizeSHA2(remainder, remainderBinLen, processedBinLen, H, shaVariant);
 			};
 
-			switch (shaVariant)
+			if (("SHA-224" === shaVariant) && (2 & SUPPORTED_ALGS))
 			{
-			case "SHA-224":
 				variantBlockSize = 512;
 				outputBinLen = 224;
-				break;
-			case "SHA-256":
+			}
+			else if (("SHA-256" === shaVariant) && (2 & SUPPORTED_ALGS))
+			{
 				variantBlockSize = 512;
 				outputBinLen = 256;
-				break;
-			case "SHA-384":
+			}
+			else if (("SHA-384" === shaVariant) && (4 & SUPPORTED_ALGS))
+			{
 				variantBlockSize = 1024;
 				outputBinLen = 384;
-				break;
-			case "SHA-512":
+			}
+			else if (("SHA-512" === shaVariant) && (4 & SUPPORTED_ALGS))
+			{
 				variantBlockSize = 1024;
 				outputBinLen = 512;
-				break;
-			default:
+			}
+			else
+			{
 				throw "Chosen SHA variant is not supported";
 			}
+		}
+		else
+		{
+			throw "Chosen SHA variant is not supported";
 		}
 		intermediateH = getH(shaVariant);
 
@@ -1449,7 +1463,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		this.setHMACKey = function(key, inputFormat, options)
 		{
 			var keyConverterFunc, convertRet, keyBinLen, keyToUse, blockByteSize,
-				i, lastArrayIndex;
+				i, lastArrayIndex, inputOptions;
 
 			if (true === hmacKeySet)
 			{
@@ -1466,8 +1480,8 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				throw "Cannot set HMAC key after calling update";
 			}
 
-			options = options || {};
-			utfType = options["encoding"] || "UTF8";
+			inputOptions = options || {};
+			utfType = inputOptions["encoding"] || "UTF8";
 
 			keyConverterFunc = getStrConverter(inputFormat, utfType);
 
@@ -1559,7 +1573,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		 *
 		 * @expose
 		 * @param {string} format The desired output formatting (B64, HEX, or BYTES)
-		 * @param {{outputUpper : (boolean|undefined), b64Pad : (string|undefined}=}
+		 * @param {{outputUpper : (boolean|undefined), b64Pad : (string|undefined)}=}
 		 *   options Hash list of output formatting options
 		 * @return {string} The string representation of the hash in the format
 		 *   specified
