@@ -548,10 +548,12 @@
 					for (var i = 0; i < data[hashType].length; i++)
 					{
 						/* Grab the TEXT input for a given hash and test case */
-						var shaObj = new jsSHA(data[hashType][i]['text'], 'TEXT');
+						var shaObj = new jsSHA(hashType, 'TEXT');
+						shaObj.setHMACKey(data[hashType][i]['keyHex'], "HEX");
+						shaObj.update(data[hashType][i]['text']);
 
 						/* Test Text-Text/Key-Hex/Out-Hex */
-						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['keyHex'], "HEX", hashType, "HEX"))
+						if (data[hashType][i]['hexOut'] == shaObj.getHMAC("HEX"))
 						{
 							table.rows[2].cells[3*i+2].innerHTML = "PASS"
 							table.rows[2].cells[3*i+2].className= "correct";
@@ -563,7 +565,10 @@
 						}
 
 						/* Test Text-Text/Key-B64/Out-Hex */
-						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['keyB64'], "B64", hashType, "HEX"))
+						shaObj = new jsSHA(hashType, 'TEXT');
+						shaObj.setHMACKey(data[hashType][i]['keyB64'], "B64");
+						shaObj.update(data[hashType][i]['text']);
+						if (data[hashType][i]['hexOut'] == shaObj.getHMAC("HEX"))
 						{
 							table.rows[3].cells[3*i+1].innerHTML = "PASS"
 							table.rows[3].cells[3*i+1].className= "correct";
@@ -575,7 +580,10 @@
 						}
 
 						/* Test Text-Text/Key-Hex/Out-B64 */
-						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['keyHex'], "HEX", hashType, "B64"))
+						shaObj = new jsSHA(hashType, 'TEXT');
+						shaObj.setHMACKey(data[hashType][i]['keyHex'], "HEX");
+						shaObj.update(data[hashType][i]['text']);
+						if (data[hashType][i]['b64Out'] == shaObj.getHMAC("B64"))
 						{
 							table.rows[4].cells[3*i+2].innerHTML = "PASS"
 							table.rows[4].cells[3*i+2].className= "correct";
@@ -587,7 +595,10 @@
 						}
 
 						/* Test Text-Text/Key-B64/Out-B64 */
-						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['keyB64'], "B64", hashType, "B64"))
+						shaObj = new jsSHA(hashType, 'TEXT');
+						shaObj.setHMACKey(data[hashType][i]['keyHex'], "HEX");
+						shaObj.update(data[hashType][i]['text']);
+						if (data[hashType][i]['b64Out'] == shaObj.getHMAC("B64"))
 						{
 							table.rows[5].cells[3*i+1].innerHTML = "PASS"
 							table.rows[5].cells[3*i+1].className= "correct";
@@ -599,10 +610,11 @@
 						}
 
 						/* Grab the Hex input for a given hash and test case */
-						shaObj = new jsSHA(data[hashType][i]['textHex'], 'HEX');
-
+						shaObj = new jsSHA(hashType,'HEX');
+						shaObj.setHMACKey(data[hashType][i]['keyHex'], "HEX");
+						shaObj.update(data[hashType][i]['textHex']);
 						/* Test Text-Hex/Key-Hex/Out-Hex */
-						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['keyHex'], "HEX", hashType, "HEX"))
+						if (data[hashType][i]['hexOut'] == shaObj.getHMAC("HEX"))
 						{
 							table.rows[2].cells[3*i+3].innerHTML = "PASS"
 							table.rows[2].cells[3*i+3].className= "correct";
@@ -614,7 +626,10 @@
 						}
 
 						/* Test Text-Hex/Key-B64/Out-Hex */
-						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['keyB64'], "B64", hashType, "HEX"))
+						shaObj = new jsSHA(hashType,'HEX');
+						shaObj.setHMACKey(data[hashType][i]['keyB64'], "B64");
+						shaObj.update(data[hashType][i]['textHex']);
+						if (data[hashType][i]['hexOut'] == shaObj.getHMAC("HEX"))
 						{
 							table.rows[3].cells[3*i+2].innerHTML = "PASS"
 							table.rows[3].cells[3*i+2].className= "correct";
@@ -626,7 +641,10 @@
 						}
 
 						/* Test Text-Hex/Key-Hex/Out-B64 */
-						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['keyHex'], "HEX", hashType, "B64"))
+						shaObj = new jsSHA(hashType,'HEX');
+						shaObj.setHMACKey(data[hashType][i]['keyHex'], "HEX");
+						shaObj.update(data[hashType][i]['textHex']);
+						if (data[hashType][i]['b64Out'] == shaObj.getHMAC("B64"))
 						{
 							table.rows[4].cells[3*i+3].innerHTML = "PASS"
 							table.rows[4].cells[3*i+3].className= "correct";
@@ -638,7 +656,10 @@
 						}
 
 						/* Test Text-Hex/Key-B64/Out-B64 */
-						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['keyB64'], "B64", hashType, "B64"))
+						shaObj = new jsSHA(hashType,'HEX');
+						shaObj.setHMACKey(data[hashType][i]['keyB64'], "B64");
+						shaObj.update(data[hashType][i]['textHex']);
+						if (data[hashType][i]['b64Out'] == shaObj.getHMAC("B64"))
 						{
 							table.rows[5].cells[3*i+2].innerHTML = "PASS"
 							table.rows[5].cells[3*i+2].className= "correct";
@@ -650,10 +671,11 @@
 						}
 
 						/* Grab the B64 input for a given hash and test case */
-						shaObj = new jsSHA(data[hashType][i]['textB64'], 'B64');
-
+						shaObj = new jsSHA(hashType,'B64');
+						shaObj.setHMACKey(data[hashType][i]['keyHex'], "HEX");
+						shaObj.update(data[hashType][i]['textB64']);
 						/* Test Text-B64/Key-Hex/Out-Hex */
-						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['keyHex'], "HEX", hashType, "HEX"))
+						if (data[hashType][i]['hexOut'] == shaObj.getHMAC("HEX"))
 						{
 							table.rows[2].cells[3*i+4].innerHTML = "PASS"
 							table.rows[2].cells[3*i+4].className= "correct";
@@ -665,7 +687,10 @@
 						}
 
 						/* Test Text-B64/Key-B64/Out-Hex */
-						if (data[hashType][i]['hexOut'] == shaObj.getHMAC(data[hashType][i]['keyB64'], "B64", hashType, "HEX"))
+						shaObj = new jsSHA(hashType,'B64');
+						shaObj.setHMACKey(data[hashType][i]['keyB64'], "B64");
+						shaObj.update(data[hashType][i]['textB64']);
+						if (data[hashType][i]['hexOut'] == shaObj.getHMAC("HEX"))
 						{
 							table.rows[3].cells[3*i+3].innerHTML = "PASS"
 							table.rows[3].cells[3*i+3].className= "correct";
@@ -677,7 +702,10 @@
 						}
 
 						/* Test Text-B64/Key-Hex/Out-B64 */
-						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['keyHex'], "HEX", hashType, "B64"))
+						shaObj = new jsSHA(hashType,'B64');
+						shaObj.setHMACKey(data[hashType][i]['keyHex'], "HEX");
+						shaObj.update(data[hashType][i]['textB64']);
+						if (data[hashType][i]['b64Out'] == shaObj.getHMAC("B64"))
 						{
 							table.rows[4].cells[3*i+4].innerHTML = "PASS"
 							table.rows[4].cells[3*i+4].className= "correct";
@@ -689,7 +717,10 @@
 						}
 
 						/* Test Text-B64/Key-B64/Out-B64 */
-						if (data[hashType][i]['b64Out'] == shaObj.getHMAC(data[hashType][i]['keyB64'], "B64", hashType, "B64"))
+						shaObj = new jsSHA(hashType,'B64');
+						shaObj.setHMACKey(data[hashType][i]['keyB64'], "B64");
+						shaObj.update(data[hashType][i]['textB64']);
+						if (data[hashType][i]['b64Out'] == shaObj.getHMAC("B64"))
 						{
 							table.rows[5].cells[3*i+3].innerHTML = "PASS"
 							table.rows[5].cells[3*i+3].className= "correct";
