@@ -139,7 +139,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 		if (0 !== (length % 2))
 		{
-			throw "String of HEX type must be in byte increments";
+			throw new Error("String of HEX type must be in byte increments");
 		}
 
 		for (i = 0; i < length; i += 2)
@@ -156,7 +156,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else
 			{
-				throw "String of HEX type contains invalid characters";
+				throw new Error("String of HEX type contains invalid characters");
 			}
 		}
 
@@ -207,13 +207,13 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 		if (-1 === str.search(/^[a-zA-Z0-9=+\/]+$/))
 		{
-			throw "Invalid character in base-64 string";
+			throw new Error("Invalid character in base-64 string");
 		}
 		firstEqual = str.indexOf('=');
 		str = str.replace(/\=/g, '');
 		if ((-1 !== firstEqual) && (firstEqual < str.length))
 		{
-			throw "Invalid '=' found in base-64 string";
+			throw new Error("Invalid '=' found in base-64 string");
 		}
 
 		for (i = 0; i < str.length; i += 4)
@@ -364,12 +364,12 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 		if ("boolean" !== typeof(retVal["outputUpper"]))
 		{
-			throw "Invalid outputUpper formatting option";
+			throw new Error("Invalid outputUpper formatting option");
 		}
 
 		if ("string" !== typeof(retVal["b64Pad"]))
 		{
-			throw "Invalid b64Pad formatting option";
+			throw new Error("Invalid b64Pad formatting option");
 		}
 
 		return retVal;
@@ -1060,7 +1060,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		}
 		else
 		{
-			throw "Unexpected error in SHA-2 implementation";
+			throw new Error("Unexpected error in SHA-2 implementation");
 		}
 
 		while (message.length <= lengthPosition)
@@ -1164,7 +1164,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		}
 		else /* This should never be reached */
 		{
-			throw "Unexpected error in SHA-2 implementation";
+			throw new Error("Unexpected error in SHA-2 implementation");
 		}
 
 		return retVal;
@@ -1190,7 +1190,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 		if (!(("UTF8" === utfType) || ("UTF16BE" === utfType) || ("UTF16LE" === utfType)))
 		{
-			throw "encoding must be UTF8, UTF16BE, or UTF16LE";
+			throw new Error("encoding must be UTF8, UTF16BE, or UTF16LE");
 		}
 
 		/* Convert the input string into the correct type */
@@ -1198,7 +1198,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		{
 			if (0 !== (srcString.length % 2))
 			{
-				throw "srcString of HEX type must be in byte increments";
+				throw new Error("srcString of HEX type must be in byte increments");
 			}
 			srcConvertRet = hex2binb(srcString);
 			strBinLen = srcConvertRet["binLen"];
@@ -1224,7 +1224,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		}
 		else
 		{
-			throw "inputFormat must be HEX, TEXT, ASCII, B64, or BYTES";
+			throw new Error("inputFormat must be HEX, TEXT, ASCII, B64, or BYTES");
 		}
 
 		/**
@@ -1265,7 +1265,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			/* Validate the numRounds argument */
 			if ((numRounds !== parseInt(numRounds, 10)) || (1 > numRounds))
 			{
-				throw "numRounds must a integer >= 1";
+				throw new Error("numRounds must a integer >= 1");
 			}
 
 			/* Validate the output format selection */
@@ -1281,7 +1281,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				formatFunc = binb2bytes;
 				break;
 			default:
-				throw "format must be HEX, B64, or BYTES";
+				throw new Error("format must be HEX, B64, or BYTES");
 			}
 
 			if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
@@ -1326,7 +1326,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else
 			{
-				throw "Chosen SHA variant is not supported";
+				throw new Error("Chosen SHA variant is not supported");
 			}
 
 			return formatFunc(message, getOutputOpts(outputFormatOpts));
@@ -1369,7 +1369,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				formatFunc = binb2bytes;
 				break;
 			default:
-				throw "outputFormat must be HEX, B64, or BYTES";
+				throw new Error("outputFormat must be HEX, B64, or BYTES");
 			}
 
 			/* Validate the hash variant selection and set needed variables */
@@ -1400,7 +1400,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else
 			{
-				throw "Chosen SHA variant is not supported";
+				throw new Error("Chosen SHA variant is not supported");
 			}
 
 			/* Validate input format selection */
@@ -1430,7 +1430,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else
 			{
-				throw "inputFormat must be HEX, TEXT, ASCII, B64, or BYTES";
+				throw new Error("inputFormat must be HEX, TEXT, ASCII, B64, or BYTES");
 			}
 
 			/* These are used multiple times, calculate and store them */
@@ -1451,7 +1451,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				}
 				else
 				{
-					throw "Unexpected error in HMAC implementation";
+					throw new Error("Unexpected error in HMAC implementation");
 				}
 				/* For all variants, the block size is bigger than the output
 				 * size so there will never be a useful byte at the end of the
@@ -1507,7 +1507,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else
 			{
-				throw "Unexpected error in HMAC implementation";
+				throw new Error("Unexpected error in HMAC implementation");
 			}
 
 			return formatFunc(retVal, getOutputOpts(outputFormatOpts));
