@@ -165,7 +165,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 		if (0 !== (length % 2))
 		{
-			throw "String of HEX type must be in byte increments";
+			throw new Error("String of HEX type must be in byte increments");
 		}
 
 		for (i = 0; i < length; i += 2)
@@ -183,7 +183,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else
 			{
-				throw "String of HEX type contains invalid characters";
+				throw new Error("String of HEX type contains invalid characters");
 			}
 		}
 
@@ -253,13 +253,13 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 		if (-1 === str.search(/^[a-zA-Z0-9=+\/]+$/))
 		{
-			throw "Invalid character in base-64 string";
+			throw new Error("Invalid character in base-64 string");
 		}
 		firstEqual = str.indexOf('=');
 		str = str.replace(/\=/g, '');
 		if ((-1 !== firstEqual) && (firstEqual < str.length))
 		{
-			throw "Invalid '=' found in base-64 string";
+			throw new Error("Invalid '=' found in base-64 string");
 		}
 
 		for (i = 0; i < str.length; i += 4)
@@ -399,12 +399,12 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 		if ("boolean" !== typeof(retVal["outputUpper"]))
 		{
-			throw "Invalid outputUpper formatting option";
+			throw new Error("Invalid outputUpper formatting option");
 		}
 
 		if ("string" !== typeof(retVal["b64Pad"]))
 		{
-			throw "Invalid b64Pad formatting option";
+			throw new Error("Invalid b64Pad formatting option");
 		}
 
 		return retVal;
@@ -437,7 +437,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			/* Fallthrough */
 			break;
 		default:
-			throw "encoding must be UTF8, UTF16BE, or UTF16LE";
+			throw new Error("encoding must be UTF8, UTF16BE, or UTF16LE");
 		}
 
 		/* Map inputFormat to the appropriate converter */
@@ -459,7 +459,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			retVal = bytes2binb;
 			break;
 		default:
-			throw "format must be HEX, TEXT, B64, or BYTES";
+			throw new Error("format must be HEX, TEXT, B64, or BYTES");
 		}
 
 		return retVal;
@@ -969,12 +969,12 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				];
 				break;
 			default:
-				throw "Unknown SHA variant";
+				throw new Error("Unknown SHA variant");
 			}
 		}
 		else
 		{
-			throw "No SHA variants supported";
+			throw new Error("No SHA variants supported");
 		}
 
 		return retVal;
@@ -1214,7 +1214,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		}
 		else
 		{
-			throw "Unexpected error in SHA-2 implementation";
+			throw new Error("Unexpected error in SHA-2 implementation");
 		}
 
 		a = H[0];
@@ -1307,7 +1307,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		}
 		else
 		{
-			throw "Unexpected error in SHA-2 implementation";
+			throw new Error("Unexpected error in SHA-2 implementation");
 		}
 
 		while (remainder.length <= offset)
@@ -1365,7 +1365,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		}
 		else /* This should never be reached */
 		{
-			throw "Unexpected error in SHA-2 implementation";
+			throw new Error("Unexpected error in SHA-2 implementation");
 		}
 
 		return retVal;
@@ -1399,7 +1399,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 		if ((numRounds !== parseInt(numRounds, 10)) || (1 > numRounds))
 		{
-			throw "numRounds must a integer >= 1";
+			throw new Error("numRounds must a integer >= 1");
 		}
 
 		if (("SHA-1" === shaVariant) && (1 & SUPPORTED_ALGS))
@@ -1444,7 +1444,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			}
 			else
 			{
-				throw "Chosen SHA variant is not supported";
+				throw new Error("Chosen SHA variant is not supported");
 			}
 		}
 
@@ -1467,17 +1467,17 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 			if (true === hmacKeySet)
 			{
-				throw "HMAC key already set";
+				throw new Error("HMAC key already set");
 			}
 
 			if (true === finalized)
 			{
-				throw "Cannot set HMAC key after finalizing hash";
+				throw new Error("Cannot set HMAC key after finalizing hash");
 			}
 
 			if (true === updatedCalled)
 			{
-				throw "Cannot set HMAC key after calling update";
+				throw new Error("Cannot set HMAC key after calling update");
 			}
 
 			keyOptions = options || {};
@@ -1584,7 +1584,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 			if (true === hmacKeySet)
 			{
-				throw "Cannot call getHash after setting HMAC key";
+				throw new Error("Cannot call getHash after setting HMAC key");
 			}
 
 			outputOptions = getOutputOpts(options);
@@ -1602,7 +1602,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				formatFunc = binb2bytes;
 				break;
 			default:
-				throw "format must be HEX, B64, or BYTES";
+				throw new Error("format must be HEX, B64, or BYTES");
 			}
 
 			if (false === finalized)
@@ -1636,7 +1636,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 			if (false === hmacKeySet)
 			{
-				throw "Cannot call getHMAC without first setting HMAC key";
+				throw new Error("Cannot call getHMAC without first setting HMAC key");
 			}
 
 			outputOptions = getOutputOpts(options);
@@ -1654,7 +1654,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				formatFunc = binb2bytes;
 				break;
 			default:
-				throw "outputFormat must be HEX, B64, or BYTES";
+				throw new Error("outputFormat must be HEX, B64, or BYTES");
 			}
 
 			if (false === finalized)
