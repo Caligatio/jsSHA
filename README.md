@@ -69,32 +69,45 @@ in your header (sha.js used below):
 
 	<script type="text/javascript" src="/path/to/sha.js"></script>
 
-Instantiate a new jsSHA object with your string to be hashed and its format
-(HEX or TEXT) as the parameters.  Then, call getHash with the desired hash
-variant (SHA-1, SHA-224, SHA-256, SHA-384, or SHA-512) and output type
-(HEX or B64).
+#### Hashing
+Instantiate a new jsSHA object with the desired hash type, input type, and
+options as parameters.  The hash type can be one of SHA-1, SHA-224, SHA-256,
+SHA-384, or SHA-512.  The input type can be one of HEX, TEXT, B64, or BYTES.
+You can then stream in input using the "update" object function.  Finally,
+simply call "getHash" with the output type as a parameter (B64, HEX, or BYTES).
+Example to calculate the SHA-512 of "This is a test":
 
-In the example below, "This is a Test" and "SHA-512" were used
-as the string to be hashed and variant respectively.  Also, the HMAC using TEXT
-key "SecretKey" and hashing algorithm SHA-512 was calculated.
+	var shaObj = new jsSHA("SHA-512", "TEXT");
+	shaObj.update("This is a test");
+	var hash = shaObj.getHash("HEX");
 
-	var shaObj = new jsSHA("This is a Test", "TEXT");
-	var hash = shaObj.getHash("SHA-512", "HEX");
-	var hmac = shaObj.getHMAC("SecretKey", "TEXT", "SHA-512", "HEX");
+The constructor takes a hashmap as a optional third argument with possible
+properties of "numRounds" and "encoding".  numRounds controls the number of
+hashing iterations/rounds performed and defaults to a value of "1" if not
+specified. encoding specifies the encoding used to encode TEXT-type inputs.
+Valid options are "UTF8", "UTF16BE", and "UTF16LE", it defaults to "UTF8".
 
-The constructor takes an optional parameter, encoding, that specifies the
-encoding used to encode TEXT-type inputs. Valid options are "UTF8", "UTF16BE",
-and "UTF16LE", it defaults to "UTF8"
+getHash also takes a hashmap as an optional second argument.  By default the
+hashmap is `{"outputUpper" : false, "b64Pad" : "="}`.  These options are
+intelligently interpreted based upon the chosen output format.
 
-getHash takes two optional parameters, a numRounds integer and an outputFormatOpts
-hashlist.  numRounds controls the number of hashing iterations/rounds performed
-and defaults to a value of "1" if not specified. outputFormatOpts dictates
-some formatting options for the output.  By default,
-`outputFormatOpts = {"outputUpper" : false, "b64Pad" : "="}`.  These
-options are intelligently interpreted based upon the chosen output format.
+#### HMAC
+Instantiate a new jsSHA object the same way as for hashing.  Then set the HMAC
+key to be used by calling "setHMACKey" with the key and its input type (this
+MUST be done before calling update).  You can stream in the input using the
+"update" object function just like hashing.  Finally, get the HMAC by calling
+the "getHMAC" function with the output type as its argument.  Example to
+calculate the SHA-512 HMAC of the string "This is a test" with the key "abc":
 
-getHMAC also takes an optional outputFormatOpts hashlist which operates the exact
-same way as above.
+	var shaObj = new jsSHA(hashType, "TEXT");
+	shaObj.setHMACKey("abc", "TEXT");
+	shaObj.update("This is a test");
+	var hmac = shaObj.getHMAC("HEX");
+
+setHMACKey takes the same input types as the constructor and getHMAC takes the
+same inputs as "getHash" as described above.
+
+Note: You cannot calculate both the hash and HMAC using the same object.
 
 ### Node.js
 jsSHA is available through NPM and be installed by simply doing
@@ -116,12 +129,12 @@ a command like the following:
 		--externs /path/to/build/externs.js --warning_level VERBOSE \
 		--compilation_level ADVANCED_OPTIMIZATIONS \
 		--js /path/to/sha_dev.js --js_output_file /path/to/sha.js
-		
+
 where FLAG is a bitwise OR of the following values:
 
 * 4 for SHA-384/SHA-512
 * 2 for SHA-224/256
 * 1 for SHA-1
 
-##Contact Info
+## Contact Info
 The project's website is located at [http://caligatio.github.com/jsSHA/](http://caligatio.github.com/jsSHA/)
