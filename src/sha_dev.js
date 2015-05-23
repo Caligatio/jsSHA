@@ -1379,7 +1379,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @this {jsSHA}
 	 * @param {string} variant The desired SHA variant (SHA-1, SHA-224, SHA-256,
 	 *   SHA-384, or SHA-512)
-	 * @param {string} inputFormat The format of srcString, HEX, TEXT, B64, or BYTES
+	 * @param {string} inputFormat The format of srcString: HEX, TEXT, B64, or BYTES
 	 * @param {{encoding: (string|undefined), numRounds: (string|undefined)}=}
 	 *   options Optional values
 	 */
