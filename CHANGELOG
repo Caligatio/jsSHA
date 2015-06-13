@@ -1,7 +1,7 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
-2.0.0 (2015-XX-XX)
+2.0.0 (2015-06-13)
 =========================
 - Completely reworked API to support streaming inputs
 - Exceptions now throw Errors instead of strings (thanks jclem!)
