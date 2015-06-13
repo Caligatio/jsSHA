@@ -41,17 +41,31 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	/**
 	 * Convert a string to an array of big-endian words
 	 *
+	 * There is a known bug with an odd number of existing bytes and using a
+	 * UTF-16 encoding.  However, this function is used such that the existing
+	 * bytes are always a result of a previous UTF-16 str2binb call and
+	 * therefore there should never be an odd number of existing bytes
+	 *
 	 * @private
 	 * @param {string} str String to be converted to binary representation
 	 * @param {string} utfType The Unicode type, UTF8 or UTF16BE, UTF16LE, to
 	 *   use to encode the source string
+	 * @param {Array.<number>} existingBin A packed int array of bytes to
+	 *   append the results to
+	 * @param {number} existingBinLen The number of bits in the existingBin
+	 *   array
 	 * @return {{value : Array.<number>, binLen : number}} Hash list where
 	 *   "value" contains the output number array and "binLen" is the binary
 	 *   length of "value"
 	 */
-	function str2binb(str, utfType)
+	function str2binb(str, utfType, existingBin, existingBinLen)
 	{
-		var bin = [], codePnt, binArr = [], byteCnt = 0, i, j, offset;
+		var bin = [], codePnt, binArr = [], byteCnt = 0, i, j, existingByteLen,
+			intOffset, byteOffset;
+
+		bin = existingBin || [0];
+		existingBinLen = existingBinLen || 0;
+		existingByteLen = existingBinLen >>> 3;
 
 		if ("UTF8" === utfType)
 		{
@@ -90,12 +104,14 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 				for (j = 0; j < binArr.length; j += 1)
 				{
-					offset = byteCnt >>> 2;
-					while (bin.length <= offset)
+					byteOffset = byteCnt + existingByteLen;
+					intOffset = byteOffset >>> 2;
+					while (bin.length <= intOffset)
 					{
 						bin.push(0);
 					}
-					bin[offset] |= binArr[j] << (24 - (8 * (byteCnt % 4)));
+					/* Known bug kicks in here */
+					bin[intOffset] |= binArr[j] << (8 * (3 - (byteOffset % 4)));
 					byteCnt += 1;
 				}
 			}
@@ -109,19 +125,20 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				if ("UTF16LE" === utfType)
 				{
 					j = codePnt & 0xFF;
-					codePnt = (j << 8) | (codePnt >> 8);
+					codePnt = (j << 8) | (codePnt >>> 8);
 				}
 
-				offset = byteCnt >>> 2;
-				while (bin.length <= offset)
+				byteOffset = byteCnt + existingByteLen;
+				intOffset = byteOffset >>> 2;
+				while (bin.length <= intOffset)
 				{
 					bin.push(0);
 				}
-				bin[offset] |= codePnt << (16 - (8 * (byteCnt % 4)));
+				bin[intOffset] |= codePnt << (8 * (2 - (byteOffset % 4)));
 				byteCnt += 2;
 			}
 		}
-		return {"value" : bin, "binLen" : byteCnt * 8};
+		return {"value" : bin, "binLen" : byteCnt * 8 + existingBinLen};
 	}
 
 	/**
@@ -129,17 +146,26 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 *
 	 * @private
 	 * @param {string} str String to be converted to binary representation
+	 * @param {Array.<number>} existingBin A packed int array of bytes to
+	 *   append the results to
+	 * @param {number} existingBinLen The number of bits in the existingBin
+	 *   array
 	 * @return {{value : Array.<number>, binLen : number}} Hash list where
 	 *   "value" contains the output number array and "binLen" is the binary
 	 *   length of "value"
 	 */
-	function hex2binb(str)
+	function hex2binb(str, existingBin, existingBinLen)
 	{
-		var bin = [], length = str.length, i, num, offset;
+		var bin, length = str.length, i, num, intOffset, byteOffset,
+			existingByteLen;
+
+		bin = existingBin || [0];
+		existingBinLen = existingBinLen || 0;
+		existingByteLen = existingBinLen >>> 3;
 
 		if (0 !== (length % 2))
 		{
-			throw "String of HEX type must be in byte increments";
+			throw new Error("String of HEX type must be in byte increments");
 		}
 
 		for (i = 0; i < length; i += 2)
@@ -147,48 +173,59 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			num = parseInt(str.substr(i, 2), 16);
 			if (!isNaN(num))
 			{
-				offset = i >>> 3;
-				while (bin.length <= offset)
+				byteOffset = (i >>> 1) + existingByteLen;
+				intOffset = byteOffset >>> 2;
+				while (bin.length <= intOffset)
 				{
 					bin.push(0);
 				}
-				bin[i >>> 3] |= num << (24 - (4 * (i % 8)));
+				bin[intOffset] |= num << 8 * (3 - (byteOffset % 4));
 			}
 			else
 			{
-				throw "String of HEX type contains invalid characters";
+				throw new Error("String of HEX type contains invalid characters");
 			}
 		}
 
-		return {"value" : bin, "binLen" : length * 4};
+		return {"value" : bin, "binLen" : length * 4 + existingBinLen};
 	}
 
-		/**
+	/**
 	 * Convert a string of raw bytes to an array of big-endian words
 	 *
 	 * @private
 	 * @param {string} str String of raw bytes to be converted to binary representation
+	 * @param {Array.<number>} existingBin A packed int array of bytes to
+	 *   append the results to
+	 * @param {number} existingBinLen The number of bits in the existingBin
+	 *   array
 	 * @return {{value : Array.<number>, binLen : number}} Hash list where
 	 *   "value" contains the output number array and "binLen" is the binary
 	 *   length of "value"
 	 */
-	function bytes2binb(str)
+	function bytes2binb(str, existingBin, existingBinLen)
 	{
-		var bin = [], codePnt, i, offset;
+		var bin = [], codePnt, i, existingByteLen, intOffset,
+			byteOffset;
+
+		bin = existingBin || [0];
+		existingBinLen = existingBinLen || 0;
+		existingByteLen = existingBinLen >>> 3;
 
 		for (i = 0; i < str.length; i += 1)
 		{
 			codePnt = str.charCodeAt(i);
 
-			offset = i >>> 2;
-			if (bin.length <= offset)
+			byteOffset = i + existingByteLen;
+			intOffset = byteOffset >>> 2;
+			if (bin.length <= intOffset)
 			{
 				bin.push(0);
 			}
-			bin[offset] |= codePnt << (24 - (8 * (i % 4)));
+			bin[intOffset] |= codePnt << 8 * (3 - (byteOffset % 4));
 		}
 
-		return {"value" : bin, "binLen" : str.length * 8};
+		return {"value" : bin, "binLen" : str.length * 8 + existingBinLen};
 	}
 
 	/**
@@ -196,24 +233,33 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 *
 	 * @private
 	 * @param {string} str String to be converted to binary representation
+	 * @param {Array.<number>} existingBin A packed int array of bytes to
+	 *   append the results to
+	 * @param {number} existingBinLen The number of bits in the existingBin
+	 *   array
 	 * @return {{value : Array.<number>, binLen : number}} Hash list where
 	 *   "value" contains the output number array and "binLen" is the binary
 	 *   length of "value"
 	 */
-	function b642binb(str)
+	function b642binb(str, existingBin, existingBinLen)
 	{
-		var retVal = [], byteCnt = 0, index, i, j, tmpInt, strPart, firstEqual, offset,
-			b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+		var bin = [], byteCnt = 0, index, i, j, tmpInt, strPart, firstEqual,
+			b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
+			existingByteLen, intOffset, byteOffset;
+
+		bin = existingBin || [0];
+		existingBinLen = existingBinLen || 0;
+		existingByteLen = existingBinLen >>> 3;
 
 		if (-1 === str.search(/^[a-zA-Z0-9=+\/]+$/))
 		{
-			throw "Invalid character in base-64 string";
+			throw new Error("Invalid character in base-64 string");
 		}
 		firstEqual = str.indexOf('=');
 		str = str.replace(/\=/g, '');
 		if ((-1 !== firstEqual) && (firstEqual < str.length))
 		{
-			throw "Invalid '=' found in base-64 string";
+			throw new Error("Invalid '=' found in base-64 string");
 		}
 
 		for (i = 0; i < str.length; i += 4)
@@ -229,18 +275,19 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 			for (j = 0; j < strPart.length - 1; j += 1)
 			{
-				offset = byteCnt >>> 2;
-				while (retVal.length <= offset)
+				byteOffset = byteCnt + existingByteLen;
+				intOffset = byteOffset >>> 2;
+				while (bin.length <= intOffset)
 				{
-					retVal.push(0);
+					bin.push(0);
 				}
-				retVal[offset] |= ((tmpInt >>> (16 - (j * 8))) & 0xFF) <<
-					(24 - (8 * (byteCnt % 4)));
+				bin[intOffset] |= ((tmpInt >>> (16 - (j * 8))) & 0xFF) <<
+					8 * (3 - (byteOffset % 4));
 				byteCnt += 1;
 			}
 		}
 
-		return {"value" : retVal, "binLen" : byteCnt * 8};
+		return {"value" : bin, "binLen" : byteCnt * 8 + existingBinLen};
 	}
 
 	/**
@@ -316,11 +363,10 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @private
 	 * @param {Array.<number>} binarray Array of integers to be converted to
 	 *   a raw bytes string representation
-	 * @param {!Object} formatOpts Unused Hash list
 	 * @return {string} Raw bytes representation of the parameter in string
 	 *   form
 	 */
-	function binb2bytes(binarray, formatOpts)
+	function binb2bytes(binarray)
 	{
 		var str = "", length = binarray.length * 4, i, srcByte;
 
@@ -338,38 +384,82 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * presence of every option or adding the default value
 	 *
 	 * @private
-	 * @param {{outputUpper : boolean, b64Pad : string}|undefined} outputOpts
-	 *   Hash list of output formatting options
+	 * @param {{outputUpper : (boolean|undefined), b64Pad : (string|undefined)}=}
+	 *   options Hash list of output formatting options
 	 * @return {{outputUpper : boolean, b64Pad : string}} Validated hash list
 	 *   containing output formatting options
 	 */
-	function getOutputOpts(outputOpts)
+	function getOutputOpts(options)
 	{
-		var retVal = {"outputUpper" : false, "b64Pad" : "="};
+		var retVal = {"outputUpper" : false, "b64Pad" : "="}, outputOptions;
+		outputOptions = options || {};
 
-		try
-		{
-			if (outputOpts.hasOwnProperty("outputUpper"))
-			{
-				retVal["outputUpper"] = outputOpts["outputUpper"];
-			}
-
-			if (outputOpts.hasOwnProperty("b64Pad"))
-			{
-				retVal["b64Pad"] = outputOpts["b64Pad"];
-			}
-		}
-		catch(ignore)
-		{}
+		retVal["outputUpper"] = outputOptions["outputUpper"] || false;
+		retVal["b64Pad"] = outputOptions["b64Pad"] || "=";
 
 		if ("boolean" !== typeof(retVal["outputUpper"]))
 		{
-			throw "Invalid outputUpper formatting option";
+			throw new Error("Invalid outputUpper formatting option");
 		}
 
 		if ("string" !== typeof(retVal["b64Pad"]))
 		{
-			throw "Invalid b64Pad formatting option";
+			throw new Error("Invalid b64Pad formatting option");
+		}
+
+		return retVal;
+	}
+
+	/**
+	 * Function that takes an input format and UTF encoding and returns the
+	 * appropriate function used to convert the input.
+	 *
+	 * @private
+	 * @param {string} format The format of the string to be converted
+	 * @param {string} utfType The string encoding to use (UTF8, UTF16BE,
+	 *	UTF16LE)
+	 * @return {function(string, Array.<number>=, number=): {value :
+	 *   Array.<number>, binLen : number}} Function that will convert an input
+	 *   string to a packed int array
+	 */
+	function getStrConverter(format, utfType)
+	{
+		var retVal;
+
+		/* Validate encoding */
+		switch (utfType)
+		{
+		case "UTF8":
+			/* Fallthrough */
+		case "UTF16BE":
+			/* Fallthrough */
+		case "UTF16LE":
+			/* Fallthrough */
+			break;
+		default:
+			throw new Error("encoding must be UTF8, UTF16BE, or UTF16LE");
+		}
+
+		/* Map inputFormat to the appropriate converter */
+		switch (format)
+		{
+		case "HEX":
+			retVal = hex2binb;
+			break;
+		case "TEXT":
+			retVal = function(str, existingBin, existingBinLen)
+				{
+					return str2binb(str, utfType, existingBin, existingBinLen);
+				};
+			break;
+		case "B64":
+			retVal = b642binb;
+			break;
+		case "BYTES":
+			retVal = bytes2binb;
+			break;
+		default:
+			throw new Error("format must be HEX, TEXT, B64, or BYTES");
 		}
 
 		return retVal;
@@ -820,132 +910,269 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	}
 
 	/**
-	 * Calculates the SHA-1 hash of the string set at instantiation
+	 * Gets the H values for the specified SHA variant
 	 *
-	 * @private
-	 * @param {Array.<number>} message The binary array representation of the
-	 *   string to hash
-	 * @param {number} messageLen The number of bits in the message
-	 * @return {Array.<number>} The array of integers representing the SHA-1
-	 *   hash of message
+	 * @param {string} variant The SHA variant
+	 * @return {Array.<number|Int_64>} The initial H values
 	 */
-	function coreSHA1(message, messageLen)
+	function getH(variant)
 	{
-		var W = [], a, b, c, d, e, T, ch = ch_32, parity = parity_32,
-			maj = maj_32, rotl = rotl_32, safeAdd_2 = safeAdd_32_2, i, t,
-			safeAdd_5 = safeAdd_32_5, appendedMessageLength, offset,
-			H = [
+		var retVal, H_trunc, H_full;
+
+		if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
+		{
+			retVal = [
 				0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0
 			];
-
-		offset = (((messageLen + 65) >>> 9) << 4) + 15;
-		while (message.length <= offset)
-		{
-			message.push(0);
 		}
-		/* Append '1' at the end of the binary string */
-		message[messageLen >>> 5] |= 0x80 << (24 - (messageLen % 32));
-		/* Append length of binary string in the position such that the new
-		length is a multiple of 512.  Logic does not work for even multiples
-		of 512 but there can never be even multiples of 512 */
-		message[offset] = messageLen;
-
-		appendedMessageLength = message.length;
-
-		for (i = 0; i < appendedMessageLength; i += 16)
+		else if (6 & SUPPORTED_ALGS)
 		{
-			a = H[0];
-			b = H[1];
-			c = H[2];
-			d = H[3];
-			e = H[4];
+			H_trunc = [
+				0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939,
+				0xffc00b31, 0x68581511, 0x64f98fa7, 0xbefa4fa4
+			];
+			H_full = [
+				0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A,
+				0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19
+			];
 
-			for (t = 0; t < 80; t += 1)
+			switch (variant)
 			{
-				if (t < 16)
-				{
-					W[t] = message[t + i];
-				}
-				else
-				{
-					W[t] = rotl(W[t - 3] ^ W[t - 8] ^ W[t - 14] ^ W[t - 16], 1);
-				}
+			case "SHA-224":
+				retVal = H_trunc;
+				break;
+			case "SHA-256":
+				retVal = H_full;
+				break;
+			case "SHA-384":
+				retVal = [
+					new Int_64(0xcbbb9d5d, H_trunc[0]),
+					new Int_64(0x0629a292a, H_trunc[1]),
+					new Int_64(0x9159015a, H_trunc[2]),
+					new Int_64(0x0152fecd8, H_trunc[3]),
+					new Int_64(0x67332667, H_trunc[4]),
+					new Int_64(0x98eb44a87, H_trunc[5]),
+					new Int_64(0xdb0c2e0d, H_trunc[6]),
+					new Int_64(0x047b5481d, H_trunc[7])
+				];
+				break;
+			case "SHA-512":
+				retVal = [
+					new Int_64(H_full[0], 0xf3bcc908),
+					new Int_64(H_full[1], 0x84caa73b),
+					new Int_64(H_full[2], 0xfe94f82b),
+					new Int_64(H_full[3], 0x5f1d36f1),
+					new Int_64(H_full[4], 0xade682d1),
+					new Int_64(H_full[5], 0x2b3e6c1f),
+					new Int_64(H_full[6], 0xfb41bd6b),
+					new Int_64(H_full[7], 0x137e2179)
+				];
+				break;
+			default:
+				throw new Error("Unknown SHA variant");
+			}
+		}
+		else
+		{
+			throw new Error("No SHA variants supported");
+		}
 
-				if (t < 20)
-				{
-					T = safeAdd_5(rotl(a, 5), ch(b, c, d), e, 0x5a827999, W[t]);
-				}
-				else if (t < 40)
-				{
-					T = safeAdd_5(rotl(a, 5), parity(b, c, d), e, 0x6ed9eba1, W[t]);
-				}
-				else if (t < 60)
-				{
-					T = safeAdd_5(rotl(a, 5), maj(b, c, d), e, 0x8f1bbcdc, W[t]);
-				} else {
-					T = safeAdd_5(rotl(a, 5), parity(b, c, d), e, 0xca62c1d6, W[t]);
-				}
+		return retVal;
+	}
 
-				e = d;
-				d = c;
-				c = rotl(b, 30);
-				b = a;
-				a = T;
+	/**
+	 * Performs a round of SHA-1 hashing over a 512-byte block
+	 *
+	 * @private
+	 * @param {Array.<number>} block The binary array representation of the
+	 *   block to hash
+	 * @param {Array.<number>} H The intermediate H values from a previous
+	 *   round
+	 * @return {Array.<number>} The resulting H values
+	 */
+	function roundSHA1(block, H)
+	{
+		var W = [], a, b, c, d, e, T, ch = ch_32, parity = parity_32,
+			maj = maj_32, rotl = rotl_32, safeAdd_2 = safeAdd_32_2, t,
+			safeAdd_5 = safeAdd_32_5;
+
+		a = H[0];
+		b = H[1];
+		c = H[2];
+		d = H[3];
+		e = H[4];
+
+		for (t = 0; t < 80; t += 1)
+		{
+			if (t < 16)
+			{
+				W[t] = block[t];
+			}
+			else
+			{
+				W[t] = rotl(W[t - 3] ^ W[t - 8] ^ W[t - 14] ^ W[t - 16], 1);
 			}
 
-			H[0] = safeAdd_2(a, H[0]);
-			H[1] = safeAdd_2(b, H[1]);
-			H[2] = safeAdd_2(c, H[2]);
-			H[3] = safeAdd_2(d, H[3]);
-			H[4] = safeAdd_2(e, H[4]);
+			if (t < 20)
+			{
+				T = safeAdd_5(rotl(a, 5), ch(b, c, d), e, 0x5a827999, W[t]);
+			}
+			else if (t < 40)
+			{
+				T = safeAdd_5(rotl(a, 5), parity(b, c, d), e, 0x6ed9eba1, W[t]);
+			}
+			else if (t < 60)
+			{
+				T = safeAdd_5(rotl(a, 5), maj(b, c, d), e, 0x8f1bbcdc, W[t]);
+			} else {
+				T = safeAdd_5(rotl(a, 5), parity(b, c, d), e, 0xca62c1d6, W[t]);
+			}
+
+			e = d;
+			d = c;
+			c = rotl(b, 30);
+			b = a;
+			a = T;
 		}
+
+		H[0] = safeAdd_2(a, H[0]);
+		H[1] = safeAdd_2(b, H[1]);
+		H[2] = safeAdd_2(c, H[2]);
+		H[3] = safeAdd_2(d, H[3]);
+		H[4] = safeAdd_2(e, H[4]);
 
 		return H;
 	}
 
 	/**
-	 * Calculates the desired SHA-2 hash of the string set at instantiation
+	 * Finalizes the SHA-1 hash
 	 *
 	 * @private
-	 * @param {Array.<number>} message The binary array representation of the
-	 *   string to hash
-	 * @param {number} messageLen The number of bits in message
-	 * @param {string} variant The desired SHA-2 variant
-	 * @return {Array.<number>} The array of integers representing the SHA-2
+	 * @param {Array.<number>} remainder Any leftover unprocessed packed ints
+	 *   that still need to be processed
+	 * @param {number} remainderBinLen The number of bits in remainder
+	 * @param {number} processedBinLen The number of bits already
+	 *   processed
+	 * @param {Array.<number>} H The intermediate H values from a previous
+	 *   round
+	 * @return {Array.<number>} The array of integers representing the SHA-1
 	 *   hash of message
 	 */
-	function coreSHA2(message, messageLen, variant)
+	function finalizeSHA1(remainder, remainderBinLen, processedBinLen, H)
 	{
-		var a, b, c, d, e, f, g, h, T1, T2, H, numRounds, lengthPosition, i, t,
-			binaryStringInc, binaryStringMult, safeAdd_2, safeAdd_4, safeAdd_5,
-			gamma0, gamma1, sigma0, sigma1, ch, maj, Int, W = [], int1, int2, offset,
-			appendedMessageLength, retVal,
-			K = [
-				0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5,
-				0x3956C25B, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5,
-				0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3,
-				0x72BE5D74, 0x80DEB1FE, 0x9BDC06A7, 0xC19BF174,
-				0xE49B69C1, 0xEFBE4786, 0x0FC19DC6, 0x240CA1CC,
-				0x2DE92C6F, 0x4A7484AA, 0x5CB0A9DC, 0x76F988DA,
-				0x983E5152, 0xA831C66D, 0xB00327C8, 0xBF597FC7,
-				0xC6E00BF3, 0xD5A79147, 0x06CA6351, 0x14292967,
-				0x27B70A85, 0x2E1B2138, 0x4D2C6DFC, 0x53380D13,
-				0x650A7354, 0x766A0ABB, 0x81C2C92E, 0x92722C85,
-				0xA2BFE8A1, 0xA81A664B, 0xC24B8B70, 0xC76C51A3,
-				0xD192E819, 0xD6990624, 0xF40E3585, 0x106AA070,
-				0x19A4C116, 0x1E376C08, 0x2748774C, 0x34B0BCB5,
-				0x391C0CB3, 0x4ED8AA4A, 0x5B9CCA4F, 0x682E6FF3,
-				0x748F82EE, 0x78A5636F, 0x84C87814, 0x8CC70208,
-				0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2
-			],
-			H_trunc = [
-				0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939,
-				0xffc00b31, 0x68581511, 0x64f98fa7, 0xbefa4fa4
-			],
-			H_full = [
-				0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A,
-				0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19
+		var i, appendedMessageLength, offset;
+
+		/* Add 72 because of the 64-bit length and the extra byte because
+		   of the bit (actually a byte) append */
+		offset = (((remainderBinLen + 72) >>> 9) << 4) + 15;
+		while (remainder.length <= offset)
+		{
+			remainder.push(0);
+		}
+		/* Append '1' at the end of the binary string */
+		remainder[remainderBinLen >>> 5] |= 0x80 << (24 - (remainderBinLen % 32));
+		/* Append length of binary string in the position such that the new
+		length is a multiple of 512.  Logic does not work for even multiples
+		of 512 but there can never be even multiples of 512 */
+		remainder[offset] = remainderBinLen + processedBinLen;
+
+		appendedMessageLength = remainder.length;
+
+		/* This will always be at least 1 full chunk */
+		for (i = 0; i < appendedMessageLength; i += 16)
+		{
+			H = roundSHA1(remainder.slice(i, i + 16), H);
+		}
+
+		return H;
+	}
+
+	/* Put this here so the K arrays aren't put on the stack for every block */
+	var K_sha2, K_sha512;
+	if (6 & SUPPORTED_ALGS)
+	{
+		K_sha2 = [
+			0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5,
+			0x3956C25B, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5,
+			0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3,
+			0x72BE5D74, 0x80DEB1FE, 0x9BDC06A7, 0xC19BF174,
+			0xE49B69C1, 0xEFBE4786, 0x0FC19DC6, 0x240CA1CC,
+			0x2DE92C6F, 0x4A7484AA, 0x5CB0A9DC, 0x76F988DA,
+			0x983E5152, 0xA831C66D, 0xB00327C8, 0xBF597FC7,
+			0xC6E00BF3, 0xD5A79147, 0x06CA6351, 0x14292967,
+			0x27B70A85, 0x2E1B2138, 0x4D2C6DFC, 0x53380D13,
+			0x650A7354, 0x766A0ABB, 0x81C2C92E, 0x92722C85,
+			0xA2BFE8A1, 0xA81A664B, 0xC24B8B70, 0xC76C51A3,
+			0xD192E819, 0xD6990624, 0xF40E3585, 0x106AA070,
+			0x19A4C116, 0x1E376C08, 0x2748774C, 0x34B0BCB5,
+			0x391C0CB3, 0x4ED8AA4A, 0x5B9CCA4F, 0x682E6FF3,
+			0x748F82EE, 0x78A5636F, 0x84C87814, 0x8CC70208,
+			0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2
+		];
+
+		if (4 & SUPPORTED_ALGS)
+		{
+			 K_sha512 = [
+				new Int_64(K_sha2[ 0], 0xd728ae22), new Int_64(K_sha2[ 1], 0x23ef65cd),
+				new Int_64(K_sha2[ 2], 0xec4d3b2f), new Int_64(K_sha2[ 3], 0x8189dbbc),
+				new Int_64(K_sha2[ 4], 0xf348b538), new Int_64(K_sha2[ 5], 0xb605d019),
+				new Int_64(K_sha2[ 6], 0xaf194f9b), new Int_64(K_sha2[ 7], 0xda6d8118),
+				new Int_64(K_sha2[ 8], 0xa3030242), new Int_64(K_sha2[ 9], 0x45706fbe),
+				new Int_64(K_sha2[10], 0x4ee4b28c), new Int_64(K_sha2[11], 0xd5ffb4e2),
+				new Int_64(K_sha2[12], 0xf27b896f), new Int_64(K_sha2[13], 0x3b1696b1),
+				new Int_64(K_sha2[14], 0x25c71235), new Int_64(K_sha2[15], 0xcf692694),
+				new Int_64(K_sha2[16], 0x9ef14ad2), new Int_64(K_sha2[17], 0x384f25e3),
+				new Int_64(K_sha2[18], 0x8b8cd5b5), new Int_64(K_sha2[19], 0x77ac9c65),
+				new Int_64(K_sha2[20], 0x592b0275), new Int_64(K_sha2[21], 0x6ea6e483),
+				new Int_64(K_sha2[22], 0xbd41fbd4), new Int_64(K_sha2[23], 0x831153b5),
+				new Int_64(K_sha2[24], 0xee66dfab), new Int_64(K_sha2[25], 0x2db43210),
+				new Int_64(K_sha2[26], 0x98fb213f), new Int_64(K_sha2[27], 0xbeef0ee4),
+				new Int_64(K_sha2[28], 0x3da88fc2), new Int_64(K_sha2[29], 0x930aa725),
+				new Int_64(K_sha2[30], 0xe003826f), new Int_64(K_sha2[31], 0x0a0e6e70),
+				new Int_64(K_sha2[32], 0x46d22ffc), new Int_64(K_sha2[33], 0x5c26c926),
+				new Int_64(K_sha2[34], 0x5ac42aed), new Int_64(K_sha2[35], 0x9d95b3df),
+				new Int_64(K_sha2[36], 0x8baf63de), new Int_64(K_sha2[37], 0x3c77b2a8),
+				new Int_64(K_sha2[38], 0x47edaee6), new Int_64(K_sha2[39], 0x1482353b),
+				new Int_64(K_sha2[40], 0x4cf10364), new Int_64(K_sha2[41], 0xbc423001),
+				new Int_64(K_sha2[42], 0xd0f89791), new Int_64(K_sha2[43], 0x0654be30),
+				new Int_64(K_sha2[44], 0xd6ef5218), new Int_64(K_sha2[45], 0x5565a910),
+				new Int_64(K_sha2[46], 0x5771202a), new Int_64(K_sha2[47], 0x32bbd1b8),
+				new Int_64(K_sha2[48], 0xb8d2d0c8), new Int_64(K_sha2[49], 0x5141ab53),
+				new Int_64(K_sha2[50], 0xdf8eeb99), new Int_64(K_sha2[51], 0xe19b48a8),
+				new Int_64(K_sha2[52], 0xc5c95a63), new Int_64(K_sha2[53], 0xe3418acb),
+				new Int_64(K_sha2[54], 0x7763e373), new Int_64(K_sha2[55], 0xd6b2b8a3),
+				new Int_64(K_sha2[56], 0x5defb2fc), new Int_64(K_sha2[57], 0x43172f60),
+				new Int_64(K_sha2[58], 0xa1f0ab72), new Int_64(K_sha2[59], 0x1a6439ec),
+				new Int_64(K_sha2[60], 0x23631e28), new Int_64(K_sha2[61], 0xde82bde9),
+				new Int_64(K_sha2[62], 0xb2c67915), new Int_64(K_sha2[63], 0xe372532b),
+				new Int_64(0xca273ece, 0xea26619c), new Int_64(0xd186b8c7, 0x21c0c207),
+				new Int_64(0xeada7dd6, 0xcde0eb1e), new Int_64(0xf57d4f7f, 0xee6ed178),
+				new Int_64(0x06f067aa, 0x72176fba), new Int_64(0x0a637dc5, 0xa2c898a6),
+				new Int_64(0x113f9804, 0xbef90dae), new Int_64(0x1b710b35, 0x131c471b),
+				new Int_64(0x28db77f5, 0x23047d84), new Int_64(0x32caab7b, 0x40c72493),
+				new Int_64(0x3c9ebe0a, 0x15c9bebc), new Int_64(0x431d67c4, 0x9c100d4c),
+				new Int_64(0x4cc5d4be, 0xcb3e42b6), new Int_64(0x597f299c, 0xfc657e2a),
+				new Int_64(0x5fcb6fab, 0x3ad6faec), new Int_64(0x6c44198c, 0x4a475817)
 			];
+		}
+	}
+
+	/**
+	 * Performs a round of SHA-2 hashing over a block
+	 *
+	 * @private
+	 * @param {Array.<number>} block The binary array representation of the
+	 *   block to hash
+	 * @param {Array.<number|Int_64>} H The intermediate H values from a previous
+	 *   round
+	 * @param {string} variant The desired SHA-2 variant
+	 * @return {Array.<number|Int_64>} The resulting H values
+	 */
+	function roundSHA2(block, H, variant)
+	{
+		var a, b, c, d, e, f, g, h, T1, T2, numRounds, t, binaryStringMult,
+			safeAdd_2, safeAdd_4, safeAdd_5, gamma0, gamma1, sigma0, sigma1,
+			ch, maj, Int, W = [], int1, int2, offset, K;
 
 		/* Set up the various function handles and variable for the specific
 		 * variant */
@@ -954,8 +1181,6 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		{
 			/* 32-bit variant */
 			numRounds = 64;
-			lengthPosition = (((messageLen + 65) >>> 9) << 4) + 15;
-			binaryStringInc = 16;
 			binaryStringMult = 1;
 			Int = Number;
 			safeAdd_2 = safeAdd_32_2;
@@ -967,23 +1192,13 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			sigma1 = sigma1_32;
 			maj = maj_32;
 			ch = ch_32;
-
-			if ("SHA-224" === variant)
-			{
-				H = H_trunc;
-			}
-			else /* "SHA-256" === variant */
-			{
-				H = H_full;
-			}
+			K = K_sha2;
 		}
 		else if ((variant === "SHA-384" || variant === "SHA-512") &&
 			(4 & SUPPORTED_ALGS))
 		{
 			/* 64-bit variant */
 			numRounds = 80;
-			lengthPosition = (((messageLen + 128) >>> 10) << 5) + 31;
-			binaryStringInc = 32;
 			binaryStringMult = 2;
 			Int = Int_64;
 			safeAdd_2 = safeAdd_64_2;
@@ -995,136 +1210,122 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			sigma1 = sigma1_64;
 			maj = maj_64;
 			ch = ch_64;
-
-			K = [
-				new Int(K[ 0], 0xd728ae22), new Int(K[ 1], 0x23ef65cd),
-				new Int(K[ 2], 0xec4d3b2f), new Int(K[ 3], 0x8189dbbc),
-				new Int(K[ 4], 0xf348b538), new Int(K[ 5], 0xb605d019),
-				new Int(K[ 6], 0xaf194f9b), new Int(K[ 7], 0xda6d8118),
-				new Int(K[ 8], 0xa3030242), new Int(K[ 9], 0x45706fbe),
-				new Int(K[10], 0x4ee4b28c), new Int(K[11], 0xd5ffb4e2),
-				new Int(K[12], 0xf27b896f), new Int(K[13], 0x3b1696b1),
-				new Int(K[14], 0x25c71235), new Int(K[15], 0xcf692694),
-				new Int(K[16], 0x9ef14ad2), new Int(K[17], 0x384f25e3),
-				new Int(K[18], 0x8b8cd5b5), new Int(K[19], 0x77ac9c65),
-				new Int(K[20], 0x592b0275), new Int(K[21], 0x6ea6e483),
-				new Int(K[22], 0xbd41fbd4), new Int(K[23], 0x831153b5),
-				new Int(K[24], 0xee66dfab), new Int(K[25], 0x2db43210),
-				new Int(K[26], 0x98fb213f), new Int(K[27], 0xbeef0ee4),
-				new Int(K[28], 0x3da88fc2), new Int(K[29], 0x930aa725),
-				new Int(K[30], 0xe003826f), new Int(K[31], 0x0a0e6e70),
-				new Int(K[32], 0x46d22ffc), new Int(K[33], 0x5c26c926),
-				new Int(K[34], 0x5ac42aed), new Int(K[35], 0x9d95b3df),
-				new Int(K[36], 0x8baf63de), new Int(K[37], 0x3c77b2a8),
-				new Int(K[38], 0x47edaee6), new Int(K[39], 0x1482353b),
-				new Int(K[40], 0x4cf10364), new Int(K[41], 0xbc423001),
-				new Int(K[42], 0xd0f89791), new Int(K[43], 0x0654be30),
-				new Int(K[44], 0xd6ef5218), new Int(K[45], 0x5565a910),
-				new Int(K[46], 0x5771202a), new Int(K[47], 0x32bbd1b8),
-				new Int(K[48], 0xb8d2d0c8), new Int(K[49], 0x5141ab53),
-				new Int(K[50], 0xdf8eeb99), new Int(K[51], 0xe19b48a8),
-				new Int(K[52], 0xc5c95a63), new Int(K[53], 0xe3418acb),
-				new Int(K[54], 0x7763e373), new Int(K[55], 0xd6b2b8a3),
-				new Int(K[56], 0x5defb2fc), new Int(K[57], 0x43172f60),
-				new Int(K[58], 0xa1f0ab72), new Int(K[59], 0x1a6439ec),
-				new Int(K[60], 0x23631e28), new Int(K[61], 0xde82bde9),
-				new Int(K[62], 0xb2c67915), new Int(K[63], 0xe372532b),
-				new Int(0xca273ece, 0xea26619c), new Int(0xd186b8c7, 0x21c0c207),
-				new Int(0xeada7dd6, 0xcde0eb1e), new Int(0xf57d4f7f, 0xee6ed178),
-				new Int(0x06f067aa, 0x72176fba), new Int(0x0a637dc5, 0xa2c898a6),
-				new Int(0x113f9804, 0xbef90dae), new Int(0x1b710b35, 0x131c471b),
-				new Int(0x28db77f5, 0x23047d84), new Int(0x32caab7b, 0x40c72493),
-				new Int(0x3c9ebe0a, 0x15c9bebc), new Int(0x431d67c4, 0x9c100d4c),
-				new Int(0x4cc5d4be, 0xcb3e42b6), new Int(0x597f299c, 0xfc657e2a),
-				new Int(0x5fcb6fab, 0x3ad6faec), new Int(0x6c44198c, 0x4a475817)
-			];
-
-			if ("SHA-384" === variant)
-			{
-				H = [
-					new Int(0xcbbb9d5d, H_trunc[0]), new Int(0x0629a292a, H_trunc[1]),
-					new Int(0x9159015a, H_trunc[2]), new Int(0x0152fecd8, H_trunc[3]),
-					new Int(0x67332667, H_trunc[4]), new Int(0x98eb44a87, H_trunc[5]),
-					new Int(0xdb0c2e0d, H_trunc[6]), new Int(0x047b5481d, H_trunc[7])
-				];
-			}
-			else /* "SHA-512" === variant */
-			{
-				H = [
-					new Int(H_full[0], 0xf3bcc908), new Int(H_full[1], 0x84caa73b),
-					new Int(H_full[2], 0xfe94f82b), new Int(H_full[3], 0x5f1d36f1),
-					new Int(H_full[4], 0xade682d1), new Int(H_full[5], 0x2b3e6c1f),
-					new Int(H_full[6], 0xfb41bd6b), new Int(H_full[7], 0x137e2179)
-				];
-			}
+			K = K_sha512;
 		}
 		else
 		{
-			throw "Unexpected error in SHA-2 implementation";
+			throw new Error("Unexpected error in SHA-2 implementation");
 		}
 
-		while (message.length <= lengthPosition)
+		a = H[0];
+		b = H[1];
+		c = H[2];
+		d = H[3];
+		e = H[4];
+		f = H[5];
+		g = H[6];
+		h = H[7];
+
+		for (t = 0; t < numRounds; t += 1)
 		{
-			message.push(0);
-		}
-		/* Append '1' at the end of the binary string */
-		message[messageLen >>> 5] |= 0x80 << (24 - messageLen % 32);
-		/* Append length of binary string in the position such that the new
-		 * length is correct */
-		message[lengthPosition] = messageLen;
-
-		appendedMessageLength = message.length;
-
-		for (i = 0; i < appendedMessageLength; i += binaryStringInc)
-		{
-			a = H[0];
-			b = H[1];
-			c = H[2];
-			d = H[3];
-			e = H[4];
-			f = H[5];
-			g = H[6];
-			h = H[7];
-
-			for (t = 0; t < numRounds; t += 1)
+			if (t < 16)
 			{
-				if (t < 16)
-				{
-					offset = t * binaryStringMult + i;
-					int1 = (message.length <= offset) ? 0 : message[offset];
-					int2 = (message.length <= offset + 1) ? 0 : message[offset + 1];
-					/* Bit of a hack - for 32-bit, the second term is ignored */
-					W[t] = new Int(int1, int2);
-				}
-				else
-				{
-					W[t] = safeAdd_4(
-							gamma1(W[t - 2]), W[t - 7],
-							gamma0(W[t - 15]), W[t - 16]
-						);
-				}
-
-				T1 = safeAdd_5(h, sigma1(e), ch(e, f, g), K[t], W[t]);
-				T2 = safeAdd_2(sigma0(a), maj(a, b, c));
-				h = g;
-				g = f;
-				f = e;
-				e = safeAdd_2(d, T1);
-				d = c;
-				c = b;
-				b = a;
-				a = safeAdd_2(T1, T2);
-
+				offset = t * binaryStringMult;
+				int1 = (block.length <= offset) ? 0 : block[offset];
+				int2 = (block.length <= offset + 1) ? 0 : block[offset + 1];
+				/* Bit of a hack - for 32-bit, the second term is ignored */
+				W[t] = new Int(int1, int2);
+			}
+			else
+			{
+				W[t] = safeAdd_4(
+						gamma1(W[t - 2]), W[t - 7],
+						gamma0(W[t - 15]), W[t - 16]
+					);
 			}
 
-			H[0] = safeAdd_2(a, H[0]);
-			H[1] = safeAdd_2(b, H[1]);
-			H[2] = safeAdd_2(c, H[2]);
-			H[3] = safeAdd_2(d, H[3]);
-			H[4] = safeAdd_2(e, H[4]);
-			H[5] = safeAdd_2(f, H[5]);
-			H[6] = safeAdd_2(g, H[6]);
-			H[7] = safeAdd_2(h, H[7]);
+			T1 = safeAdd_5(h, sigma1(e), ch(e, f, g), K[t], W[t]);
+			T2 = safeAdd_2(sigma0(a), maj(a, b, c));
+			h = g;
+			g = f;
+			f = e;
+			e = safeAdd_2(d, T1);
+			d = c;
+			c = b;
+			b = a;
+			a = safeAdd_2(T1, T2);
+		}
+
+		H[0] = safeAdd_2(a, H[0]);
+		H[1] = safeAdd_2(b, H[1]);
+		H[2] = safeAdd_2(c, H[2]);
+		H[3] = safeAdd_2(d, H[3]);
+		H[4] = safeAdd_2(e, H[4]);
+		H[5] = safeAdd_2(f, H[5]);
+		H[6] = safeAdd_2(g, H[6]);
+		H[7] = safeAdd_2(h, H[7]);
+
+		return H;
+	}
+
+	/**
+	 * Finalizes the SHA-2 hash
+	 *
+	 * @private
+	 * @param {Array.<number>} remainder Any leftover unprocessed packed ints
+	 *   that still need to be processed
+	 * @param {number} remainderBinLen The number of bits in remainder
+	 * @param {number} processedBinLen The number of bits already
+	 *   processed
+	 * @param {Array.<number|Int_64>} H The intermediate H values from a previous
+	 *   round
+	 * @param {string} variant The desired SHA-2 variant
+	 * @return {Array.<number>} The array of integers representing the SHA-2
+	 *   hash of message
+	 */
+	function finalizeSHA2(remainder, remainderBinLen, processedBinLen, H, variant)
+	{
+		var i, appendedMessageLength, offset, retVal, binaryStringInc;
+
+		if ((variant === "SHA-224" || variant === "SHA-256") &&
+			(2 & SUPPORTED_ALGS))
+		{
+			/* 32-bit variant */
+			/* Add 72 because of the 64-bit length and the extra byte because
+			   of the bit (actually a byte) append */
+			offset = (((remainderBinLen + 72) >>> 9) << 4) + 15;
+			binaryStringInc = 16;
+		}
+		else if ((variant === "SHA-384" || variant === "SHA-512") &&
+			(4 & SUPPORTED_ALGS))
+		{
+			/* 64-bit variant */
+			/* Add 136 because of the 128-bit length and the extra byte because
+			   of the bit (actually a byte) append */
+			offset = (((remainderBinLen + 136) >>> 10) << 5) + 31;
+			binaryStringInc = 32;
+		}
+		else
+		{
+			throw new Error("Unexpected error in SHA-2 implementation");
+		}
+
+		while (remainder.length <= offset)
+		{
+			remainder.push(0);
+		}
+		/* Append '1' at the end of the binary string */
+		remainder[remainderBinLen >>> 5] |= 0x80 << (24 - remainderBinLen % 32);
+		/* Append length of binary string in the position such that the new
+		 * length is correct */
+		remainder[offset] = remainderBinLen + processedBinLen;
+
+		appendedMessageLength = remainder.length;
+
+		/* This will always be at least 1 full chunk */
+		for (i = 0; i < appendedMessageLength; i += binaryStringInc)
+		{
+			H = roundSHA2(remainder.slice(i, i + binaryStringInc), H, variant);
 		}
 
 		if (("SHA-224" === variant) && (2 & SUPPORTED_ALGS))
@@ -1164,7 +1365,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		}
 		else /* This should never be reached */
 		{
-			throw "Unexpected error in SHA-2 implementation";
+			throw new Error("Unexpected error in SHA-2 implementation");
 		}
 
 		return retVal;
@@ -1176,283 +1377,128 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 *
 	 * @constructor
 	 * @this {jsSHA}
-	 * @param {string} srcString The string to be hashed
-	 * @param {string} inputFormat The format of srcString, HEX, ASCII, TEXT,
-     *   B64, or BYTES
-	 * @param {string=} encoding The text encoding to use to encode the source
-	 *   string
+	 * @param {string} variant The desired SHA variant (SHA-1, SHA-224, SHA-256,
+	 *   SHA-384, or SHA-512)
+	 * @param {string} inputFormat The format of srcString: HEX, TEXT, B64, or BYTES
+	 * @param {{encoding: (string|undefined), numRounds: (string|undefined)}=}
+	 *   options Optional values
 	 */
-	var jsSHA = function(srcString, inputFormat, encoding)
+	var jsSHA = function(variant, inputFormat, options)
 	{
-		var strBinLen = 0, strToHash = [0], utfType = '', srcConvertRet = null;
+		var processedLen = 0, remainder = [], remainderLen = 0, utfType,
+			intermediateH, converterFunc, shaVariant = variant, outputBinLen,
+			variantBlockSize, roundFunc, finalizeFunc, finalized = false,
+			hmacKeySet = false, keyWithIPad = [], keyWithOPad = [], numRounds,
+			updatedCalled = false, inputOptions;
 
-		utfType = encoding || "UTF8";
+		inputOptions = options || {};
+		utfType = inputOptions["encoding"] || "UTF8";
+		numRounds = inputOptions["numRounds"] || 1;
 
-		if (!(("UTF8" === utfType) || ("UTF16BE" === utfType) || ("UTF16LE" === utfType)))
+		converterFunc = getStrConverter(inputFormat, utfType);
+
+		if ((numRounds !== parseInt(numRounds, 10)) || (1 > numRounds))
 		{
-			throw "encoding must be UTF8, UTF16BE, or UTF16LE";
+			throw new Error("numRounds must a integer >= 1");
 		}
 
-		/* Convert the input string into the correct type */
-		if ("HEX" === inputFormat)
+		if (("SHA-1" === shaVariant) && (1 & SUPPORTED_ALGS))
 		{
-			if (0 !== (srcString.length % 2))
-			{
-				throw "srcString of HEX type must be in byte increments";
-			}
-			srcConvertRet = hex2binb(srcString);
-			strBinLen = srcConvertRet["binLen"];
-			strToHash = srcConvertRet["value"];
-		}
-		else if (("TEXT" === inputFormat) || ("ASCII" === inputFormat))
-		{
-			srcConvertRet = str2binb(srcString, utfType);
-			strBinLen = srcConvertRet["binLen"];
-			strToHash = srcConvertRet["value"];
-		}
-		else if ("B64" === inputFormat)
-		{
-			srcConvertRet = b642binb(srcString);
-			strBinLen = srcConvertRet["binLen"];
-			strToHash = srcConvertRet["value"];
-		}
-		else if ("BYTES" === inputFormat)
-		{
-			srcConvertRet = bytes2binb(srcString);
-			strBinLen = srcConvertRet["binLen"];
-			strToHash = srcConvertRet["value"];
+			variantBlockSize = 512;
+			roundFunc = roundSHA1;
+			finalizeFunc = finalizeSHA1;
+			outputBinLen = 160;
 		}
 		else
 		{
-			throw "inputFormat must be HEX, TEXT, ASCII, B64, or BYTES";
-		}
-
-		/**
-		 * Returns the desired SHA hash of the string specified at instantiation
-		 * using the specified parameters
-		 *
-		 * @expose
-		 * @param {string} variant The desired SHA variant (SHA-1, SHA-224,
-		 *	 SHA-256, SHA-384, or SHA-512)
-		 * @param {string} format The desired output formatting (B64, HEX, or BYTES)
-		 * @param {number=} numRounds The number of rounds of hashing to be
-		 *   executed
-		 * @param {{outputUpper : boolean, b64Pad : string}=} outputFormatOpts
-		 *   Hash list of output formatting options
-		 * @return {string} The string representation of the hash in the format
-		 *   specified
-		 */
-		this.getHash = function(variant, format, numRounds, outputFormatOpts)
-		{
-			var formatFunc = null, message = strToHash.slice(),
-				messageBinLen = strBinLen, i;
-
-			/* Need to do argument patching since both numRounds and
-			   outputFormatOpts are optional */
-			if (3 === arguments.length)
+			if (6 & SUPPORTED_ALGS)
 			{
-				if ("number" !== typeof numRounds)
+				roundFunc = function (block, H) {
+					return roundSHA2(block, H, shaVariant);
+				};
+				finalizeFunc = function (remainder, remainderBinLen, processedBinLen, H)
 				{
-					outputFormatOpts = numRounds;
-					numRounds = 1;
-				}
-			}
-			else if (2 === arguments.length)
-			{
-				numRounds = 1;
+					return finalizeSHA2(remainder, remainderBinLen, processedBinLen, H, shaVariant);
+				};
 			}
 
-			/* Validate the numRounds argument */
-			if ((numRounds !== parseInt(numRounds, 10)) || (1 > numRounds))
+			if (("SHA-224" === shaVariant) && (2 & SUPPORTED_ALGS))
 			{
-				throw "numRounds must a integer >= 1";
+				variantBlockSize = 512;
+				outputBinLen = 224;
 			}
-
-			/* Validate the output format selection */
-			switch (format)
+			else if (("SHA-256" === shaVariant) && (2 & SUPPORTED_ALGS))
 			{
-			case "HEX":
-				formatFunc = binb2hex;
-				break;
-			case "B64":
-				formatFunc = binb2b64;
-				break;
-			case "BYTES":
-				formatFunc = binb2bytes;
-				break;
-			default:
-				throw "format must be HEX, B64, or BYTES";
+				variantBlockSize = 512;
+				outputBinLen = 256;
 			}
-
-			if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
+			else if (("SHA-384" === shaVariant) && (4 & SUPPORTED_ALGS))
 			{
-				for (i = 0; i < numRounds; i += 1)
-				{
-					message = coreSHA1(message, messageBinLen);
-					messageBinLen = 160;
-				}
+				variantBlockSize = 1024;
+				outputBinLen = 384;
 			}
-			else if (("SHA-224" === variant) && (2 & SUPPORTED_ALGS))
+			else if (("SHA-512" === shaVariant) && (4 & SUPPORTED_ALGS))
 			{
-				for (i = 0; i < numRounds; i += 1)
-				{
-					message = coreSHA2(message, messageBinLen, variant);
-					messageBinLen = 224;
-				}
-			}
-			else if (("SHA-256" === variant) && (2 & SUPPORTED_ALGS))
-			{
-				for (i = 0; i < numRounds; i += 1)
-				{
-					message = coreSHA2(message, messageBinLen, variant);
-					messageBinLen = 256;
-				}
-			}
-			else if (("SHA-384" === variant) && (4 & SUPPORTED_ALGS))
-			{
-				for (i = 0; i < numRounds; i += 1)
-				{
-					message = coreSHA2(message, messageBinLen, variant);
-					messageBinLen = 384;
-				}
-			}
-			else if (("SHA-512" === variant) && (4 & SUPPORTED_ALGS))
-			{
-				for (i = 0; i < numRounds; i += 1)
-				{
-					message = coreSHA2(message, messageBinLen, variant);
-					messageBinLen = 512;
-				}
+				variantBlockSize = 1024;
+				outputBinLen = 512;
 			}
 			else
 			{
-				throw "Chosen SHA variant is not supported";
+				throw new Error("Chosen SHA variant is not supported");
 			}
+		}
 
-			return formatFunc(message, getOutputOpts(outputFormatOpts));
-		};
+		intermediateH = getH(shaVariant);
 
 		/**
-		 * Returns the desired HMAC of the string specified at instantiation
-		 * using the key and variant parameter
+		 * Sets the HMAC key for an eventual getHMAC call.  Must be called
+		 * immediately after jsSHA object instantiation
 		 *
 		 * @expose
 		 * @param {string} key The key used to calculate the HMAC
-		 * @param {string} inputFormat The format of key, HEX, TEXT, ASCII,
-         *   B64, or BYTES
-		 * @param {string} variant The desired SHA variant (SHA-1, SHA-224,
-		 *	 SHA-256, SHA-384, or SHA-512)
-		 * @param {string} outputFormat The desired output formatting
-		 *   (B64, HEX, or BYTES)
-		 * @param {{outputUpper : boolean, b64Pad : string}=} outputFormatOpts
-		 *   associative array of output formatting options
-		 * @return {string} The string representation of the hash in the format
-		 *   specified
+		 * @param {string} inputFormat The format of key, HEX, TEXT, B64, or BYTES
+		 * @param {{encoding : (string|undefined)}=} options Associative array
+		 *   of input format options
 		 */
-		this.getHMAC = function(key, inputFormat, variant, outputFormat,
-			outputFormatOpts)
+		this.setHMACKey = function(key, inputFormat, options)
 		{
-			var formatFunc, keyToUse, blockByteSize, blockBitSize, i,
-				retVal, lastArrayIndex, keyBinLen, hashBitSize,
-				keyWithIPad = [], keyWithOPad = [], keyConvertRet = null;
+			var keyConverterFunc, convertRet, keyBinLen, keyToUse, blockByteSize,
+				i, lastArrayIndex, keyOptions;
 
-			/* Validate the output format selection */
-			switch (outputFormat)
+			if (true === hmacKeySet)
 			{
-			case "HEX":
-				formatFunc = binb2hex;
-				break;
-			case "B64":
-				formatFunc = binb2b64;
-				break;
-			case "BYTES":
-				formatFunc = binb2bytes;
-				break;
-			default:
-				throw "outputFormat must be HEX, B64, or BYTES";
+				throw new Error("HMAC key already set");
 			}
 
-			/* Validate the hash variant selection and set needed variables */
-			if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
+			if (true === finalized)
 			{
-				blockByteSize = 64;
-				hashBitSize = 160;
-			}
-			else if (("SHA-224" === variant) && (2 & SUPPORTED_ALGS))
-			{
-				blockByteSize = 64;
-				hashBitSize = 224;
-			}
-			else if (("SHA-256" === variant) && (2 & SUPPORTED_ALGS))
-			{
-				blockByteSize = 64;
-				hashBitSize = 256;
-			}
-			else if (("SHA-384" === variant) && (4 & SUPPORTED_ALGS))
-			{
-				blockByteSize = 128;
-				hashBitSize = 384;
-			}
-			else if (("SHA-512" === variant) && (4 & SUPPORTED_ALGS))
-			{
-				blockByteSize = 128;
-				hashBitSize = 512;
-			}
-			else
-			{
-				throw "Chosen SHA variant is not supported";
+				throw new Error("Cannot set HMAC key after finalizing hash");
 			}
 
-			/* Validate input format selection */
-			if ("HEX" === inputFormat)
+			if (true === updatedCalled)
 			{
-				keyConvertRet = hex2binb(key);
-				keyBinLen = keyConvertRet["binLen"];
-				keyToUse = keyConvertRet["value"];
+				throw new Error("Cannot set HMAC key after calling update");
 			}
-			else if (("TEXT" === inputFormat) || ("ASCII" === inputFormat))
-			{
-				keyConvertRet = str2binb(key, utfType);
-				keyBinLen = keyConvertRet["binLen"];
-				keyToUse = keyConvertRet["value"];
-			}
-			else if ("B64" === inputFormat)
-			{
-				keyConvertRet = b642binb(key);
-				keyBinLen = keyConvertRet["binLen"];
-				keyToUse = keyConvertRet["value"];
-			}
-			else if ("BYTES" === inputFormat)
-			{
-				keyConvertRet = bytes2binb(key);
-				keyBinLen = keyConvertRet["binLen"];
-				keyToUse = keyConvertRet["value"];
-			}
-			else
-			{
-				throw "inputFormat must be HEX, TEXT, ASCII, B64, or BYTES";
-			}
+
+			keyOptions = options || {};
+			utfType = keyOptions["encoding"] || "UTF8";
+
+			keyConverterFunc = getStrConverter(inputFormat, utfType);
+
+			convertRet = keyConverterFunc(key);
+			keyBinLen = convertRet["binLen"];
+			keyToUse = convertRet["value"];
+
+			blockByteSize = variantBlockSize >>> 3;
 
 			/* These are used multiple times, calculate and store them */
-			blockBitSize = blockByteSize * 8;
 			lastArrayIndex = (blockByteSize / 4) - 1;
 
 			/* Figure out what to do with the key based on its size relative to
 			 * the hash's block size */
 			if (blockByteSize < (keyBinLen / 8))
 			{
-				if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
-				{
-					keyToUse = coreSHA1(keyToUse, keyBinLen);
-				}
-				else if (6 & SUPPORTED_ALGS)
-				{
-					keyToUse = coreSHA2(keyToUse, keyBinLen, variant);
-				}
-				else
-				{
-					throw "Unexpected error in HMAC implementation";
-				}
+				keyToUse = finalizeFunc(keyToUse, keyBinLen, 0, getH(shaVariant));
 				/* For all variants, the block size is bigger than the output
 				 * size so there will never be a useful byte at the end of the
 				 * string */
@@ -1481,36 +1527,145 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				keyWithOPad[i] = keyToUse[i] ^ 0x5C5C5C5C;
 			}
 
-			/* Calculate the HMAC */
-			if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
+			intermediateH = roundFunc(keyWithIPad, intermediateH);
+			processedLen = variantBlockSize;
+
+			hmacKeySet = true;
+		};
+
+		/**
+		 * Takes strString and hashes as many blocks as possible.  Stores the
+		 * rest for either a future update or getHash call.
+		 *
+		 * @expose
+		 * @param {string} srcString The string to be hashed
+		 */
+		this.update = function(srcString)
+		{
+			var convertRet, chunkBinLen, chunkIntLen, chunk, i, updateProcessedLen = 0,
+				variantBlockIntInc = variantBlockSize >>> 5;
+
+			convertRet = converterFunc(srcString, remainder, remainderLen);
+			chunkBinLen = convertRet["binLen"];
+			chunk = convertRet["value"];
+
+			chunkIntLen = chunkBinLen >>> 5;
+			for (i = 0; i < chunkIntLen; i += variantBlockIntInc)
 			{
-				retVal = coreSHA1(
-					keyWithOPad.concat(
-						coreSHA1(
-							keyWithIPad.concat(strToHash),
-							blockBitSize + strBinLen
-						)
-					),
-					blockBitSize + hashBitSize);
+				if (updateProcessedLen + variantBlockSize <= chunkBinLen)
+				{
+					intermediateH = roundFunc(
+						chunk.slice(i, i + variantBlockIntInc),
+						intermediateH
+					);
+					updateProcessedLen += variantBlockSize;
+				}
 			}
-			else if (6 & SUPPORTED_ALGS)
+			processedLen += updateProcessedLen;
+			remainder = chunk.slice(updateProcessedLen >>> 5);
+			remainderLen = chunkBinLen % variantBlockSize;
+			updatedCalled = true;
+		};
+
+		/**
+		 * Returns the desired SHA hash of the string specified at instantiation
+		 * using the specified parameters
+		 *
+		 * @expose
+		 * @param {string} format The desired output formatting (B64, HEX, or BYTES)
+		 * @param {{outputUpper : (boolean|undefined), b64Pad : (string|undefined)}=}
+		 *   options Hash list of output formatting options
+		 * @return {string} The string representation of the hash in the format
+		 *   specified
+		 */
+		this.getHash = function(format, options)
+		{
+			var formatFunc, i, outputOptions;
+
+			if (true === hmacKeySet)
 			{
-				retVal = coreSHA2(
-					keyWithOPad.concat(
-						coreSHA2(
-							keyWithIPad.concat(strToHash),
-							blockBitSize + strBinLen,
-							variant
-						)
-					),
-					blockBitSize + hashBitSize, variant);
-			}
-			else
-			{
-				throw "Unexpected error in HMAC implementation";
+				throw new Error("Cannot call getHash after setting HMAC key");
 			}
 
-			return formatFunc(retVal, getOutputOpts(outputFormatOpts));
+			outputOptions = getOutputOpts(options);
+
+			/* Validate the output format selection */
+			switch (format)
+			{
+			case "HEX":
+				formatFunc = function(binarray) {return binb2hex(binarray, outputOptions);};
+				break;
+			case "B64":
+				formatFunc = function(binarray) {return binb2b64(binarray, outputOptions);};
+				break;
+			case "BYTES":
+				formatFunc = binb2bytes;
+				break;
+			default:
+				throw new Error("format must be HEX, B64, or BYTES");
+			}
+
+			if (false === finalized)
+			{
+				intermediateH = finalizeFunc(remainder, remainderLen, processedLen, intermediateH);
+				for (i = 1; i < numRounds; i += 1)
+				{
+					intermediateH = finalizeFunc(intermediateH, outputBinLen, 0, getH(shaVariant));
+				}
+			}
+
+			finalized = true;
+			return formatFunc(intermediateH);
+		};
+
+		/**
+		 * Returns the the HMAC in the specified format using the key given by
+		 * a previous setHMACKey call.
+		 *
+		 * @expose
+		 * @param {string} format The desired output formatting
+		 *   (B64, HEX, or BYTES)
+		 * @param {{outputUpper : (boolean|undefined), b64Pad : (string|undefined)}=}
+		 *   options associative array of output formatting options
+		 * @return {string} The string representation of the hash in the format
+		 *   specified
+		 */
+		this.getHMAC = function(format, options)
+		{
+			var formatFunc,	firstHash, outputOptions;
+
+			if (false === hmacKeySet)
+			{
+				throw new Error("Cannot call getHMAC without first setting HMAC key");
+			}
+
+			outputOptions = getOutputOpts(options);
+
+			/* Validate the output format selection */
+			switch (format)
+			{
+			case "HEX":
+				formatFunc = function(binarray) {return binb2hex(binarray, outputOptions);};
+				break;
+			case "B64":
+				formatFunc = function(binarray) {return binb2b64(binarray, outputOptions);};
+				break;
+			case "BYTES":
+				formatFunc = binb2bytes;
+				break;
+			default:
+				throw new Error("outputFormat must be HEX, B64, or BYTES");
+			}
+
+			if (false === finalized)
+			{
+				firstHash = finalizeFunc(remainder, remainderLen, processedLen, intermediateH);
+				intermediateH = roundFunc(keyWithOPad, getH(shaVariant));
+				intermediateH = finalizeFunc(firstHash, outputBinLen, variantBlockSize, intermediateH);
+			}
+
+			finalized = true;
+			return formatFunc(intermediateH);
 		};
 	};
 
