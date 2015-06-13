@@ -15,14 +15,15 @@
 				var hashRounds = document.getElementById("hashRounds");
 				var hashOutputType = document.getElementById("hashOutputType");
 				var hashOutput = document.getElementById("hashOutputText");
-				var hashObj = new jsSHA(hashInput.value, hashInputType.options[hashInputType.selectedIndex].value);
-				hashOutput.value = hashObj.getHash(
+				var hashObj = new jsSHA(
 					hashVariant.options[hashVariant.selectedIndex].value,
-					hashOutputType.options[hashOutputType.selectedIndex].value,
-					parseInt(hashRounds.value, 10)
+					hashInputType.options[hashInputType.selectedIndex].value,
+					{numRounds: parseInt(hashRounds.value, 10)}
 				);
+				hashObj.update(hashInput.value);
+				hashOutput.value = hashObj.getHash(hashOutputType.options[hashOutputType.selectedIndex].value);
 			} catch(e) {
-				hashOutput.value = e
+				hashOutput.value = e.message
 			}
 		}
 
@@ -35,16 +36,19 @@
 				var hmacVariant = document.getElementById("hmacVariant");
 				var hmacOutputType = document.getElementById("hmacOutputType");
 				var hmacOutput = document.getElementById("hmacOutputText");
-				var hmacObj = new jsSHA(hmacText.value, hmacTextType.options[hmacTextType.selectedIndex].value);
-
-				hmacOutput.value = hmacObj.getHMAC(
-					hmacKeyInput.value,
-					hmacKeyInputType.options[hmacKeyInputType.selectedIndex].value,
+				var hmacObj = new jsSHA(
 					hmacVariant.options[hmacVariant.selectedIndex].value,
-					hmacOutputType.options[hmacOutputType.selectedIndex].value
+					hmacTextType.options[hmacTextType.selectedIndex].value
 				);
+				hmacObj.setHMACKey(
+					hmacKeyInput.value,
+					hmacKeyInputType.options[hmacKeyInputType.selectedIndex].value
+				);
+				hmacObj.update(hmacText.value);
+
+				hmacOutput.value = hmacObj.getHMAC(hmacOutputType.options[hmacOutputType.selectedIndex].value);
 			} catch(e) {
-				hmacOutput.value = e
+				hmacOutput.value = e.message
 			}
 		}
 	</script>
@@ -63,7 +67,7 @@
 		<div>
 			<h1>Newest Release / Download</h1>
 			<p>
-				As of 8 March 2015, the newest release is v1.6.0 and can be found at <a href="https://github.com/Caligatio/jsSHA/releases/tag/v1.6.0">GitHub</a>.
+				As of 13 June 2015, the newest release is v2.0.0 and can be found at <a href="https://github.com/Caligatio/jsSHA/releases/tag/v2.0.0">GitHub</a>.
 			</p>
 		</div>
 		<div>
