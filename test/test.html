@@ -57,7 +57,7 @@
 				}
 				catch(e)
 				{
-					if (e != "Chosen SHA variant is not supported")
+					if (e.message != "Chosen SHA variant is not supported")
 					{
 						throw "Testing presence of SHA-1 failed";
 					}
@@ -71,7 +71,7 @@
 				}
 				catch(e)
 				{
-					if (e != "Chosen SHA variant is not supported")
+					if (e.message != "Chosen SHA variant is not supported")
 					{
 						throw "Testing presence of SHA-256 failed";
 					}
@@ -85,7 +85,7 @@
 				}
 				catch(e)
 								{
-					if (e != "Chosen SHA variant is not supported")
+					if (e.message != "Chosen SHA variant is not supported")
 					{
 						throw "Testing presence of SHA-512 failed";
 					}
