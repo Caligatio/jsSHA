@@ -1,0 +1,75 @@
+<script src="../src/sha_dev.js"></script>
+
+<input type="file" id="files" name="file" />
+<div id="progress"></div>
+
+<script>
+	// How many bytes to read per chunk
+	var chunkSize = Math.pow(10, 5)
+
+	// Reporting
+	var progress = document.querySelector('#progress')
+
+	// Handle various I/O problems
+	function errorHandler(evt) {
+		switch(evt.target.error.code) {
+			case evt.target.error.NOT_FOUND_ERR:
+				alert('File Not Found!')
+				break
+			case evt.target.error.NOT_READABLE_ERR:
+				alert('File is not readable')
+				break
+			case evt.target.error.ABORT_ERR:
+				break // noop
+			default:
+				alert('An error occurred reading this file.')
+		}
+	}
+
+	// Recurse through async chunk reads
+	function readFile(hasher, file, start, stop) {
+		// Only read to the end of the file
+		stop = (stop <= file.size) ? stop : file.size
+
+		// Prepare to read chunk
+		var reader = new FileReader()
+		reader.onerror = errorHandler
+
+		// If we use onloadend, we need to check the readyState.
+		reader.onloadend = function(evt) {
+			if (evt.target.readyState == FileReader.DONE) {
+				hasher.update(evt.target.result)
+
+				var percent = Math.round((stop / file.size) * 100)
+				progress.innerHTML = 'Progress: ' + percent + '%'
+
+				// Recurse or finish
+				if (stop == file.size) {
+					result = hasher.getHash('HEX')
+					progress.innerHTML = result
+				} else {
+					readFile(hasher, file, start + chunkSize, stop + chunkSize)
+				}
+			}
+		}
+
+		// Begin read
+		var blob = file.slice(start, stop)
+		reader.readAsBinaryString(blob)
+	}
+
+	function handleFileSelect(evt) {
+		// Reset progress indicator on new file selection.
+		progress.innerHTML = 'Progress: 0%'
+
+		// Get file object from the form
+		var file = evt.target.files[0]
+
+		var hasher = new jsSHA('SHA-384', 'BYTES')
+
+		// Read file in chunks
+		readFile(hasher, file, 0, chunkSize)
+	}
+
+	document.getElementById('files').addEventListener('change', handleFileSelect, false)
+</script>
