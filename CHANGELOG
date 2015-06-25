@@ -1,10 +1,20 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
+2.0.1 (2015-06-25)
+=========================
+- Fixed major issue with all hashes failing if raw input was a particular size
+  (thanks treus!)
+
 2.0.0 (2015-06-13)
 =========================
 - Completely reworked API to support streaming inputs
 - Exceptions now throw Errors instead of strings (thanks jclem!)
+
+1.6.1 (2015-06-25)
+=========================
+- Fixed issue with SHA-512 family of hashes failing is raw input was a
+  particular size
 
 1.6.0 (2015-03-08)
 =========================
