@@ -1062,9 +1062,11 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	{
 		var i, appendedMessageLength, offset;
 
-		/* Add 72 because of the 64-bit length and the extra byte because
-		   of the bit (actually a byte) append */
-		offset = (((remainderBinLen + 72) >>> 9) << 4) + 15;
+		/* The 65 addition is a hack but it works.  The correct number is
+		   actually 72 (64 + 8) but the below math fails if
+		   remainderBinLen + 72 % 512 = 0. Since remainderBinLen % 8 = 0,
+		   "shorting" the addition is OK. */
+		offset = (((remainderBinLen + 65) >>> 9) << 4) + 15;
 		while (remainder.length <= offset)
 		{
 			remainder.push(0);
@@ -1291,18 +1293,22 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			(2 & SUPPORTED_ALGS))
 		{
 			/* 32-bit variant */
-			/* Add 72 because of the 64-bit length and the extra byte because
-			   of the bit (actually a byte) append */
-			offset = (((remainderBinLen + 72) >>> 9) << 4) + 15;
+			/* The 65 addition is a hack but it works.  The correct number is
+			   actually 72 (64 + 8) but the below math fails if
+			   remainderBinLen + 72 % 512 = 0. Since remainderBinLen % 8 = 0,
+			   "shorting" the addition is OK. */
+			offset = (((remainderBinLen + 65) >>> 9) << 4) + 15;;
 			binaryStringInc = 16;
 		}
 		else if ((variant === "SHA-384" || variant === "SHA-512") &&
 			(4 & SUPPORTED_ALGS))
 		{
 			/* 64-bit variant */
-			/* Add 136 because of the 128-bit length and the extra byte because
-			   of the bit (actually a byte) append */
-			offset = (((remainderBinLen + 136) >>> 10) << 5) + 31;
+			/* The 129 addition is a hack but it works.  The correct number is
+			   actually 136 (128 + 8) but the below math fails if
+			   remainderBinLen + 136 % 1024 = 0. Since remainderBinLen % 8 = 0,
+			   "shorting" the addition is OK. */
+			offset = (((remainderBinLen + 129) >>> 10) << 5) + 31;
 			binaryStringInc = 32;
 		}
 		else
