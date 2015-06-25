@@ -982,7 +982,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		{
 			/* 64-bit variant */
 			numRounds = 80;
-			lengthPosition = (((messageLen + 128) >>> 10) << 5) + 31;
+			lengthPosition = (((messageLen + 129) >>> 10) << 5) + 31;
 			binaryStringInc = 32;
 			binaryStringMult = 2;
 			Int = Int_64;
