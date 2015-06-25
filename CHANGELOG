@@ -1,6 +1,11 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
+1.6.1 (2015-06-25)
+=========================
+- Fixed issue with SHA-512 family of hashes failing is raw input was a
+  particular size
+
 1.6.0 (2015-03-08)
 =========================
 This marks the last v1.X new feature release.  The API is changing
