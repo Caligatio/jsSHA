@@ -395,7 +395,11 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		outputOptions = options || {};
 
 		retVal["outputUpper"] = outputOptions["outputUpper"] || false;
-		retVal["b64Pad"] = outputOptions["b64Pad"] || "=";
+
+		if (true === outputOptions.hasOwnProperty("b64Pad"))
+		{
+			retVal["b64Pad"] = outputOptions["b64Pad"];
+		}
 
 		if ("boolean" !== typeof(retVal["outputUpper"]))
 		{
@@ -1297,7 +1301,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			   actually 72 (64 + 8) but the below math fails if
 			   remainderBinLen + 72 % 512 = 0. Since remainderBinLen % 8 = 0,
 			   "shorting" the addition is OK. */
-			offset = (((remainderBinLen + 65) >>> 9) << 4) + 15;;
+			offset = (((remainderBinLen + 65) >>> 9) << 4) + 15;
 			binaryStringInc = 16;
 		}
 		else if ((variant === "SHA-384" || variant === "SHA-512") &&

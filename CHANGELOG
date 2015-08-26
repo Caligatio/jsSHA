@@ -1,6 +1,10 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
+2.0.2 (XXX-XX-XX)
+=========================
+- Fixed inability to have a blank "b64Pad" (thanks xlc!)
+
 2.0.1 (2015-06-25)
 =========================
 - Fixed major issue with all hashes failing if raw input was a particular size
