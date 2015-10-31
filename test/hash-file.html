@@ -1,0 +1,106 @@
+<script src="../src/sha.js"></script>
+
+Drop this project's LICENSE file to test, or any other file to find its SHA-384 hash:
+<p>
+<input type="file" id="files" name="file" />
+<p>
+<div id="progress"></div>
+
+<style>
+	.correct
+	{
+		color: #00FF00;
+		background-color: #FFFFFF;
+	}
+
+	.incorrect
+	{
+		color: #FF0000;
+		background-color: #FFFFFF;
+	}
+</style>
+
+<script>
+	// How many bytes to read per chunk
+	var chunkSize = Math.pow(10, 5)
+
+	// Reporting
+	var progress = document.querySelector('#progress')
+
+	// Handle various I/O problems
+	function errorHandler(evt) {
+		switch(evt.target.error.code) {
+			case evt.target.error.NOT_FOUND_ERR:
+				alert('File Not Found!')
+				break
+			case evt.target.error.NOT_READABLE_ERR:
+				alert('File is not readable')
+				break
+			case evt.target.error.ABORT_ERR:
+				break // noop
+			default:
+				alert('An error occurred reading this file.')
+		}
+	}
+
+	// Recurse through async chunk reads
+	function readFile(hasher, file, start, stop) {
+		// Only read to the end of the file
+		stop = (stop <= file.size) ? stop : file.size
+
+		// Prepare to read chunk
+		var reader = new FileReader()
+		reader.onerror = errorHandler
+
+		// If we use onloadend, we need to check the readyState.
+		reader.onloadend = function(evt) {
+			if (evt.target.readyState == FileReader.DONE) {
+				hasher.update(evt.target.result)
+
+				var percent = Math.round((stop / file.size) * 100)
+				progress.innerHTML = 'Progress: ' + percent + '%'
+
+				// Recurse or finish
+				if (stop == file.size) {
+					result = hasher.getHash('HEX')
+					progress.innerHTML = result
+
+					// Allow testing on project license file
+					if (file.name == 'LICENSE') {
+						progress.innerHTML += ''
+
+						// Compare with sha384sum util
+						if (result == '25490ec88947b64b51e4bd1bcd52e19131c4ae324e4b5d12b17451eaf98121fde440204cb62ed5a1bd44ebff97dec2bd') {
+							progress.innerHTML += '<p>License hash comparison: <span class="correct">PASS</span>'
+						} else {
+							progress.innerHTML += '<p>License hash comparison: <span class="incorrect">FAIL</span>'
+						}
+					}
+				} else {
+					readFile(hasher, file, start + chunkSize, stop + chunkSize)
+				}
+			}
+		}
+
+		// Begin read
+		var blob = file.slice(start, stop)
+		reader.readAsBinaryString(blob)
+	}
+
+	function handleFileSelect(evt) {
+		// Reset progress indicator on new file selection.
+		progress.innerHTML = 'Progress: 0%'
+
+		// Get file object from the form
+		var file = evt.target.files[0]
+
+		var hasher = new jsSHA('SHA-384', 'BYTES')
+
+		// Read file in chunks
+		readFile(hasher, file, 0, chunkSize)
+	}
+
+	// Trigger file hash
+	document.getElementById('files').addEventListener('change', handleFileSelect, false)
+
+</script>
