@@ -1,9 +1,10 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
-2.0.2 (XXX-XX-XX)
+2.0.2 (XXXX-XX-XX)
 =========================
 - Fixed inability to have a blank "b64Pad" (thanks xlc!)
+- Added file hashing test (thanks kofalt!)
 
 2.0.1 (2015-06-25)
 =========================
