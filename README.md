@@ -83,7 +83,7 @@ Example to calculate the SHA-512 of "This is a test":
 
 The constructor takes a hashmap as a optional third argument with possible
 properties of "numRounds" and "encoding".  numRounds controls the number of
-hashing iterations/rounds performed and defaults to a value of "1" if not
+hashing iterations/rounds performed and defaults to a value of 1 if not
 specified. encoding specifies the encoding used to encode TEXT-type inputs.
 Valid options are "UTF8", "UTF16BE", and "UTF16LE", it defaults to "UTF8".
 

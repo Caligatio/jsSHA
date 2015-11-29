@@ -1390,7 +1390,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @param {string} variant The desired SHA variant (SHA-1, SHA-224, SHA-256,
 	 *   SHA-384, or SHA-512)
 	 * @param {string} inputFormat The format of srcString: HEX, TEXT, B64, or BYTES
-	 * @param {{encoding: (string|undefined), numRounds: (string|undefined)}=}
+	 * @param {{encoding: (string|undefined), numRounds: (number|undefined)}=}
 	 *   options Optional values
 	 */
 	var jsSHA = function(variant, inputFormat, options)
