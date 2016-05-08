@@ -3,7 +3,7 @@
  * defined in FIPS PUB 180-2 as well as the corresponding HMAC implementation
  * as defined in FIPS PUB 198a
  *
- * Copyright Brian Turek 2008-2015
+ * Copyright Brian Turek 2008-2016
  * Distributed under the BSD License
  * See http://caligatio.github.com/jsSHA/ for more information
  *
