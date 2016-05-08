@@ -998,13 +998,13 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	{
 		var W = [], a, b, c, d, e, T, ch = ch_32, parity = parity_32,
 			maj = maj_32, rotl = rotl_32, safeAdd_2 = safeAdd_32_2, t,
-			safeAdd_5 = safeAdd_32_5, localH = H.slice();
+			safeAdd_5 = safeAdd_32_5;
 
-		a = localH[0];
-		b = localH[1];
-		c = localH[2];
-		d = localH[3];
-		e = localH[4];
+		a = H[0];
+		b = H[1];
+		c = H[2];
+		d = H[3];
+		e = H[4];
 
 		for (t = 0; t < 80; t += 1)
 		{
@@ -1039,13 +1039,13 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			a = T;
 		}
 
-		localH[0] = safeAdd_2(a, localH[0]);
-		localH[1] = safeAdd_2(b, localH[1]);
-		localH[2] = safeAdd_2(c, localH[2]);
-		localH[3] = safeAdd_2(d, localH[3]);
-		localH[4] = safeAdd_2(e, localH[4]);
+		H[0] = safeAdd_2(a, H[0]);
+		H[1] = safeAdd_2(b, H[1]);
+		H[2] = safeAdd_2(c, H[2]);
+		H[3] = safeAdd_2(d, H[3]);
+		H[4] = safeAdd_2(e, H[4]);
 
-		return localH;
+		return H;
 	}
 
 	/**
@@ -1064,34 +1064,33 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	function finalizeSHA1(remainder, remainderBinLen, processedBinLen, H)
 	{
-		var i, appendedMessageLength, offset,
-			localRemainder = remainder.slice(), localH = H.slice();
+		var i, appendedMessageLength, offset;
 
 		/* The 65 addition is a hack but it works.  The correct number is
 		   actually 72 (64 + 8) but the below math fails if
 		   remainderBinLen + 72 % 512 = 0. Since remainderBinLen % 8 = 0,
 		   "shorting" the addition is OK. */
 		offset = (((remainderBinLen + 65) >>> 9) << 4) + 15;
-		while (localRemainder.length <= offset)
+		while (remainder.length <= offset)
 		{
-			localRemainder.push(0);
+			remainder.push(0);
 		}
 		/* Append '1' at the end of the binary string */
-		localRemainder[remainderBinLen >>> 5] |= 0x80 << (24 - (remainderBinLen % 32));
+		remainder[remainderBinLen >>> 5] |= 0x80 << (24 - (remainderBinLen % 32));
 		/* Append length of binary string in the position such that the new
 		length is a multiple of 512.  Logic does not work for even multiples
 		of 512 but there can never be even multiples of 512 */
-		localRemainder[offset] = remainderBinLen + processedBinLen;
+		remainder[offset] = remainderBinLen + processedBinLen;
 
-		appendedMessageLength = localRemainder.length;
+		appendedMessageLength = remainder.length;
 
 		/* This will always be at least 1 full chunk */
 		for (i = 0; i < appendedMessageLength; i += 16)
 		{
-			localH = roundSHA1(localRemainder.slice(i, i + 16), localH);
+			H = roundSHA1(remainder.slice(i, i + 16), H);
 		}
 
-		return localH;
+		return H;
 	}
 
 	/* Put this here so the K arrays aren't put on the stack for every block */
@@ -1179,7 +1178,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	{
 		var a, b, c, d, e, f, g, h, T1, T2, numRounds, t, binaryStringMult,
 			safeAdd_2, safeAdd_4, safeAdd_5, gamma0, gamma1, sigma0, sigma1,
-			ch, maj, Int, W = [], int1, int2, offset, K, localH = H.slice();
+			ch, maj, Int, W = [], int1, int2, offset, K;
 
 		/* Set up the various function handles and variable for the specific
 		 * variant */
@@ -1224,14 +1223,14 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			throw new Error("Unexpected error in SHA-2 implementation");
 		}
 
-		a = localH[0];
-		b = localH[1];
-		c = localH[2];
-		d = localH[3];
-		e = localH[4];
-		f = localH[5];
-		g = localH[6];
-		h = localH[7];
+		a = H[0];
+		b = H[1];
+		c = H[2];
+		d = H[3];
+		e = H[4];
+		f = H[5];
+		g = H[6];
+		h = H[7];
 
 		for (t = 0; t < numRounds; t += 1)
 		{
@@ -1263,16 +1262,16 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			a = safeAdd_2(T1, T2);
 		}
 
-		localH[0] = safeAdd_2(a, localH[0]);
-		localH[1] = safeAdd_2(b, localH[1]);
-		localH[2] = safeAdd_2(c, localH[2]);
-		localH[3] = safeAdd_2(d, localH[3]);
-		localH[4] = safeAdd_2(e, localH[4]);
-		localH[5] = safeAdd_2(f, localH[5]);
-		localH[6] = safeAdd_2(g, localH[6]);
-		localH[7] = safeAdd_2(h, localH[7]);
+		H[0] = safeAdd_2(a, H[0]);
+		H[1] = safeAdd_2(b, H[1]);
+		H[2] = safeAdd_2(c, H[2]);
+		H[3] = safeAdd_2(d, H[3]);
+		H[4] = safeAdd_2(e, H[4]);
+		H[5] = safeAdd_2(f, H[5]);
+		H[6] = safeAdd_2(g, H[6]);
+		H[7] = safeAdd_2(h, H[7]);
 
-		return localH;
+		return H;
 	}
 
 	/**
@@ -1292,8 +1291,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	function finalizeSHA2(remainder, remainderBinLen, processedBinLen, H, variant)
 	{
-		var i, appendedMessageLength, offset, retVal, binaryStringInc,
-			localRemainer = remainder.slice(), localH = H.slice();
+		var i, appendedMessageLength, offset, retVal, binaryStringInc;
 
 		if ((variant === "SHA-224" || variant === "SHA-256") &&
 			(2 & SUPPORTED_ALGS))
@@ -1322,57 +1320,57 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			throw new Error("Unexpected error in SHA-2 implementation");
 		}
 
-		while (localRemainer.length <= offset)
+		while (remainder.length <= offset)
 		{
-			localRemainer.push(0);
+			remainder.push(0);
 		}
 		/* Append '1' at the end of the binary string */
-		localRemainer[remainderBinLen >>> 5] |= 0x80 << (24 - remainderBinLen % 32);
+		remainder[remainderBinLen >>> 5] |= 0x80 << (24 - remainderBinLen % 32);
 		/* Append length of binary string in the position such that the new
 		 * length is correct */
-		localRemainer[offset] = remainderBinLen + processedBinLen;
+		remainder[offset] = remainderBinLen + processedBinLen;
 
-		appendedMessageLength = localRemainer.length;
+		appendedMessageLength = remainder.length;
 
 		/* This will always be at least 1 full chunk */
 		for (i = 0; i < appendedMessageLength; i += binaryStringInc)
 		{
-			localH = roundSHA2(localRemainer.slice(i, i + binaryStringInc), localH, variant);
+			H = roundSHA2(remainder.slice(i, i + binaryStringInc), H, variant);
 		}
 
 		if (("SHA-224" === variant) && (2 & SUPPORTED_ALGS))
 		{
 			retVal = [
-				localH[0], localH[1], localH[2], localH[3],
-				localH[4], localH[5], localH[6]
+				H[0], H[1], H[2], H[3],
+				H[4], H[5], H[6]
 			];
 		}
 		else if (("SHA-256" === variant) && (2 & SUPPORTED_ALGS))
 		{
-			retVal = localH;
+			retVal = H;
 		}
 		else if (("SHA-384" === variant) && (4 & SUPPORTED_ALGS))
 		{
 			retVal = [
-				localH[0].highOrder, localH[0].lowOrder,
-				localH[1].highOrder, localH[1].lowOrder,
-				localH[2].highOrder, localH[2].lowOrder,
-				localH[3].highOrder, localH[3].lowOrder,
-				localH[4].highOrder, localH[4].lowOrder,
-				localH[5].highOrder, localH[5].lowOrder
+				H[0].highOrder, H[0].lowOrder,
+				H[1].highOrder, H[1].lowOrder,
+				H[2].highOrder, H[2].lowOrder,
+				H[3].highOrder, H[3].lowOrder,
+				H[4].highOrder, H[4].lowOrder,
+				H[5].highOrder, H[5].lowOrder
 			];
 		}
 		else if (("SHA-512" === variant) && (4 & SUPPORTED_ALGS))
 		{
 			retVal = [
-				localH[0].highOrder, localH[0].lowOrder,
-				localH[1].highOrder, localH[1].lowOrder,
-				localH[2].highOrder, localH[2].lowOrder,
-				localH[3].highOrder, localH[3].lowOrder,
-				localH[4].highOrder, localH[4].lowOrder,
-				localH[5].highOrder, localH[5].lowOrder,
-				localH[6].highOrder, localH[6].lowOrder,
-				localH[7].highOrder, localH[7].lowOrder
+				H[0].highOrder, H[0].lowOrder,
+				H[1].highOrder, H[1].lowOrder,
+				H[2].highOrder, H[2].lowOrder,
+				H[3].highOrder, H[3].lowOrder,
+				H[4].highOrder, H[4].lowOrder,
+				H[5].highOrder, H[5].lowOrder,
+				H[6].highOrder, H[6].lowOrder,
+				H[7].highOrder, H[7].lowOrder
 			];
 		}
 		else /* This should never be reached */
@@ -1613,7 +1611,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				throw new Error("format must be HEX, B64, or BYTES");
 			}
 
-			finalizedH = finalizeFunc(remainder, remainderLen, processedLen, intermediateH);
+			finalizedH = finalizeFunc(remainder.slice(), remainderLen, processedLen, intermediateH.slice());
 			for (i = 1; i < numRounds; i += 1)
 			{
 				finalizedH = finalizeFunc(finalizedH, outputBinLen, 0, getH(shaVariant));
@@ -1661,7 +1659,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				throw new Error("outputFormat must be HEX, B64, or BYTES");
 			}
 
-			firstHash = finalizeFunc(remainder, remainderLen, processedLen, intermediateH);
+			firstHash = finalizeFunc(remainder.slice(), remainderLen, processedLen, intermediateH.slice());
 			finalizedH = roundFunc(keyWithOPad, getH(shaVariant));
 			finalizedH = finalizeFunc(firstHash, outputBinLen, variantBlockSize, finalizedH);
 
