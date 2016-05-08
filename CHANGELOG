@@ -3,7 +3,7 @@
 -------------------------
 2.1.0 (2016-XX-XX)
 =========================
-- Added ability to call `update` on hashes between `getHash` calls
+- Added ability to call `update` on hashes between `getHash` and `getHMAC` calls
 
 2.0.2 (2015-10-31)
 =========================
