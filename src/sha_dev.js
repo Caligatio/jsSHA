@@ -291,6 +291,42 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	}
 
 	/**
+	 * Convert an ArrayBuffer to an array of big-endian words
+	 *
+	 * @private
+	 * @param {ArrayBuffer} arr ArrayBuffer to be converted to binary
+	 *   representation
+	 * @param {Array.<number>} existingBin A packed int array of bytes to
+	 *   append the results to
+	 * @param {number} existingBinLen The number of bits in the existingBin
+	 *   array
+	 * @return {{value : Array.<number>, binLen : number}} Hash list where
+	 *   "value" contains the output number array and "binLen" is the binary
+	 *   length of "value"
+	 */
+	function arraybuffer2binb(arr, existingBin, existingBinLen)
+	{
+		var bin = [], i, existingByteLen, intOffset, byteOffset;
+
+		bin = existingBin || [0];
+		existingBinLen = existingBinLen || 0;
+		existingByteLen = existingBinLen >>> 3;
+
+		for (i = 0; i < arr.byteLength; i += 1)
+		{
+			byteOffset = i + existingByteLen;
+			intOffset = byteOffset >>> 2;
+			if (bin.length <= intOffset)
+			{
+				bin.push(0);
+			}
+			bin[intOffset] |= arr[i] << 8 * (3 - (byteOffset % 4));
+		}
+
+		return {"value" : bin, "binLen" : arr.byteLength * 8 + existingBinLen};
+	}
+
+	/**
 	 * Convert an array of big-endian words to a hex string.
 	 *
 	 * @private
@@ -380,6 +416,27 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	}
 
 	/**
+	 * Convert an array of big-endian words to an ArrayBuffer
+	 *
+	 * @private
+	 * @param {Array.<number>} binarray Array of integers to be converted to
+	 *   an ArrayBuffer
+	 * @return {ArrayBuffer} Raw bytes representation of the parameter in an
+	 *   ArrayBuffer
+	 */
+	function binb2arraybuffer(binarray)
+	{
+		var length = binarray.length * 4, i, retVal = new ArrayBuffer(length);
+
+		for (i = 0; i < length; i += 1)
+		{
+			retVal[i] = (binarray[i >>> 2] >>> ((3 - (i % 4)) * 8)) & 0xFF;
+		}
+
+		return retVal;
+	}
+
+	/**
 	 * Validate hash list containing output formatting options, ensuring
 	 * presence of every option or adding the default value
 	 *
@@ -462,8 +519,16 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		case "BYTES":
 			retVal = bytes2binb;
 			break;
+		case "ARRAYBUFFER":
+			try {
+				retVal = new ArrayBuffer(0);
+			} catch (err) {
+				throw new Error("ARRAYBUFFER not supported by this environment");
+			}
+			retVal = arraybuffer2binb;
+			break;
 		default:
-			throw new Error("format must be HEX, TEXT, B64, or BYTES");
+			throw new Error("format must be HEX, TEXT, B64, BYTES, or ARRAYBUFFER");
 		}
 
 		return retVal;
@@ -1389,7 +1454,8 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @this {jsSHA}
 	 * @param {string} variant The desired SHA variant (SHA-1, SHA-224, SHA-256,
 	 *   SHA-384, or SHA-512)
-	 * @param {string} inputFormat The format of srcString: HEX, TEXT, B64, or BYTES
+	 * @param {string} inputFormat The format of srcString: HEX, TEXT, B64,
+	 *   BYTES, or ARRAYBUFFER
 	 * @param {{encoding: (string|undefined), numRounds: (number|undefined)}=}
 	 *   options Optional values
 	 */
@@ -1466,7 +1532,8 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		 *
 		 * @expose
 		 * @param {string} key The key used to calculate the HMAC
-		 * @param {string} inputFormat The format of key, HEX, TEXT, B64, or BYTES
+		 * @param {string} inputFormat The format of key, HEX, TEXT, B64, BYTES,
+		 *   or ARRAYBUFFER
 		 * @param {{encoding : (string|undefined)}=} options Associative array
 		 *   of input format options
 		 */
@@ -1578,11 +1645,12 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		 * using the specified parameters
 		 *
 		 * @expose
-		 * @param {string} format The desired output formatting (B64, HEX, or BYTES)
+		 * @param {string} format The desired output formatting (B64, HEX,
+		 *   BYTES, or ARRAYBUFFER)
 		 * @param {{outputUpper : (boolean|undefined), b64Pad : (string|undefined)}=}
 		 *   options Hash list of output formatting options
-		 * @return {string} The string representation of the hash in the format
-		 *   specified
+		 * @return {string|ArrayBuffer} The string representation of the hash
+		 *   in the format specified.
 		 */
 		this.getHash = function(format, options)
 		{
@@ -1607,8 +1675,16 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			case "BYTES":
 				formatFunc = binb2bytes;
 				break;
+			case "ARRAYBUFFER":
+				try {
+					i = new ArrayBuffer(0);
+				} catch (err) {
+					throw new Error("ARRAYBUFFER not supported by this environment");
+				}
+				formatFunc = binb2arraybuffer;
+				break;
 			default:
-				throw new Error("format must be HEX, B64, or BYTES");
+				throw new Error("format must be HEX, B64, BYTES, or ARRAYBUFFER");
 			}
 
 			finalizedH = finalizeFunc(remainder.slice(), remainderLen, processedLen, intermediateH.slice());
@@ -1626,11 +1702,11 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		 *
 		 * @expose
 		 * @param {string} format The desired output formatting
-		 *   (B64, HEX, or BYTES)
+		 *   (B64, HEX, BYTES, or ARRAYBUFFER)
 		 * @param {{outputUpper : (boolean|undefined), b64Pad : (string|undefined)}=}
 		 *   options associative array of output formatting options
-		 * @return {string} The string representation of the hash in the format
-		 *   specified
+		 * @return {string|ArrayBuffer} The string representation of the hash in the
+		 *   format specified.
 		 */
 		this.getHMAC = function(format, options)
 		{
@@ -1655,8 +1731,16 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			case "BYTES":
 				formatFunc = binb2bytes;
 				break;
+			case "ARRAYBUFFER":
+				try {
+					formatFunc = new ArrayBuffer(0);
+				} catch (err) {
+					throw new Error("ARRAYBUFFER not supported by this environment");
+				}
+				formatFunc = binb2arraybuffer;
+				break;
 			default:
-				throw new Error("outputFormat must be HEX, B64, or BYTES");
+				throw new Error("outputFormat must be HEX, B64, BYTES, or ARRAYBUFFER");
 			}
 
 			firstHash = finalizeFunc(remainder.slice(), remainderLen, processedLen, intermediateH.slice());

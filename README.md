@@ -72,10 +72,10 @@ in your header (sha.js used below):
 #### Hashing
 Instantiate a new jsSHA object with the desired hash type, input type, and
 options as parameters.  The hash type can be one of SHA-1, SHA-224, SHA-256,
-SHA-384, or SHA-512.  The input type can be one of HEX, TEXT, B64, or BYTES.
-You can then stream in input using the "update" object function.  Finally,
-simply call "getHash" with the output type as a parameter (B64, HEX, or BYTES).
-Example to calculate the SHA-512 of "This is a test":
+SHA-384, or SHA-512.  The input type can be one of HEX, TEXT, B64, BYTES, or
+ARRAYBUFFER.  You can then stream in input using the "update" object function.
+Finally, simply call "getHash" with the output type as a parameter (B64, HEX,
+BYTES, or ARRAYBUFFER).  Example to calculate the SHA-512 of "This is a test":
 
 	var shaObj = new jsSHA("SHA-512", "TEXT");
 	shaObj.update("This is a test");
