@@ -1,6 +1,10 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
+2.1.0 (2016-XX-XX)
+=========================
+- Added ability to call `update` on hashes between `getHash` calls
+
 2.0.2 (2015-10-31)
 =========================
 - Fixed inability to have a blank "b64Pad" (thanks xlc!)
