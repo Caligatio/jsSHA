@@ -6,6 +6,7 @@
 - Added ability to call `update` on hashes between `getHash` and `getHMAC` calls
 - Added new input and output type, "ARRAYBUFFER" which is a JavaScript
   ArrayBuffer
+- Now keeping smaller build files in NPM (thanks vogievetsky!)
 
 2.0.2 (2015-10-31)
 =========================
