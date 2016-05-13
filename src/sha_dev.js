@@ -23,6 +23,10 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 (function (global)
 {
 	"use strict";
+
+	/* Globals */
+	var TWO_PWR_32 = (1 << 16) * (1 << 16);
+
 	/**
 	 * Int_64 is a object for 2 32-bit numbers emulating a 64-bit number
 	 *
@@ -1129,7 +1133,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	function finalizeSHA1(remainder, remainderBinLen, processedBinLen, H)
 	{
-		var i, appendedMessageLength, offset;
+		var i, appendedMessageLength, offset, totalLen;
 
 		/* The 65 addition is a hack but it works.  The correct number is
 		   actually 72 (64 + 8) but the below math fails if
@@ -1143,9 +1147,15 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		/* Append '1' at the end of the binary string */
 		remainder[remainderBinLen >>> 5] |= 0x80 << (24 - (remainderBinLen % 32));
 		/* Append length of binary string in the position such that the new
-		length is a multiple of 512.  Logic does not work for even multiples
-		of 512 but there can never be even multiples of 512 */
-		remainder[offset] = remainderBinLen + processedBinLen;
+		 * length is a multiple of 512.  Logic does not work for even multiples
+		 * of 512 but there can never be even multiples of 512. JavaScript
+		 * numbers are limited to 2^53 so it's "safe" to treat the totalLen as
+		 * a 64-bit integer. */
+		totalLen = remainderBinLen + processedBinLen;
+		remainder[offset] = totalLen & 0xFFFFFFFF;
+		/* Bitwise operators treat the operand as a 32-bit number so need to
+		 * use hacky division and round to get access to upper 32-ish bits */
+		remainder[offset - 1] = (totalLen / TWO_PWR_32) | 0;
 
 		appendedMessageLength = remainder.length;
 
@@ -1356,7 +1366,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 */
 	function finalizeSHA2(remainder, remainderBinLen, processedBinLen, H, variant)
 	{
-		var i, appendedMessageLength, offset, retVal, binaryStringInc;
+		var i, appendedMessageLength, offset, retVal, binaryStringInc, totalLen;
 
 		if ((variant === "SHA-224" || variant === "SHA-256") &&
 			(2 & SUPPORTED_ALGS))
@@ -1392,8 +1402,13 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		/* Append '1' at the end of the binary string */
 		remainder[remainderBinLen >>> 5] |= 0x80 << (24 - remainderBinLen % 32);
 		/* Append length of binary string in the position such that the new
-		 * length is correct */
-		remainder[offset] = remainderBinLen + processedBinLen;
+		 * length is correct. JavaScript numbers are limited to 2^53 so it's
+		 * "safe" to treat the totalLen as a 64-bit integer. */
+		totalLen = remainderBinLen + processedBinLen;
+		remainder[offset] = totalLen & 0xFFFFFFFF;
+		/* Bitwise operators treat the operand as a 32-bit number so need to
+		 * use hacky division and round to get access to upper 32-ish bits */
+		remainder[offset - 1] = (totalLen / TWO_PWR_32) | 0;
 
 		appendedMessageLength = remainder.length;
 

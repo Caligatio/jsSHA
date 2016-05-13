@@ -7,6 +7,7 @@
 - Added new input and output type, "ARRAYBUFFER" which is a JavaScript
   ArrayBuffer
 - Now keeping smaller build files in NPM (thanks vogievetsky!)
+- Fixed problem with hashing strings over 4 billion bits (thanks Eicar!)
 
 2.0.2 (2015-10-31)
 =========================
