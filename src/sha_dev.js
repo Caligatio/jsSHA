@@ -3,7 +3,7 @@
  * defined in FIPS PUB 180-2 as well as the corresponding HMAC implementation
  * as defined in FIPS PUB 198a
  *
- * Copyright Brian Turek 2008-2015
+ * Copyright Brian Turek 2008-2016
  * Distributed under the BSD License
  * See http://caligatio.github.com/jsSHA/ for more information
  *
@@ -23,6 +23,10 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 (function (global)
 {
 	"use strict";
+
+	/* Globals */
+	var TWO_PWR_32 = (1 << 16) * (1 << 16);
+
 	/**
 	 * Int_64 is a object for 2 32-bit numbers emulating a 64-bit number
 	 *
@@ -846,9 +850,14 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		/* Append '1' at the end of the binary string */
 		message[messageLen >>> 5] |= 0x80 << (24 - (messageLen % 32));
 		/* Append length of binary string in the position such that the new
-		length is a multiple of 512.  Logic does not work for even multiples
-		of 512 but there can never be even multiples of 512 */
-		message[offset] = messageLen;
+		 * length is a multiple of 512.  Logic does not work for even multiples
+		 * of 512 but there can never be even multiples of 512. JavaScript
+		 * numbers are limited to 2^53 so it's "safe" to treat the totalLen as
+		 * a 64-bit integer. */
+		message[offset] = messageLen & 0xFFFFFFFF;
+		/* Bitwise operators treat the operand as a 32-bit number so need to
+		 * use hacky division and round to get access to upper 32-ish bits */
+		message[offset - 1] = (messageLen / TWO_PWR_32) | 0;
 
 		appendedMessageLength = message.length;
 
@@ -1070,8 +1079,12 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		/* Append '1' at the end of the binary string */
 		message[messageLen >>> 5] |= 0x80 << (24 - messageLen % 32);
 		/* Append length of binary string in the position such that the new
-		 * length is correct */
-		message[lengthPosition] = messageLen;
+		 * length is correct. JavaScript numbers are limited to 2^53 so it's
+		 * "safe" to treat the totalLen as a 64-bit integer. */
+		message[lengthPosition] = messageLen & 0xFFFFFFFF;
+		/* Bitwise operators treat the operand as a 32-bit number so need to
+		 * use hacky division and round to get access to upper 32-ish bits */
+		message[lengthPosition - 1] = (messageLen / TWO_PWR_32) | 0;
 
 		appendedMessageLength = message.length;
 
