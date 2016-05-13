@@ -1,7 +1,7 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
-2.1.0 (2016-XX-XX)
+2.1.0 (2016-05-13)
 =========================
 - Added ability to call `update` on hashes between `getHash` and `getHMAC` calls
 - Added new input and output type, "ARRAYBUFFER" which is a JavaScript
