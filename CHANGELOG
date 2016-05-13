@@ -1,6 +1,10 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
+1.6.2 (2016-05-13)
+=========================
+- Fixed problem with hashing strings over 4 billion bits (thanks Eicar!)
+
 1.6.1 (2015-06-25)
 =========================
 - Fixed issue with SHA-512 family of hashes failing is raw input was a

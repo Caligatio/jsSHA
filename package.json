@@ -1,6 +1,6 @@
 {
   "name": "jssha",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "jsSHA is a JavaScript implementation of the entire family of SHA hashes as defined in FIPS 180-2 (SHA-1, SHA-224, SHA-256, SHA-384, and SHA-512) as well as HMAC",
   "main": "src/sha.js",
   "repository": {
