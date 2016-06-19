@@ -22,7 +22,7 @@
     "HMAC",
     "hash"
   ],
-  "license": "BSD",
+  "license": "BSD-3-Clause",
   "author": "Brian Turek <brian.turek@gmail.com>",
   "bugs": {
     "url": "https://github.com/Caligatio/jsSHA/issues"
