@@ -16,9 +16,9 @@
   * selected
   *
   * @define {number} ORed value of SHA variants to be supported
-  *   1 = SHA-1, 2 = SHA-224/SHA-256, 4 = SHA-384/SHA-512
+  *   1 = SHA-1, 2 = SHA-224/SHA-256, 4 = SHA-384/SHA-512, 8 = SHA3
   */
-var SUPPORTED_ALGS = 4 | 2 | 1;
+var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 
 (function (global)
 {
@@ -336,15 +336,16 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @private
 	 * @param {Array.<number>} binarray Array of integers to be converted to
 	 *   hexidecimal representation
+	 * @param {number} outputLength Length of output in bits
 	 * @param {{outputUpper : boolean, b64Pad : string}} formatOpts Hash list
 	 *   containing validated output formatting options
 	 * @return {string} Hexidecimal representation of the parameter in string
 	 *   form
 	 */
-	function binb2hex(binarray, formatOpts)
+	function binb2hex(binarray, outputLength, formatOpts)
 	{
 		var hex_tab = "0123456789abcdef", str = "",
-			length = binarray.length * 4, i, srcByte;
+			length = outputLength / 8, i, srcByte;
 
 		for (i = 0; i < length; i += 1)
 		{
@@ -363,14 +364,15 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @private
 	 * @param {Array.<number>} binarray Array of integers to be converted to
 	 *   base-64 representation
+	 * @param {number} outputLength Length of output in bits
 	 * @param {{outputUpper : boolean, b64Pad : string}} formatOpts Hash list
 	 *   containing validated output formatting options
 	 * @return {string} Base-64 encoded representation of the parameter in
 	 *   string form
 	 */
-	function binb2b64(binarray, formatOpts)
+	function binb2b64(binarray, outputLength, formatOpts)
 	{
-		var str = "", length = binarray.length * 4, i, j, triplet, offset, int1, int2,
+		var str = "", length = outputLength / 8, i, j, triplet, offset, int1, int2,
 			b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 		for (i = 0; i < length; i += 3)
@@ -403,12 +405,13 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @private
 	 * @param {Array.<number>} binarray Array of integers to be converted to
 	 *   a raw bytes string representation
+	 * @param {number} outputLength Length of output in bits
 	 * @return {string} Raw bytes representation of the parameter in string
 	 *   form
 	 */
-	function binb2bytes(binarray)
+	function binb2bytes(binarray, outputLength)
 	{
-		var str = "", length = binarray.length * 4, i, srcByte;
+		var str = "", length = outputLength / 8, i, srcByte;
 
 		for (i = 0; i < length; i += 1)
 		{
@@ -425,12 +428,13 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	 * @private
 	 * @param {Array.<number>} binarray Array of integers to be converted to
 	 *   an ArrayBuffer
+	 * @param {number} outputLength Length of output in bits
 	 * @return {ArrayBuffer} Raw bytes representation of the parameter in an
 	 *   ArrayBuffer
 	 */
-	function binb2arraybuffer(binarray)
+	function binb2arraybuffer(binarray, outputLength)
 	{
-		var length = binarray.length * 4, i, retVal = new ArrayBuffer(length);
+		var length = outputLength / 8, i, retVal = new ArrayBuffer(length);
 
 		for (i = 0; i < length; i += 1)
 		{
@@ -549,6 +553,29 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	function rotl_32(x, n)
 	{
 		return (x << n) | (x >>> (32 - n));
+	}
+
+	function rotl_64(x, n)
+	{
+		if (n > 32)
+		{
+			n = n - 32;
+			return new Int_64(
+				x.lowOrder << n | x.highOrder >>> (32 - n),
+				x.highOrder << n | x.lowOrder >>> (32 - n)
+			);
+		}
+		else if (0 !== n)
+		{
+			return new Int_64(
+				x.highOrder << n | x.lowOrder >>> (32 - n),
+				x.lowOrder << n | x.highOrder >>> (32 - n)
+			);
+		}
+		else
+		{
+			return x;
+		}
 	}
 
 	/**
@@ -983,14 +1010,51 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	}
 
 	/**
-	 * Gets the H values for the specified SHA variant
+	 * XORs all of the given arguments
+	 *
+	 * @private
+	 * @param {...Int_64} var_args The arguments to be XORed
+	 * @return {Int_64} The XOR of the arguments
+	 */
+	function xor_64(var_args)
+	{
+		/* Use the `arguments` object here, not `var_args` */
+		var lowXor = 0, highXor = 0, i;
+
+		for (i = 0; i < arguments.length; i++)
+		{
+			lowXor ^= arguments[i].lowOrder;
+			highXor ^= arguments[i].highOrder;
+		}
+		return new Int_64(highXor, lowXor)
+	}
+
+	/**
+	 * Returns a clone of the given SHA3 state
+	 *
+	 * @private
+	 * @param {{Array.<{Array.<Int_64>}>}} state The state to be cloned
+	 * @return {{Array.<{Array.<Int_64>}>}} The cloned state
+	 */
+	function cloneSHA3State(state) {
+		var clone = [], i;
+		for (i = 0; i < 5; i++)
+		{
+			clone[i] = state[i].slice();
+		}
+
+		return clone
+	}
+
+	/**
+	 * Gets the state values for the specified SHA variant
 	 *
 	 * @param {string} variant The SHA variant
-	 * @return {Array.<number|Int_64>} The initial H values
+	 * @return {Array.<number|Int_64|{Array.<null>}>} The initial state values
 	 */
-	function getH(variant)
+	function getNewState(variant)
 	{
-		var retVal, H_trunc, H_full;
+		var retVal = [], H_trunc, H_full, i;
 
 		if (("SHA-1" === variant) && (1 & SUPPORTED_ALGS))
 		{
@@ -998,7 +1062,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0
 			];
 		}
-		else if (6 & SUPPORTED_ALGS)
+		else if (variant.startsWith("SHA-") && (6 & SUPPORTED_ALGS))
 		{
 			H_trunc = [
 				0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939,
@@ -1043,6 +1107,14 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				break;
 			default:
 				throw new Error("Unknown SHA variant");
+			}
+		}
+		else if ((variant.startsWith("SHA3-") || variant.startsWith("SHAKE")) &&
+			(8 & SUPPORTED_ALGS))
+		{
+			for (i = 0; i < 5; i++)
+			{
+				retVal[i] = [new Int_64(0, 0), new Int_64(0, 0), new Int_64(0, 0), new Int_64(0, 0), new Int_64(0, 0)];
 			}
 		}
 		else
@@ -1169,7 +1241,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	}
 
 	/* Put this here so the K arrays aren't put on the stack for every block */
-	var K_sha2, K_sha512;
+	var K_sha2, K_sha512, r_sha3, rc_sha3;
 	if (6 & SUPPORTED_ALGS)
 	{
 		K_sha2 = [
@@ -1236,6 +1308,31 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				new Int_64(0x5fcb6fab, 0x3ad6faec), new Int_64(0x6c44198c, 0x4a475817)
 			];
 		}
+	}
+	if (8 & SUPPORTED_ALGS)
+	{
+		rc_sha3 = [
+			new Int_64(0x00000000, 0x00000001), new Int_64(0x00000000, 0x00008082),
+			new Int_64(0x80000000, 0x0000808A), new Int_64(0x80000000, 0x80008000),
+			new Int_64(0x00000000, 0x0000808B), new Int_64(0x00000000, 0x80000001),
+			new Int_64(0x80000000, 0x80008081), new Int_64(0x80000000, 0x00008009),
+			new Int_64(0x00000000, 0x0000008A), new Int_64(0x00000000, 0x00000088),
+			new Int_64(0x00000000, 0x80008009), new Int_64(0x00000000, 0x8000000A),
+			new Int_64(0x00000000, 0x8000808B), new Int_64(0x80000000, 0x0000008B),
+			new Int_64(0x80000000, 0x00008089), new Int_64(0x80000000, 0x00008003),
+			new Int_64(0x80000000, 0x00008002), new Int_64(0x80000000, 0x00000080),
+			new Int_64(0x00000000, 0x0000800A), new Int_64(0x80000000, 0x8000000A),
+			new Int_64(0x80000000, 0x80008081), new Int_64(0x80000000, 0x00008080),
+			new Int_64(0x00000000, 0x80000001), new Int_64(0x80000000, 0x80008008)
+		]
+
+		r_sha3 = [
+			[ 0, 36,  3, 41, 18],
+			[ 1, 44, 10, 45,  2],
+			[62,  6, 43, 15, 61],
+			[28, 55, 25, 21, 56],
+			[27, 20, 39,  8, 14],
+		]
 	}
 
 	/**
@@ -1462,13 +1559,164 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	}
 
 	/**
+	 * Performs a round of SHA-3 hashing over a block
+	 *
+	 * @private
+	 * @param {Array.<number>|null} block The binary array representation of the
+	 *   block to hash
+	 * @param {Array.<{Array.<Int_64>}>} state The binary array representation of the
+	 *   block to hash
+	 * @return {Array.<{Array.<Int_64>}>} The resulting state value
+	 */
+	function roundSHA3(block, state)
+	{
+		var round, x, y, B, C = [], D = [];
+
+		if (null !== block)
+		{
+			for (x = 0; x < block.length; x+=2)
+			{
+				/* Transform pair of big-endian integers to little-endian Int_64 */
+				state[(x >>> 1) % 5][((x >>> 1) / 5) | 0] = xor_64(
+					state[(x >>> 1) % 5][((x >>> 1) / 5) | 0],
+					new Int_64(
+						(block[x + 1] & 0xFF) << 24 | (block[x + 1] & 0xFF00) << 8 | (block[x + 1] & 0xFF0000) >>> 8 | block[x + 1] >>> 24,
+						(block[x] & 0xFF) << 24 | (block[x] & 0xFF00) << 8 | (block[x] & 0xFF0000) >>> 8 | block[x] >>> 24
+
+					)
+				)
+			}
+		}
+
+		for (round = 0; round < 24; round++)
+		{
+			/* getNewState doesn't care about variant beyond SHA3 so feed it a
+			   value that triggers the getNewState "if" statement
+			*/
+			B = getNewState("SHA3-");
+
+			/* Perform theta step */
+			for (x = 0; x < 5; x++)
+			{
+				C[x] = xor_64(state[x][0], state[x][1], state[x][2],
+					state[x][3], state[x][4]);
+			}
+			for (x = 0; x < 5; x++)
+			{
+				D[x] = xor_64(C[(x + 4) % 5], rotl_64(C[(x + 1) % 5], 1));
+			}
+			for (x = 0; x < 5; x++)
+			{
+				for (y = 0; y < 5; y++)
+				{
+					state[x][y] = xor_64(state[x][y], D[x])
+				}
+			}
+
+			/* Perform combined ro and pi steps */
+			for (x = 0; x < 5; x++)
+			{
+				for (y = 0; y < 5; y++)
+				{
+					B[y][(2 * x + 3 * y) % 5] = rotl_64(
+						state[x][y],
+						r_sha3[x][y]
+					)
+				}
+			}
+
+			/* Perform chi step */
+			for (x = 0; x < 5; x++)
+			{
+				for (y = 0; y < 5; y++)
+				{
+					state[x][y] = xor_64(
+						B[x][y],
+						new Int_64(
+							~(B[(x + 1) % 5][y].highOrder) & B[(x + 2) % 5][y].highOrder,
+							~(B[(x + 1) % 5][y].lowOrder)  & B[(x + 2) % 5][y].lowOrder
+						)
+					)
+				}
+			}
+
+			/* Perform iota step */
+			state[0][0] = xor_64(state[0][0], rc_sha3[round])
+		}
+
+		return state;
+	}
+
+	/**
+	 * Finalizes the SHA-3 hash
+	 *
+	 * @private
+	 * @param {Array.<number>} remainder Any leftover unprocessed packed ints
+	 *   that still need to be processed
+	 * @param {number} remainderBinLen The number of bits in remainder
+	 * @param {number} processedBinLen The number of bits already
+	 *   processed
+	 * @param {Array.<{Array.<Int_64>}>} state The state from a previous round
+	 * @param {number} blockSize The block size/rate of the variant in bits
+	 * @param {number} delimiter The delimiter value for the variant
+	 * @param {number} ouputLen The output length for the variant in bits
+	 * @return {Array.<number>} The array of integers representing the SHA-3
+	 *   hash of message
+	 */
+	function finalizeSHA3(remainder, remainderBinLen, processedBinLen, state, blockSize, delimiter, ouputLen)
+	{
+		var i, retVal = [], binaryStringInc = blockSize >>> 5, state_offset = 0,
+			remainderIntLen = remainderBinLen >>> 5, temp, ouputIntLen = ouputLen >> 5;
+
+
+		/* Process as many blocks as possible, some may be here for multiple rounds
+		   with SHAKE
+		*/
+		for (i = 0; i < remainderIntLen && remainderBinLen >= blockSize; i += binaryStringInc)
+		{
+			state = roundSHA3(remainder.slice(i, i + binaryStringInc), state);
+		}
+
+		remainder = remainder.slice(i);
+		remainderBinLen = remainderBinLen % blockSize;
+
+		/* Pad out the remainder to a full block */
+		while (remainder.length < binaryStringInc)
+		{
+			remainder.push(0);
+		}
+
+		/* Find the next "empty" byte for the 0x80 and append it via an xor */
+		i = remainderBinLen >>> 3
+		remainder[i >> 2] ^= delimiter << (24 - (8 * (i % 4)))
+
+		remainder[binaryStringInc - 1] ^= 0x80
+		state = roundSHA3(remainder, state);
+
+		while (retVal.length < ouputIntLen)
+		{
+			temp = state[state_offset % 5][(state_offset / 5) | 0]
+			retVal.push((temp.lowOrder & 0xFF) << 24 | (temp.lowOrder & 0xFF00) << 8 | (temp.lowOrder & 0xFF0000) >> 8 | temp.lowOrder >>> 24)
+			retVal.push((temp.highOrder & 0xFF) << 24 | (temp.highOrder & 0xFF00) << 8 | (temp.highOrder & 0xFF0000) >> 8 | temp.highOrder >>> 24)
+			state_offset += 1;
+
+			if (0 == ((state_offset * 64) % blockSize))
+			{
+				roundSHA3(null, state)
+			}
+		}
+
+		return retVal;
+	}
+
+	/**
 	 * jsSHA is the workhorse of the library.  Instantiate it with the string to
 	 * be hashed as the parameter
 	 *
 	 * @constructor
 	 * @this {jsSHA}
 	 * @param {string} variant The desired SHA variant (SHA-1, SHA-224, SHA-256,
-	 *   SHA-384, or SHA-512)
+	 *   SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, or SHA3-512)
 	 * @param {string} inputFormat The format of srcString: HEX, TEXT, B64,
 	 *   BYTES, or ARRAYBUFFER
 	 * @param {{encoding: (string|undefined), numRounds: (number|undefined)}=}
@@ -1477,8 +1725,8 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 	var jsSHA = function(variant, inputFormat, options)
 	{
 		var processedLen = 0, remainder = [], remainderLen = 0, utfType,
-			intermediateH, converterFunc, shaVariant = variant, outputBinLen,
-			variantBlockSize, roundFunc, finalizeFunc,
+			intermediateState, converterFunc, shaVariant = variant, outputBinLen,
+			variantBlockSize, roundFunc, finalizeFunc, stateCloneFunc,
 			hmacKeySet = false, keyWithIPad = [], keyWithOPad = [], numRounds,
 			updatedCalled = false, inputOptions;
 
@@ -1499,19 +1747,18 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			roundFunc = roundSHA1;
 			finalizeFunc = finalizeSHA1;
 			outputBinLen = 160;
+			stateCloneFunc = function(state) { return state.slice()};
 		}
-		else
+		else if (shaVariant.startsWith("SHA-") && (6 & SUPPORTED_ALGS))
 		{
-			if (6 & SUPPORTED_ALGS)
+			roundFunc = function (block, H) {
+				return roundSHA2(block, H, shaVariant);
+			};
+			finalizeFunc = function (remainder, remainderBinLen, processedBinLen, H)
 			{
-				roundFunc = function (block, H) {
-					return roundSHA2(block, H, shaVariant);
-				};
-				finalizeFunc = function (remainder, remainderBinLen, processedBinLen, H)
-				{
-					return finalizeSHA2(remainder, remainderBinLen, processedBinLen, H, shaVariant);
-				};
-			}
+				return finalizeSHA2(remainder, remainderBinLen, processedBinLen, H, shaVariant);
+			};
+			stateCloneFunc = function(state) { return state.slice()};
 
 			if (("SHA-224" === shaVariant) && (2 & SUPPORTED_ALGS))
 			{
@@ -1538,8 +1785,45 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				throw new Error("Chosen SHA variant is not supported");
 			}
 		}
+		else if (shaVariant.startsWith("SHA3-") && (8 & SUPPORTED_ALGS))
+		{
+			roundFunc = roundSHA3;
+			finalizeFunc = function (remainder, remainderBinLen, processedBinLen, state)
+			{
+				return finalizeSHA3(remainder, remainderBinLen, processedBinLen, state, variantBlockSize, 0x06, outputBinLen)
+			};
+			stateCloneFunc = function(state) { return cloneSHA3State(state);};
+			if ("SHA3-224" === shaVariant)
+			{
+				variantBlockSize = 1152;
+				outputBinLen = 224;
 
-		intermediateH = getH(shaVariant);
+			}
+			else if ("SHA3-256" === shaVariant)
+			{
+				variantBlockSize = 1088;
+				outputBinLen = 256;
+			}
+			else if ("SHA3-384" === shaVariant)
+			{
+				variantBlockSize = 832;
+				outputBinLen = 384;
+			}
+			else if ("SHA3-512" === shaVariant)
+			{
+				variantBlockSize = 576;
+				outputBinLen = 512;
+			}
+			else
+			{
+				throw new Error("Chosen SHA variant is not supported");
+			}
+		}
+		else
+		{
+			throw new Error("Chosen SHA variant is not supported");
+		}
+		intermediateState = getNewState(shaVariant);
 
 		/**
 		 * Sets the HMAC key for an eventual getHMAC call.  Must be called
@@ -1586,7 +1870,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			 * the hash's block size */
 			if (blockByteSize < (keyBinLen / 8))
 			{
-				keyToUse = finalizeFunc(keyToUse, keyBinLen, 0, getH(shaVariant));
+				keyToUse = finalizeFunc(keyToUse, keyBinLen, 0, getNewState(shaVariant));
 				/* For all variants, the block size is bigger than the output
 				 * size so there will never be a useful byte at the end of the
 				 * string */
@@ -1615,7 +1899,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				keyWithOPad[i] = keyToUse[i] ^ 0x5C5C5C5C;
 			}
 
-			intermediateH = roundFunc(keyWithIPad, intermediateH);
+			intermediateState = roundFunc(keyWithIPad, intermediateState);
 			processedLen = variantBlockSize;
 
 			hmacKeySet = true;
@@ -1642,9 +1926,9 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			{
 				if (updateProcessedLen + variantBlockSize <= chunkBinLen)
 				{
-					intermediateH = roundFunc(
+					intermediateState = roundFunc(
 						chunk.slice(i, i + variantBlockIntInc),
-						intermediateH
+						intermediateState
 					);
 					updateProcessedLen += variantBlockSize;
 				}
@@ -1653,6 +1937,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			remainder = chunk.slice(updateProcessedLen >>> 5);
 			remainderLen = chunkBinLen % variantBlockSize;
 			updatedCalled = true;
+
 		};
 
 		/**
@@ -1669,7 +1954,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		 */
 		this.getHash = function(format, options)
 		{
-			var formatFunc, i, outputOptions, finalizedH;
+			var formatFunc, i, outputOptions, finalizedState;
 
 			if (true === hmacKeySet)
 			{
@@ -1682,13 +1967,13 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			switch (format)
 			{
 			case "HEX":
-				formatFunc = function(binarray) {return binb2hex(binarray, outputOptions);};
+				formatFunc = function(binarray) {return binb2hex(binarray, outputBinLen, outputOptions);};
 				break;
 			case "B64":
-				formatFunc = function(binarray) {return binb2b64(binarray, outputOptions);};
+				formatFunc = function(binarray) {return binb2b64(binarray, outputBinLen, outputOptions);};
 				break;
 			case "BYTES":
-				formatFunc = binb2bytes;
+				formatFunc = function(binarray) {return binb2bytes(binarray, outputBinLen);};
 				break;
 			case "ARRAYBUFFER":
 				try {
@@ -1696,19 +1981,19 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				} catch (err) {
 					throw new Error("ARRAYBUFFER not supported by this environment");
 				}
-				formatFunc = binb2arraybuffer;
+				formatFunc = function(binarray) {return binb2arraybuffer(binarray, outputBinLen);};
 				break;
 			default:
 				throw new Error("format must be HEX, B64, BYTES, or ARRAYBUFFER");
 			}
 
-			finalizedH = finalizeFunc(remainder.slice(), remainderLen, processedLen, intermediateH.slice());
+			finalizedState = finalizeFunc(remainder.slice(), remainderLen, processedLen, stateCloneFunc(intermediateState));
 			for (i = 1; i < numRounds; i += 1)
 			{
-				finalizedH = finalizeFunc(finalizedH, outputBinLen, 0, getH(shaVariant));
+				finalizedState = finalizeFunc(finalizedState, outputBinLen, 0, getNewState(shaVariant));
 			}
 
-			return formatFunc(finalizedH);
+			return formatFunc(finalizedState);
 		};
 
 		/**
@@ -1725,7 +2010,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 		 */
 		this.getHMAC = function(format, options)
 		{
-			var formatFunc,	firstHash, outputOptions, finalizedH;
+			var formatFunc,	firstHash, outputOptions, finalizedState;
 
 			if (false === hmacKeySet)
 			{
@@ -1738,13 +2023,13 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 			switch (format)
 			{
 			case "HEX":
-				formatFunc = function(binarray) {return binb2hex(binarray, outputOptions);};
+				formatFunc = function(binarray) {return binb2hex(binarray, outputBinLen, outputOptions);};
 				break;
 			case "B64":
-				formatFunc = function(binarray) {return binb2b64(binarray, outputOptions);};
+				formatFunc = function(binarray) {return binb2b64(binarray, outputBinLen, outputOptions);};
 				break;
 			case "BYTES":
-				formatFunc = binb2bytes;
+				formatFunc = function(binarray) {return binb2bytes(binarray, outputBinLen);};
 				break;
 			case "ARRAYBUFFER":
 				try {
@@ -1752,17 +2037,17 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 				} catch (err) {
 					throw new Error("ARRAYBUFFER not supported by this environment");
 				}
-				formatFunc = binb2arraybuffer;
+				formatFunc = function(binarray) {return binb2bytes(binb2arraybuffer, outputBinLen);};;
 				break;
 			default:
 				throw new Error("outputFormat must be HEX, B64, BYTES, or ARRAYBUFFER");
 			}
 
-			firstHash = finalizeFunc(remainder.slice(), remainderLen, processedLen, intermediateH.slice());
-			finalizedH = roundFunc(keyWithOPad, getH(shaVariant));
-			finalizedH = finalizeFunc(firstHash, outputBinLen, variantBlockSize, finalizedH);
+			firstHash = finalizeFunc(remainder.slice(), remainderLen, processedLen, stateCloneFunc(intermediateState));
+			finalizedState = roundFunc(keyWithOPad, getNewState(shaVariant));
+			finalizedState = finalizeFunc(firstHash, outputBinLen, variantBlockSize, finalizedState);
 
-			return formatFunc(finalizedH);
+			return formatFunc(finalizedState);
 		};
 	};
 
