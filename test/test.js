@@ -374,6 +374,22 @@ var hmacTests = [
 			{
 				"name": "Short",
 				"ptInputs": [
+					{"type": "TEXT", "value": "Sample message for keylen<blocklen"},
+					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E"},
+					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbjxibG9ja2xlbg=="}
+				],
+				"keyInputs": [
+					{"type": "HEX", "value": "000102030405060708090A0B0C0D0E0F10111213"},
+					{"type": "B64", "value": "AAECAwQFBgcICQoLDA0ODxAREhM="}
+				],
+				"outputs": [
+					{"type": "HEX", "value": "4c99ff0cb1b31bd33f8431dbaf4d17fcd356a807"},
+					{"type": "B64", "value": "TJn/DLGzG9M/hDHbr00X/NNWqAc="}
+				]
+			},
+			{
+				"name": "Medium",
+				"ptInputs": [
 					{"type": "TEXT", "value": "Sample message for keylen=blocklen"},
 					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E"},
 					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg=="}
@@ -388,24 +404,12 @@ var hmacTests = [
 				]
 			},
 			{
-				"name": "Medium",
-				"keyInputs": [
-					{"type": "HEX", "value": "000102030405060708090A0B0C0D0E0F10111213"},
-					{"type": "B64", "value": "AAECAwQFBgcICQoLDA0ODxAREhM="}
-				],
-
-				"outputs": [
-					{"type": "HEX", "value": "4c99ff0cb1b31bd33f8431dbaf4d17fcd356a807"},
-					{"type": "B64", "value": "TJn/DLGzG9M/hDHbr00X/NNWqAc="}
-				],
-				"ptInputs": [
-					{"type": "TEXT", "value": "Sample message for keylen<blocklen"},
-					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E"},
-					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbjxibG9ja2xlbg=="}
-				]
-			},
-			{
 				"name": "Long",
+				"ptInputs": [
+					{"type": "TEXT", "value": "Sample message for keylen=blocklen"},
+					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E"},
+					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg=="}
+				],
 				"keyInputs": [
 					{"type": "HEX", "value": "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263"},
 					{"type": "B64", "value": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiYw=="}
@@ -413,11 +417,6 @@ var hmacTests = [
 				"outputs": [
 					{"type": "HEX", "value": "2d51b2f7750e410584662e38f133435f4c4fd42a"},
 					{"type": "B64", "value": "LVGy93UOQQWEZi448TNDX0xP1Co="}
-				],
-				"ptInputs": [
-					{"type": "TEXT", "value": "Sample message for keylen=blocklen"},
-					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E"},
-					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg=="}
 				]
 			}
 		]
@@ -427,6 +426,22 @@ var hmacTests = [
 		"tests": [
 			{
 				"name": "Short",
+				"ptInputs": [
+					{"type": "TEXT", "value": "Sample message for keylen<blocklen"},
+					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E"},
+					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbjxibG9ja2xlbg=="}
+				],
+				"keyInputs": [
+					{"type": "HEX", "value": "000102030405060708090A0B0C0D0E0F101112131415161718191A1B"},
+					{"type": "B64", "value": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGw=="}
+				],
+				"outputs": [
+					{"type": "HEX", "value": "e3d249a8cfb67ef8b7a169e9a0a599714a2cecba65999a51beb8fbbe"},
+					{"type": "B64", "value": "49JJqM+2fvi3oWnpoKWZcUos7LplmZpRvrj7vg=="}
+				]
+			},
+			{
+				"name": "Medium",
 				"ptInputs": [
 					{"type": "TEXT", "value": "Sample message for keylen=blocklen"},
 					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E"},
@@ -439,23 +454,6 @@ var hmacTests = [
 				"outputs": [
 					{"type": "HEX", "value": "c7405e3ae058e8cd30b08b4140248581ed174cb34e1224bcc1efc81b"},
 					{"type": "B64", "value": "x0BeOuBY6M0wsItBQCSFge0XTLNOEiS8we/IGw=="}
-				]
-			},
-			{
-				"name": "Medium",
-				"ptInputs": [
-					{"type": "TEXT", "value": "Sample message for keylen<blocklen"},
-					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E"},
-					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbjxibG9ja2xlbg=="}
-				],
-				"keyInputs": [
-					{"type": "HEX", "value": "000102030405060708090A0B0C0D0E0F101112131415161718191A1B"},
-					{"type": "B64", "value": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGw=="}
-				],
-
-				"outputs": [
-					{"type": "HEX", "value": "e3d249a8cfb67ef8b7a169e9a0a599714a2cecba65999a51beb8fbbe"},
-					{"type": "B64", "value": "49JJqM+2fvi3oWnpoKWZcUos7LplmZpRvrj7vg=="}
 				]
 			},
 			{
@@ -482,22 +480,6 @@ var hmacTests = [
 			{
 				"name": "Short",
 				"ptInputs": [
-					{"type": "TEXT", "value": "Sample message for keylen=blocklen"},
-					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E"},
-					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg=="}
-				],
-				"keyInputs": [
-					{"type": "HEX", "value": "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F"},
-					{"type": "B64", "value": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+Pw=="}
-				],
-				"outputs": [
-					{"type": "HEX", "value": "8bb9a1db9806f20df7f77b82138c7914d174d59e13dc4d0169c9057b133e1d62"},
-					{"type": "B64", "value": "i7mh25gG8g3393uCE4x5FNF01Z4T3E0BackFexM+HWI="}
-				],
-			},
-			{
-				"name": "Medium",
-				"ptInputs": [
 					{"type": "TEXT", "value": "Sample message for keylen<blocklen"},
 					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E"},
 					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbjxibG9ja2xlbg=="}
@@ -510,6 +492,22 @@ var hmacTests = [
 				"outputs": [
 					{"type": "HEX", "value": "a28cf43130ee696a98f14a37678b56bcfcbdd9e5cf69717fecf5480f0ebdf790"},
 					{"type": "B64", "value": "ooz0MTDuaWqY8Uo3Z4tWvPy92eXPaXF/7PVIDw6995A="}
+				],
+			},
+			{
+				"name": "Medium",
+				"ptInputs": [
+					{"type": "TEXT", "value": "Sample message for keylen=blocklen"},
+					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E"},
+					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg=="}
+				],
+				"keyInputs": [
+					{"type": "HEX", "value": "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F"},
+					{"type": "B64", "value": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+Pw=="}
+				],
+				"outputs": [
+					{"type": "HEX", "value": "8bb9a1db9806f20df7f77b82138c7914d174d59e13dc4d0169c9057b133e1d62"},
+					{"type": "B64", "value": "i7mh25gG8g3393uCE4x5FNF01Z4T3E0BackFexM+HWI="}
 				],
 			},
 			{
@@ -536,22 +534,6 @@ var hmacTests = [
 			{
 				"name": "Short",
 				"ptInputs": [
-					{"type": "TEXT", "value": "Sample message for keylen=blocklen"},
-					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E"},
-					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg=="}
-				],
-				"keyInputs": [
-					{"type": "HEX", "value": "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F"},
-					{"type": "B64", "value": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn8="}
-				],
-				"outputs": [
-					{"type": "HEX", "value": "63c5daa5e651847ca897c95814ab830bededc7d25e83eef9195cd45857a37f448947858f5af50cc2b1b730ddf29671a9"},
-					{"type": "B64", "value": "Y8XapeZRhHyol8lYFKuDC+3tx9Jeg+75GVzUWFejf0SJR4WPWvUMwrG3MN3ylnGp"}
-				]
-			},
-			{
-				"name": "Medium",
-				"ptInputs": [
 					{"type": "TEXT", "value": "Sample message for keylen<blocklen"},
 					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E"},
 					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbjxibG9ja2xlbg=="}
@@ -563,6 +545,22 @@ var hmacTests = [
 				"outputs": [
 					{"type": "HEX", "value": "6eb242bdbb582ca17bebfa481b1e23211464d2b7f8c20b9ff2201637b93646af5ae9ac316e98db45d9cae773675eeed0"},
 					{"type": "B64", "value": "brJCvbtYLKF76/pIGx4jIRRk0rf4wguf8iAWN7k2Rq9a6awxbpjbRdnK53NnXu7Q"}
+				]
+			},
+			{
+				"name": "Medium",
+				"ptInputs": [
+					{"type": "TEXT", "value": "Sample message for keylen=blocklen"},
+					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E"},
+					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg=="}
+				],
+				"keyInputs": [
+					{"type": "HEX", "value": "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F"},
+					{"type": "B64", "value": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn8="}
+				],
+				"outputs": [
+					{"type": "HEX", "value": "63c5daa5e651847ca897c95814ab830bededc7d25e83eef9195cd45857a37f448947858f5af50cc2b1b730ddf29671a9"},
+					{"type": "B64", "value": "Y8XapeZRhHyol8lYFKuDC+3tx9Jeg+75GVzUWFejf0SJR4WPWvUMwrG3MN3ylnGp"}
 				]
 			},
 			{
@@ -589,22 +587,6 @@ var hmacTests = [
 			{
 				"name": "Short",
 				"ptInputs": [
-					{"type": "TEXT", "value": "Sample message for keylen=blocklen"},
-					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E"},
-					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg=="}
-				],
-				"keyInputs": [
-					{"type": "HEX", "value": "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F"},
-					{"type": "B64", "value": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn8="}
-				],
-				"outputs": [
-					{"type": "HEX", "value": "fc25e240658ca785b7a811a8d3f7b4ca48cfa26a8a366bf2cd1f836b05fcb024bd36853081811d6cea4216ebad79da1cfcb95ea4586b8a0ce356596a55fb1347"},
-					{"type": "B64", "value": "/CXiQGWMp4W3qBGo0/e0ykjPomqKNmvyzR+DawX8sCS9NoUwgYEdbOpCFuutedoc/LlepFhrigzjVllqVfsTRw=="}
-				],
-			},
-			{
-				"name": "Medium",
-				"ptInputs": [
 					{"type": "TEXT", "value": "Sample message for keylen<blocklen"},
 					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3C626C6F636B6C656E"},
 					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbjxibG9ja2xlbg=="}
@@ -617,6 +599,22 @@ var hmacTests = [
 					{"type": "HEX", "value": "fd44c18bda0bb0a6ce0e82b031bf2818f6539bd56ec00bdc10a8a2d730b3634de2545d639b0f2cf710d0692c72a1896f1f211c2b922d1a96c392e07e7ea9fedc"},
 					{"type": "B64", "value": "/UTBi9oLsKbODoKwMb8oGPZTm9VuwAvcEKii1zCzY03iVF1jmw8s9xDQaSxyoYlvHyEcK5ItGpbDkuB+fqn+3A=="}
 				]
+			},
+			{
+				"name": "Medium",
+				"ptInputs": [
+					{"type": "TEXT", "value": "Sample message for keylen=blocklen"},
+					{"type": "HEX", "value": "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E"},
+					{"type": "B64", "value": "U2FtcGxlIG1lc3NhZ2UgZm9yIGtleWxlbj1ibG9ja2xlbg=="}
+				],
+				"keyInputs": [
+					{"type": "HEX", "value": "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F"},
+					{"type": "B64", "value": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn8="}
+				],
+				"outputs": [
+					{"type": "HEX", "value": "fc25e240658ca785b7a811a8d3f7b4ca48cfa26a8a366bf2cd1f836b05fcb024bd36853081811d6cea4216ebad79da1cfcb95ea4586b8a0ce356596a55fb1347"},
+					{"type": "B64", "value": "/CXiQGWMp4W3qBGo0/e0ykjPomqKNmvyzR+DawX8sCS9NoUwgYEdbOpCFuutedoc/LlepFhrigzjVllqVfsTRw=="}
+				],
 			},
 			{
 				"name": "Long",
