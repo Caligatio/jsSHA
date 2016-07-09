@@ -1,7 +1,8 @@
 # jsSHA
 A JavaScript implementation of the complete Secure Hash Standard family
-	(SHA-1, SHA-224, SHA-256, SHA-384, and SHA-512) as well as HMAC by
-	Brian Turek
+(SHA-1, SHA-224, SHA-256, SHA-384, and SHA-512) as well as HMAC by Brian Turek
+
+[![Build Status](https://travis-ci.org/Caligatio/jsSHA.svg?branch=master)](https://travis-ci.org/Caligatio/jsSHA)
 
 ## About
 jsSHA is a javaScript implementation of the complete Secure Hash Algorithm
@@ -122,7 +123,7 @@ The rest of the instructions are identical to the [Browser](#browser) section ab
 ## Compiling
 This library makes use of the Google Closure Compiler
 (https://developers.google.com/closure/compiler) to both boost performance
-and reduce filesizes.  To compile sha_dev.js into a customized output file, use
+and reduce filesizes.  To compile sha\_dev.js into a customized output file, use
 a command like the following:
 
 	java -jar compiler.jar --define="SUPPORTED_ALGS=<FLAG>" \
