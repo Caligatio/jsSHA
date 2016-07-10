@@ -1,7 +1,7 @@
 {
 	"name" : "jsSHA",
-	"version" : "2.1.0",
-	"description" : "jsSHA is a JavaScript implementation of the entire family of SHA hashes as defined in FIPS 180-2 (SHA-1, SHA-224, SHA-256, SHA-384, and SHA-512) as well as HMAC",
+	"version" : "2.2.0",
+	"description" : "jsSHA is a JavaScript implementation of the complete Secure Hash Standard family (SHA-1, SHA-224, SHA3-224, SHA-256, SHA3-256, SHA-384, SHA3-384, SHA-512, SHA3-512, SHAKE128, and SHAKE256) as well as HMAC",
 	"main" : "src/sha.js",
 	"repository" : {
 		"type" : "git",
@@ -9,20 +9,32 @@
 	},
 	"keywords" : [
 		"SHA-1",
-		"SHA-256",
 		"SHA-224",
+		"SHA3-224",
+		"SHA-256",
+		"SHA3-256",
 		"SHA-384",
+		"SHA3-384",
 		"SHA-512",
+		"SHA3-512",
+		"SHAKE-128",
+		"SHAKE-256",
+		"SHAKE128",
+		"SHAKE256",
 		"SHA1",
-		"SHA256",
 		"SHA224",
+		"SHA256",
 		"SHA384",
 		"SHA512",
+		"SHA-2",
 		"SHA2",
+		"SHA-3",
+		"SHA3",
+		"SHAKE",
 		"HMAC",
 		"hash"
 	],
-	"license" : "BSD",
+	"license" : "BSD-3-Clause",
 	"authors" : [
 		"Brian Turek <brian.turek@gmail.com>"
 	],
@@ -31,6 +43,9 @@
 		"build",
 		"test",
 		"src/sha_dev.js"
-	]
+	],
+	"devDependencies": {
+		"chai": "^3.5.0",
+		"mocha": "^2.5.3"
+	}
 }
-
