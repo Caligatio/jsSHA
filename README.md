@@ -148,7 +148,7 @@ where FLAG is a bitwise OR of the following values:
 * 1 for SHA-1
 
 ## Contact Info
-The project's website is located at [http://caligatio.github.com/jsSHA/](http://caligatio.github.com/jsSHA/)
+The project's website is located at [https://caligatio.github.com/jsSHA/](https://caligatio.github.com/jsSHA/)
 
 ## Donations
 Feel like donating?  We're now accepting donations [through Pledgie](https://pledgie.com/campaigns/31646)!
