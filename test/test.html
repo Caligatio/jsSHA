@@ -11,9 +11,11 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.5.3/mocha.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.5.0/chai.min.js"></script>
-		<script type="text/javascript" src="../src/sha.js"></script>
+		<script type="text/javascript" src="../src/sha_dev.js"></script>
 		<script type="text/javascript">mocha.setup('bdd')</script>
-		<script type="text/javascript" src="test.js"></script>
+		<script type="text/javascript" src="test_hashes.js"></script>
+		<script type="text/javascript" src="test_multi.js"></script>
+		<script type="text/javascript" src="test_hmac.js"></script>
 	</head>
 	<body onload="mocha.run()">
 		<h1><a href="http://caligatio.github.com/jsSHA/">jsSHA</a> Hash Test Page</h1>
@@ -26,9 +28,9 @@
 			Note that the "Long" test involves hashing a 1,000,000 character string and can take quite a while depending on the browser and machine.
 		</p>
 
-		<h2>Multiple Round Tests</h2>
+		<h2>Custom Tests</h2>
 		<p>
-			Values for the multiple round tests can be generated using the included getHashRounds.py
+			Values for SHAKE tests can be generated using the included genShake.py.  Similarly, values for the multiple round tests can be generated using the included getHashRounds.py.
 		</p>
 
 		<div id="mocha"></div>

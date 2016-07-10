@@ -1,7 +1,7 @@
 #!/bin/bash
 
 declare -A releases
-releases=(["sha"]=7 ["sha1"]=1 ["sha256"]=2 ["sha512"]=4)
+releases=(["sha"]=15 ["sha1"]=1 ["sha256"]=2 ["sha512"]=4 ["sha3"]=8)
 CLOSURE_COMPILER=${CLOSURE_COMPILER-"../compiler.jar"}
 
 for i in "${!releases[@]}"

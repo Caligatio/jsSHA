@@ -1,6 +1,13 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
+2.2.0 (2016-XX-XX)
+=========================
+- Added support for the SHA-3 family of hashes (SHA3-224, SHA3-256,
+  SHA3-384, SHA3-512, SHAKE128, and SHAKE256)
+- Fixed bug with using ARRAYBUFFER as a HMAC key type
+- Switched testing framework to Mocha and Chai
+
 2.1.0 (2016-05-13)
 =========================
 - Added ability to call `update` on hashes between `getHash` and `getHMAC` calls
