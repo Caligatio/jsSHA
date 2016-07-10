@@ -131,10 +131,9 @@ To use the module, first require it using:
 The rest of the instructions are identical to the [Browser](#browser) section above.
 
 ## Compiling
-This library makes use of the Google Closure Compiler
-(https://developers.google.com/closure/compiler) to both boost performance
-and reduce filesizes.  To compile sha\_dev.js into a customized output file, use
-a command like the following:
+This library makes use of the [Google Closure Compiler](https://developers.google.com/closure/compiler)
+to both boost performance and reduce filesizes.  To compile sha\_dev.js into a customized output file,
+use a command like the following:
 
 	java -jar compiler.jar --define="SUPPORTED_ALGS=<FLAG>" \
 		--externs /path/to/build/externs.js --warning_level VERBOSE \
