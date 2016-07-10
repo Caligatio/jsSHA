@@ -1,7 +1,7 @@
 # jsSHA
 A JavaScript implementation of the complete Secure Hash Standard family
 (SHA-1, SHA-224, SHA3-224, SHA-256, SHA3-256, SHA-384, SHA3-384, SHA-512,
-SHA3-512, SHAKE128, and SHAKE256) as well as HMAC by Brian Turek
+SHA3-512, SHAKE128, and SHAKE256) as well as HMAC by Brian Turek.
 
 [![Build Status](https://travis-ci.org/Caligatio/jsSHA.svg?branch=master)](https://travis-ci.org/Caligatio/jsSHA)
 
@@ -9,10 +9,9 @@ SHA3-512, SHAKE128, and SHAKE256) as well as HMAC by Brian Turek
 jsSHA is a javaScript implementation of the complete Secure Hash Algorithm
 family as defined by
 [FIPS PUB 180-4](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf) and
-[FIPS PUB 202](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf).
-
-It also includes the HMAC algorithm with SHA support as defined by
-[FIPS PUB 198-1](http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf)
+[FIPS PUB 202](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf).  It also
+includes the HMAC algorithm with SHA support as defined by
+[FIPS PUB 198-1](http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf).
 
 ## Files
 **src/sha\_dev.js**
@@ -116,7 +115,7 @@ calculate the SHA-512 HMAC of the string "This is a test" with the key "abc":
 	shaObj.update("This is a test");
 	var hmac = shaObj.getHMAC("HEX");
 
-setHMACKey takes the same input types as the constructor and getHMAC takes the
+`setHMACKey` takes the same input types as the constructor and `getHMAC` takes the
 same inputs as `getHash` as described above.
 
 Note: You cannot calculate both the hash and HMAC using the same object.

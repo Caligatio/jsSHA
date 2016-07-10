@@ -1,15 +1,15 @@
--------------------------
     jsSHA - ChangeLog
--------------------------
-2.2.0 (2016-XX-XX)
 =========================
+
+2.2.0 (2016-07-10)
+-------------------------
 - Added support for the SHA-3 family of hashes (SHA3-224, SHA3-256,
   SHA3-384, SHA3-512, SHAKE128, and SHAKE256)
 - Fixed bug with using ARRAYBUFFER as a HMAC key type
 - Switched testing framework to Mocha and Chai
 
 2.1.0 (2016-05-13)
-=========================
+-------------------------
 - Added ability to call `update` on hashes between `getHash` and `getHMAC` calls
 - Added new input and output type, "ARRAYBUFFER" which is a JavaScript
   ArrayBuffer
@@ -17,27 +17,27 @@
 - Fixed problem with hashing strings over 4 billion bits (thanks Eicar!)
 
 2.0.2 (2015-10-31)
-=========================
+-------------------------
 - Fixed inability to have a blank "b64Pad" (thanks xlc!)
 - Added file hashing test (thanks kofalt!)
 
 2.0.1 (2015-06-25)
-=========================
+-------------------------
 - Fixed major issue with all hashes failing if raw input was a particular size
   (thanks treus!)
 
 2.0.0 (2015-06-13)
-=========================
+-------------------------
 - Completely reworked API to support streaming inputs
 - Exceptions now throw Errors instead of strings (thanks jclem!)
 
 1.6.1 (2015-06-25)
-=========================
+-------------------------
 - Fixed issue with SHA-512 family of hashes failing is raw input was a
   particular size
 
 1.6.0 (2015-03-08)
-=========================
+-------------------------
 This marks the last v1.X new feature release.  The API is changing
 significantly with upcoming v2.0 to support streaming and it will be too
 difficult to support the older API style with new features.
@@ -50,11 +50,11 @@ difficult to support the older API style with new features.
   endian) to remove confusion
 
 1.5.1 (2013-12-15)
-=========================
+-------------------------
 - Changed Google Closure Compiler options to produce "strict" compatible code
 
 1.5 (2013-12-15)
-=========================
+-------------------------
 - Added optional numRounds argument to getHash
   - Note: this necessitated removing the hash result caching functionality
 - Reduced file size by optimizing internal constants
@@ -67,20 +67,20 @@ difficult to support the older API style with new features.
   Node.js, and AMD (thanks piranna!)
 
 1.42 (2012-12-28)
-=========================
+-------------------------
 - Readded v1.4 Safari patch to support older versions
 
 1.41 (2012-12-23)
-=========================
+-------------------------
 - Fixed incorrect hash issue with Chrome x64 v25 (Dev channel), also provides
   stable patch to v1.4 Safari issue.
 
 1.4 (2012-12-08)
-=========================
+-------------------------
 - Added new input type, TEXT, that is functionally identical to ASCII*
 - Added new input type, B64, for base-64 encoded strings
 - Added new input and output formatting parameters
-  - getHash and getHMAC take an optional parameter, outputFormatOpts,
+  - `getHash` and `getHMAC` take an optional parameter, outputFormatOpts,
     that is a hash list containing the keys "outputUpper" (boolean, only
     applicable to HEX output) and "b64Pad" (string, only applicable to Base-64
     output) that have default values of false and "=", respectively
@@ -103,22 +103,22 @@ difficult to support the older API style with new features.
   - NOTE: While this fix works, it is merely a workaround for a WebKit JavaScript
    optimizer bug, see https://bugs.webkit.org/show_bug.cgi?id=88673 for more detail
 
-* This library misused the term ASCII so input type of TEXT was added with the
+\* This library misused the term ASCII so input type of TEXT was added with the
   intention of deprecating ASCII
 
 1.31 (2012-07-21)
-=========================
+-------------------------
 - Updated project URL to point to new GitHub repository
 - Added a compressed version of sha.js
 
 1.3 (2010-09-01)
-=========================
+-------------------------
 - Changed method of declaring objects/classes
 - Moved non-instance specific variables and methods to class scope
 - Removed logically correct but unneeded conditionals
 
 1.2 (2009-07-22)
-=========================
+-------------------------
 - Added the HMAC algorithm for all supported hashes (using both ASCII and hex
   keys)
 - As a result of adding HMAC, added support for hash input text to be hex
@@ -129,22 +129,22 @@ difficult to support the older API style with new features.
 - Used a different JavaScript compressor resulting in smaller file sizes
 
 1.11 (2008-12-07)
-=========================
+-------------------------
 - Fixed a base-64 encoding issue resulting from a missing capital 'X'
 
 1.1 (2008-09-25)
-=========================
+-------------------------
 - Fixed an issue with incorrect hashes being generated when jsSHA ojbects were
   used to generate multiple hashes
 
 1.0 (2008-09-25)
-=========================
+-------------------------
 - Made all functions/variables follow an object-orientated methodology
 - Removed support for string hash output as the hash is rarely ASCII friendly
 - Changed the interface to calculate hashes (see README)
-- Made sha.js validate against JSLint (http://www.jslint.com/) using
+- Made sha.js validate against [JSLint](http://www.jslint.com/) using
   "Recommended" settings
 
 0.1 (2008-02-21)
-=========================
+-------------------------
 - Initial public release
