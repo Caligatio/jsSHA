@@ -1,4 +1,4 @@
-    jsSHA - ChangeLog
+jsSHA - ChangeLog
 =========================
 
 2.2.0 (2016-07-10)
