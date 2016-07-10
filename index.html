@@ -3,7 +3,8 @@
 <head>
 	<title>jsSHA - SHA Hashes in JavaScript</title>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-	<meta name="keywords" content="SHA, SHA-1, SHA-2, SHA-224, SHA-256, SHA-384, SHA-512, HMAC, javascript, JS, Secure Hash Standard, hash, security, cryptography, FIPS 180-2" />
+	<meta name="keywords" content="SHA, SHA1, SHA-1, SHA-2, SHA2, SHA-3, SHA3, SHA-224, SHA-256, SHA-384, SHA-512, SHA-2, SHA3-224, SHA3-256, SHA3-384, SHA3-512,
+		SHAKE128, SHAKE256, SHAKE-128, SHAKE-256, HMAC, javascript, JS, Secure Hash Standard, hash, security, cryptography, FIPS 180, FIPS 202, FIPS 198" />
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<script type="text/javascript" src="sha.js"></script>
 	<script type="text/javascript">
@@ -59,21 +60,23 @@
 			<img src="logo.png" alt="jsSHA" style="margin: 0px auto" />
 			<h1>About</h1>
 			<p>
-				jsSHA is a JavaScript implementation of the entire family of SHA hashes as defined in FIPS 180-2 (SHA-1, SHA-224, SHA-256,
-				SHA-384, and SHA-512) as well as HMAC.  Despite JavaScript not natively supporting 64-bit operations, SHA-384 and SHA-512 are even implemented!
-				jsSHA is also 100% cross-browser compatible.
+				jsSHA is a JavaScript implementation of the entire family of SHA hashes as defined in <a href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf">FIPS PUB 180-4</a>
+				and <a href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf">FIPS PUB 202</a> (SHA-1, SHA-224, SHA3-224, SHA-256, SHA3-256, SHA-384, SHA3-384, SHA-512, SHA3-512,
+				SHAKE128, and SHAKE256) as well as HMAC as defined in <a href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">FIPS PUB 198-1</a>.
+				jsSHA is also 100% cross-browser compatible and works with Node.js.
 			</p>
 		</div>
 		<div>
 			<h1>Newest Release / Download</h1>
 			<p>
-				As of 13 May 2016, the newest release is v2.1.0 and can be found at <a href="https://github.com/Caligatio/jsSHA/releases/tag/v2.1.0">GitHub</a>.
+				As of 10 July 2016, the newest release is v2.2.0 and can be found at <a href="https://github.com/Caligatio/jsSHA/releases/tag/v2.2.0">GitHub</a>.
 			</p>
 		</div>
 		<div>
 			<h1>Demo</h1>
 			<p>
-				Be aware that if JavaScript is disabled in your browser there is the possibility that information entered into the below fields may be transmitted to the GitHub web servers.  Ensure that JavaScript is enabled to prevent this possibility.
+				Be aware that if JavaScript is disabled in your browser there is the possibility that information entered into the below fields may be transmitted to the GitHub web servers.
+				Ensure that JavaScript is enabled to prevent this possibility.
 			</p>
 			<form action="#" method="get">
 				<fieldset>
@@ -98,9 +101,13 @@
 						<select name="hashVariant" id="hashVariant" onchange="calcHash()">
 							<option>SHA-1</option>
 							<option>SHA-224</option>
+							<option>SHA3-224</option>
 							<option>SHA-256</option>
+							<option>SHA3-256</option>
 							<option>SHA-384</option>
+							<option>SHA3-384</option>
 							<option>SHA-512</option>
+							<option>SHA3-512</option>
 						</select>
 					</div>
 					<div>
@@ -151,9 +158,13 @@
 						<select name="hmacVariant" id="hmacVariant" onchange="calcHMAC()">
 							<option>SHA-1</option>
 							<option>SHA-224</option>
+							<option>SHA3-224</option>
 							<option>SHA-256</option>
+							<option>SHA3-256</option>
 							<option>SHA-384</option>
+							<option>SHA3-384</option>
 							<option>SHA-512</option>
+							<option>SHA3-512</option>
 						</select>
 					</div>
 					<div>
