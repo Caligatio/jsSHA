@@ -1,6 +1,11 @@
 jsSHA - ChangeLog
 =========================
 
+2.3.0 (2016-XX-XX)
+-------------------------
+- Sped up SHA-3 implementation by adding little-endian capability to
+  conversion functions 
+
 2.2.0 (2016-07-10)
 -------------------------
 - Added support for the SHA-3 family of hashes (SHA3-224, SHA3-256,
