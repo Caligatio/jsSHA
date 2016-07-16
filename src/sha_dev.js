@@ -29,7 +29,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	"use strict";
 
 	/* Globals */
-	var TWO_PWR_32 = (1 << 16) * (1 << 16);
+	var TWO_PWR_32 = 4294967296;
 
 	/**
 	 * Int_64 is a object for 2 32-bit numbers emulating a 64-bit number
@@ -51,48 +51,51 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 *
 	 * There is a known bug with an odd number of existing bytes and using a
 	 * UTF-16 encoding.  However, this function is used such that the existing
-	 * bytes are always a result of a previous UTF-16 str2binb call and
+	 * bytes are always a result of a previous UTF-16 str2packed call and
 	 * therefore there should never be an odd number of existing bytes
 	 *
 	 * @private
 	 * @param {string} str String to be converted to binary representation
 	 * @param {string} utfType The Unicode type, UTF8 or UTF16BE, UTF16LE, to
 	 *   use to encode the source string
-	 * @param {Array<number>} existingBin A packed int array of bytes to
+	 * @param {Array<number>} existingPacked A packed int array of bytes to
 	 *   append the results to
-	 * @param {number} existingBinLen The number of bits in the existingBin
+	 * @param {number} existingPackedLen The number of bits in the existingPacked
 	 *   array
+	 * @param {number} bigEndianMod Modifier for whether hash function is
+	 *   big or small endian
 	 * @return {{value : Array<number>, binLen : number}} Hash list where
 	 *   "value" contains the output number array and "binLen" is the binary
 	 *   length of "value"
 	 */
-	function str2binb(str, utfType, existingBin, existingBinLen)
+	function str2packed(str, utfType, existingPacked, existingPackedLen, bigEndianMod)
 	{
-		var bin = [], codePnt, binArr = [], byteCnt = 0, i, j, existingByteLen,
-			intOffset, byteOffset;
+		var packed, codePnt, codePntArr, byteCnt = 0, i, j, existingByteLen,
+			intOffset, byteOffset, shiftModifier;
 
-		bin = existingBin || [0];
-		existingBinLen = existingBinLen || 0;
-		existingByteLen = existingBinLen >>> 3;
+		packed = existingPacked || [0];
+		existingPackedLen = existingPackedLen || 0;
+		existingByteLen = existingPackedLen >>> 3;
 
 		if ("UTF8" === utfType)
 		{
+			shiftModifier = (bigEndianMod === -1) ? 3 : 0;
 			for (i = 0; i < str.length; i += 1)
 			{
 				codePnt = str.charCodeAt(i);
-				binArr = [];
+				codePntArr = [];
 
 				if (0x80 > codePnt)
 				{
-					binArr.push(codePnt);
+					codePntArr.push(codePnt);
 				}
 				else if (0x800 > codePnt)
 				{
-					binArr.push(0xC0 | (codePnt >>> 6));
-					binArr.push(0x80 | (codePnt & 0x3F));
+					codePntArr.push(0xC0 | (codePnt >>> 6));
+					codePntArr.push(0x80 | (codePnt & 0x3F));
 				}
 				else if ((0xd800 > codePnt) || (0xe000 <= codePnt)) {
-					binArr.push(
+					codePntArr.push(
 						0xe0 | (codePnt >>> 12),
 						0x80 | ((codePnt >>> 6) & 0x3f),
 						0x80 | (codePnt & 0x3f)
@@ -102,7 +105,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 				{
 					i += 1;
 					codePnt = 0x10000 + (((codePnt & 0x3ff) << 10) | (str.charCodeAt(i) & 0x3ff));
-					binArr.push(
+					codePntArr.push(
 						0xf0 | (codePnt >>> 18),
 						0x80 | ((codePnt >>> 12) & 0x3f),
 						0x80 | ((codePnt >>> 6) & 0x3f),
@@ -110,22 +113,23 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 					);
 				}
 
-				for (j = 0; j < binArr.length; j += 1)
+				for (j = 0; j < codePntArr.length; j += 1)
 				{
 					byteOffset = byteCnt + existingByteLen;
 					intOffset = byteOffset >>> 2;
-					while (bin.length <= intOffset)
+					while (packed.length <= intOffset)
 					{
-						bin.push(0);
+						packed.push(0);
 					}
 					/* Known bug kicks in here */
-					bin[intOffset] |= binArr[j] << (8 * (3 - (byteOffset % 4)));
+					packed[intOffset] |= codePntArr[j] << (8 * (shiftModifier + bigEndianMod * (byteOffset % 4)));
 					byteCnt += 1;
 				}
 			}
 		}
 		else if (("UTF16BE" === utfType) || "UTF16LE" === utfType)
 		{
+			shiftModifier = (bigEndianMod === -1) ? 2 : 0;
 			for (i = 0; i < str.length; i += 1)
 			{
 				codePnt = str.charCodeAt(i);
@@ -138,15 +142,15 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 
 				byteOffset = byteCnt + existingByteLen;
 				intOffset = byteOffset >>> 2;
-				while (bin.length <= intOffset)
+				while (packed.length <= intOffset)
 				{
-					bin.push(0);
+					packed.push(0);
 				}
-				bin[intOffset] |= codePnt << (8 * (2 - (byteOffset % 4)));
+				packed[intOffset] |= codePnt << (8 * (shiftModifier + bigEndianMod * (byteOffset % 4)));
 				byteCnt += 2;
 			}
 		}
-		return {"value" : bin, "binLen" : byteCnt * 8 + existingBinLen};
+		return {"value" : packed, "binLen" : byteCnt * 8 + existingPackedLen};
 	}
 
 	/**
@@ -154,27 +158,30 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 *
 	 * @private
 	 * @param {string} str String to be converted to binary representation
-	 * @param {Array<number>} existingBin A packed int array of bytes to
+	 * @param {Array<number>} existingPacked A packed int array of bytes to
 	 *   append the results to
-	 * @param {number} existingBinLen The number of bits in the existingBin
+	 * @param {number} existingPackedLen The number of bits in the existingPacked
 	 *   array
+	 * @param {number} bigEndianMod Modifier for whether hash function is
+	 *   big or small endian
 	 * @return {{value : Array<number>, binLen : number}} Hash list where
 	 *   "value" contains the output number array and "binLen" is the binary
 	 *   length of "value"
 	 */
-	function hex2binb(str, existingBin, existingBinLen)
+	function hex2packed(str, existingPacked, existingPackedLen, bigEndianMod)
 	{
-		var bin, length = str.length, i, num, intOffset, byteOffset,
-			existingByteLen;
-
-		bin = existingBin || [0];
-		existingBinLen = existingBinLen || 0;
-		existingByteLen = existingBinLen >>> 3;
+		var packed, length = str.length, i, num, intOffset, byteOffset,
+			existingByteLen, shiftModifier;
 
 		if (0 !== (length % 2))
 		{
 			throw new Error("String of HEX type must be in byte increments");
 		}
+
+		packed = existingPacked || [0];
+		existingPackedLen = existingPackedLen || 0;
+		existingByteLen = existingPackedLen >>> 3;
+		shiftModifier = (bigEndianMod === -1) ? 3 : 0;
 
 		for (i = 0; i < length; i += 2)
 		{
@@ -183,11 +190,11 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			{
 				byteOffset = (i >>> 1) + existingByteLen;
 				intOffset = byteOffset >>> 2;
-				while (bin.length <= intOffset)
+				while (packed.length <= intOffset)
 				{
-					bin.push(0);
+					packed.push(0);
 				}
-				bin[intOffset] |= num << 8 * (3 - (byteOffset % 4));
+				packed[intOffset] |= num  << (8 * (shiftModifier + bigEndianMod * (byteOffset % 4)));
 			}
 			else
 			{
@@ -195,7 +202,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			}
 		}
 
-		return {"value" : bin, "binLen" : length * 4 + existingBinLen};
+		return {"value" : packed, "binLen" : length * 4 + existingPackedLen};
 	}
 
 	/**
@@ -203,22 +210,25 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 *
 	 * @private
 	 * @param {string} str String of raw bytes to be converted to binary representation
-	 * @param {Array<number>} existingBin A packed int array of bytes to
+	 * @param {Array<number>} existingPacked A packed int array of bytes to
 	 *   append the results to
-	 * @param {number} existingBinLen The number of bits in the existingBin
+	 * @param {number} existingPackedLen The number of bits in the existingPacked
 	 *   array
+	 * @param {number} bigEndianMod Modifier for whether hash function is
+	 *   big or small endian
 	 * @return {{value : Array<number>, binLen : number}} Hash list where
 	 *   "value" contains the output number array and "binLen" is the binary
 	 *   length of "value"
 	 */
-	function bytes2binb(str, existingBin, existingBinLen)
+	function bytes2packed(str, existingPacked, existingPackedLen, bigEndianMod)
 	{
-		var bin = [], codePnt, i, existingByteLen, intOffset,
-			byteOffset;
+		var packed, codePnt, i, existingByteLen, intOffset,
+			byteOffset, shiftModifier;
 
-		bin = existingBin || [0];
-		existingBinLen = existingBinLen || 0;
-		existingByteLen = existingBinLen >>> 3;
+		packed = existingPacked || [0];
+		existingPackedLen = existingPackedLen || 0;
+		existingByteLen = existingPackedLen >>> 3;
+		shiftModifier = (bigEndianMod === -1) ? 3 : 0;
 
 		for (i = 0; i < str.length; i += 1)
 		{
@@ -226,14 +236,14 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 
 			byteOffset = i + existingByteLen;
 			intOffset = byteOffset >>> 2;
-			if (bin.length <= intOffset)
+			if (packed.length <= intOffset)
 			{
-				bin.push(0);
+				packed.push(0);
 			}
-			bin[intOffset] |= codePnt << 8 * (3 - (byteOffset % 4));
+			packed[intOffset] |= codePnt << (8 * (shiftModifier + bigEndianMod * (byteOffset % 4)));
 		}
 
-		return {"value" : bin, "binLen" : str.length * 8 + existingBinLen};
+		return {"value" : packed, "binLen" : str.length * 8 + existingPackedLen};
 	}
 
 	/**
@@ -241,34 +251,38 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 *
 	 * @private
 	 * @param {string} str String to be converted to binary representation
-	 * @param {Array<number>} existingBin A packed int array of bytes to
+	 * @param {Array<number>} existingPacked A packed int array of bytes to
 	 *   append the results to
-	 * @param {number} existingBinLen The number of bits in the existingBin
+	 * @param {number} existingPackedLen The number of bits in the existingPacked
 	 *   array
+	 * @param {number} bigEndianMod Modifier for whether hash function is
+	 *   big or small endian
 	 * @return {{value : Array<number>, binLen : number}} Hash list where
 	 *   "value" contains the output number array and "binLen" is the binary
 	 *   length of "value"
 	 */
-	function b642binb(str, existingBin, existingBinLen)
+	function b642packed(str, existingPacked, existingPackedLen, bigEndianMod)
 	{
-		var bin = [], byteCnt = 0, index, i, j, tmpInt, strPart, firstEqual,
+		var packed, byteCnt = 0, index, i, j, tmpInt, strPart, firstEqual,
 			b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
-			existingByteLen, intOffset, byteOffset;
-
-		bin = existingBin || [0];
-		existingBinLen = existingBinLen || 0;
-		existingByteLen = existingBinLen >>> 3;
+			existingByteLen, intOffset, byteOffset, shiftModifier;
 
 		if (-1 === str.search(/^[a-zA-Z0-9=+\/]+$/))
 		{
 			throw new Error("Invalid character in base-64 string");
 		}
+
 		firstEqual = str.indexOf("=");
 		str = str.replace(/\=/g, "");
 		if ((-1 !== firstEqual) && (firstEqual < str.length))
 		{
 			throw new Error("Invalid '=' found in base-64 string");
 		}
+
+		packed = existingPacked || [0];
+		existingPackedLen = existingPackedLen || 0;
+		existingByteLen = existingPackedLen >>> 3;
+		shiftModifier = (bigEndianMod === -1) ? 3 : 0;
 
 		for (i = 0; i < str.length; i += 4)
 		{
@@ -285,17 +299,17 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			{
 				byteOffset = byteCnt + existingByteLen;
 				intOffset = byteOffset >>> 2;
-				while (bin.length <= intOffset)
+				while (packed.length <= intOffset)
 				{
-					bin.push(0);
+					packed.push(0);
 				}
-				bin[intOffset] |= ((tmpInt >>> (16 - (j * 8))) & 0xFF) <<
-					8 * (3 - (byteOffset % 4));
+				packed[intOffset] |= ((tmpInt >>> (16 - (j * 8))) & 0xFF) <<
+					(8 * (shiftModifier + bigEndianMod * (byteOffset % 4)));
 				byteCnt += 1;
 			}
 		}
 
-		return {"value" : bin, "binLen" : byteCnt * 8 + existingBinLen};
+		return {"value" : packed, "binLen" : byteCnt * 8 + existingPackedLen};
 	}
 
 	/**
@@ -304,57 +318,64 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 * @private
 	 * @param {ArrayBuffer} arr ArrayBuffer to be converted to binary
 	 *   representation
-	 * @param {Array<number>} existingBin A packed int array of bytes to
+	 * @param {Array<number>} existingPacked A packed int array of bytes to
 	 *   append the results to
-	 * @param {number} existingBinLen The number of bits in the existingBin
+	 * @param {number} existingPackedLen The number of bits in the existingPacked
 	 *   array
+	 * @param {number} bigEndianMod Modifier for whether hash function is
+	 *   big or small endian
 	 * @return {{value : Array<number>, binLen : number}} Hash list where
 	 *   "value" contains the output number array and "binLen" is the binary
 	 *   length of "value"
 	 */
-	function arraybuffer2binb(arr, existingBin, existingBinLen)
+	function arraybuffer2packed(arr, existingPacked, existingPackedLen, bigEndianMod)
 	{
-		var bin = [], i, existingByteLen, intOffset, byteOffset;
+		var packed, i, existingByteLen, intOffset, byteOffset, shiftModifier;
 
-		bin = existingBin || [0];
-		existingBinLen = existingBinLen || 0;
-		existingByteLen = existingBinLen >>> 3;
+		packed = existingPacked || [0];
+		existingPackedLen = existingPackedLen || 0;
+		existingByteLen = existingPackedLen >>> 3;
+		shiftModifier = (bigEndianMod === -1) ? 3 : 0;
 
 		for (i = 0; i < arr.byteLength; i += 1)
 		{
 			byteOffset = i + existingByteLen;
 			intOffset = byteOffset >>> 2;
-			if (bin.length <= intOffset)
+			if (packed.length <= intOffset)
 			{
-				bin.push(0);
+				packed.push(0);
 			}
-			bin[intOffset] |= arr[i] << 8 * (3 - (byteOffset % 4));
+			packed[intOffset] |= arr[i] << (8 * (shiftModifier + bigEndianMod * (byteOffset % 4)));
 		}
 
-		return {"value" : bin, "binLen" : arr.byteLength * 8 + existingBinLen};
+		return {"value" : packed, "binLen" : arr.byteLength * 8 + existingPackedLen};
 	}
 
 	/**
 	 * Convert an array of big-endian words to a hex string.
 	 *
 	 * @private
-	 * @param {Array<number>} binarray Array of integers to be converted to
+	 * @param {Array<number>} packed Array of integers to be converted to
 	 *   hexidecimal representation
 	 * @param {number} outputLength Length of output in bits
+	 * @param {number} bigEndianMod Modifier for whether hash function is
+	 *   big or small endian
 	 * @param {{outputUpper : boolean, b64Pad : string}} formatOpts Hash list
 	 *   containing validated output formatting options
 	 * @return {string} Hexidecimal representation of the parameter in string
 	 *   form
 	 */
-	function binb2hex(binarray, outputLength, formatOpts)
+	function packed2hex(packed, outputLength, bigEndianMod, formatOpts)
 	{
 		var hex_tab = "0123456789abcdef", str = "",
-			length = outputLength / 8, i, srcByte;
+			length = outputLength / 8, i, srcByte, shiftModifier;
+
+		shiftModifier = (bigEndianMod === -1) ? 3 : 0;
 
 		for (i = 0; i < length; i += 1)
 		{
 			/* The below is more than a byte but it gets taken care of later */
-			srcByte = binarray[i >>> 2] >>> ((3 - (i % 4)) * 8);
+			srcByte = packed[i >>> 2] >>> (8 * (shiftModifier + bigEndianMod * (i % 4)));
 			str += hex_tab.charAt((srcByte >>> 4) & 0xF) +
 				hex_tab.charAt(srcByte & 0xF);
 		}
@@ -366,26 +387,30 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 * Convert an array of big-endian words to a base-64 string
 	 *
 	 * @private
-	 * @param {Array<number>} binarray Array of integers to be converted to
+	 * @param {Array<number>} packed Array of integers to be converted to
 	 *   base-64 representation
 	 * @param {number} outputLength Length of output in bits
+	 * @param {number} bigEndianMod Modifier for whether hash function is
+	 *   big or small endian
 	 * @param {{outputUpper : boolean, b64Pad : string}} formatOpts Hash list
 	 *   containing validated output formatting options
 	 * @return {string} Base-64 encoded representation of the parameter in
 	 *   string form
 	 */
-	function binb2b64(binarray, outputLength, formatOpts)
+	function packed2b64(packed, outputLength, bigEndianMod, formatOpts)
 	{
-		var str = "", length = outputLength / 8, i, j, triplet, int1, int2,
+		var str = "", length = outputLength / 8, i, j, triplet, int1, int2, shiftModifier,
 			b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+		shiftModifier = (bigEndianMod === -1) ? 3 : 0;
 
 		for (i = 0; i < length; i += 3)
 		{
-			int1 = ((i + 1) < length) ? binarray[(i + 1) >>> 2] : 0;
-			int2 = ((i + 2) < length) ? binarray[(i + 2) >>> 2] : 0;
-			triplet = (((binarray[i >>> 2] >>> 8 * (3 - i % 4)) & 0xFF) << 16) |
-				(((int1 >>> 8 * (3 - (i + 1) % 4)) & 0xFF) << 8) |
-				((int2 >>> 8 * (3 - (i + 2) % 4)) & 0xFF);
+			int1 = ((i + 1) < length) ? packed[(i + 1) >>> 2] : 0;
+			int2 = ((i + 2) < length) ? packed[(i + 2) >>> 2] : 0;
+			triplet = (((packed[i >>> 2] >>> (8 * (shiftModifier + bigEndianMod * (i % 4)))) & 0xFF) << 16) |
+				(((int1 >>> (8 * (shiftModifier + bigEndianMod * ((i + 1) % 4)))) & 0xFF) << 8) |
+				((int2 >>> (8 * (shiftModifier + bigEndianMod * ((i + 2) % 4)))) & 0xFF);
 			for (j = 0; j < 4; j += 1)
 			{
 				if (i * 8 + j * 6 <= outputLength)
@@ -405,19 +430,23 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 * Convert an array of big-endian words to raw bytes string
 	 *
 	 * @private
-	 * @param {Array<number>} binarray Array of integers to be converted to
+	 * @param {Array<number>} packed Array of integers to be converted to
 	 *   a raw bytes string representation
 	 * @param {number} outputLength Length of output in bits
+	 * @param {number} bigEndianMod Modifier for whether hash function is
+	 *   big or small endian
 	 * @return {string} Raw bytes representation of the parameter in string
 	 *   form
 	 */
-	function binb2bytes(binarray, outputLength)
+	function packed2bytes(packed, outputLength, bigEndianMod)
 	{
-		var str = "", length = outputLength / 8, i, srcByte;
+		var str = "", length = outputLength / 8, i, srcByte, shiftModifier;
+
+		shiftModifier = (bigEndianMod === -1) ? 3 : 0;
 
 		for (i = 0; i < length; i += 1)
 		{
-			srcByte = (binarray[i >>> 2] >>> ((3 - (i % 4)) * 8)) & 0xFF;
+			srcByte = (packed[i >>> 2] >>> (8 * (shiftModifier + bigEndianMod * (i % 4)))) & 0xFF;
 			str += String.fromCharCode(srcByte);
 		}
 
@@ -428,19 +457,23 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 * Convert an array of big-endian words to an ArrayBuffer
 	 *
 	 * @private
-	 * @param {Array<number>} binarray Array of integers to be converted to
+	 * @param {Array<number>} packed Array of integers to be converted to
 	 *   an ArrayBuffer
 	 * @param {number} outputLength Length of output in bits
+	 * @param {number} bigEndianMod Modifier for whether hash function is
+	 *   big or small endian
 	 * @return {ArrayBuffer} Raw bytes representation of the parameter in an
 	 *   ArrayBuffer
 	 */
-	function binb2arraybuffer(binarray, outputLength)
+	function packed2arraybuffer(packed, outputLength, bigEndianMod)
 	{
-		var length = outputLength / 8, i, retVal = new ArrayBuffer(length);
+		var length = outputLength / 8, i, retVal = new ArrayBuffer(length), shiftModifier;
+
+		shiftModifier = (bigEndianMod === -1) ? 3 : 0;
 
 		for (i = 0; i < length; i += 1)
 		{
-			retVal[i] = (binarray[i >>> 2] >>> ((3 - (i % 4)) * 8)) & 0xFF;
+			retVal[i] = (packed[i >>> 2] >>> (8 * (shiftModifier + bigEndianMod * (i % 4)))) & 0xFF;
 		}
 
 		return retVal;
@@ -499,11 +532,13 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 * @param {string} format The format of the string to be converted
 	 * @param {string} utfType The string encoding to use (UTF8, UTF16BE,
 	 *	UTF16LE)
+	 * @param {number} bigEndianMod Modifier for whether hash function is
+	 *   big or small endian
 	 * @return {function(string, Array<number>=, number=): {value :
 	 *   Array<number>, binLen : number}} Function that will convert an input
 	 *   string to a packed int array
 	 */
-	function getStrConverter(format, utfType)
+	function getStrConverter(format, utfType, bigEndianMod)
 	{
 		var retVal;
 
@@ -525,19 +560,68 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		switch (format)
 		{
 		case "HEX":
-			retVal = hex2binb;
-			break;
-		case "TEXT":
+			/**
+			 * @param {string} str String of raw bytes to be converted to binary representation
+			 * @param {Array<number>} existingBin A packed int array of bytes to
+			 *   append the results to
+			 * @param {number} existingBinLen The number of bits in the existingBin
+			 *   array
+			 * @return {{value : Array<number>, binLen : number}} Hash list where
+			 *   "value" contains the output number array and "binLen" is the binary
+			 *   length of "value"
+			 */
 			retVal = function(str, existingBin, existingBinLen)
 				{
-					return str2binb(str, utfType, existingBin, existingBinLen);
+				   return hex2packed(str, existingBin, existingBinLen, bigEndianMod);
+				};
+			break;
+		case "TEXT":
+			/**
+			 * @param {string} str String of raw bytes to be converted to binary representation
+			 * @param {Array<number>} existingBin A packed int array of bytes to
+			 *   append the results to
+			 * @param {number} existingBinLen The number of bits in the existingBin
+			 *   array
+			 * @return {{value : Array<number>, binLen : number}} Hash list where
+			 *   "value" contains the output number array and "binLen" is the binary
+			 *   length of "value"
+			 */
+			retVal = function(str, existingBin, existingBinLen)
+				{
+					return str2packed(str, utfType, existingBin, existingBinLen, bigEndianMod);
 				};
 			break;
 		case "B64":
-			retVal = b642binb;
+			/**
+			 * @param {string} str String of raw bytes to be converted to binary representation
+			 * @param {Array<number>} existingBin A packed int array of bytes to
+			 *   append the results to
+			 * @param {number} existingBinLen The number of bits in the existingBin
+			 *   array
+			 * @return {{value : Array<number>, binLen : number}} Hash list where
+			 *   "value" contains the output number array and "binLen" is the binary
+			 *   length of "value"
+			 */
+			retVal = function(str, existingBin, existingBinLen)
+				{
+				   return b642packed(str, existingBin, existingBinLen, bigEndianMod);
+				};
 			break;
 		case "BYTES":
-			retVal = bytes2binb;
+			/**
+			 * @param {string} str String of raw bytes to be converted to binary representation
+			 * @param {Array<number>} existingBin A packed int array of bytes to
+			 *   append the results to
+			 * @param {number} existingBinLen The number of bits in the existingBin
+			 *   array
+			 * @return {{value : Array<number>, binLen : number}} Hash list where
+			 *   "value" contains the output number array and "binLen" is the binary
+			 *   length of "value"
+			 */
+			retVal = function(str, existingBin, existingBinLen)
+				{
+				   return bytes2packed(str, existingBin, existingBinLen, bigEndianMod);
+				};
 			break;
 		case "ARRAYBUFFER":
 			try {
@@ -545,7 +629,21 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			} catch(ignore) {
 				throw new Error("ARRAYBUFFER not supported by this environment");
 			}
-			retVal = arraybuffer2binb;
+			/**
+			 * @param {ArrayBuffer} arr ArrayBuffer to be converted to binary
+			 *   representation
+			 * @param {Array<number>} existingBin A packed int array of bytes to
+			 *   append the results to
+			 * @param {number} existingBinLen The number of bits in the existingBin
+			 *   array
+			 * @return {{value : Array<number>, binLen : number}} Hash list where
+			 *   "value" contains the output number array and "binLen" is the binary
+			 *   length of "value"
+			 */
+			retVal = function(arr, existingBin, existingBinLen)
+				{
+				   return arraybuffer2packed(arr, existingBin, existingBinLen, bigEndianMod);
+				};
 			break;
 		default:
 			throw new Error("format must be HEX, TEXT, B64, BYTES, or ARRAYBUFFER");
@@ -567,6 +665,14 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		return (x << n) | (x >>> (32 - n));
 	}
 
+	/**
+	 * The 64-bit implementation of circular rotate left
+	 *
+	 * @private
+	 * @param {Int_64} x The 64-bit integer argument
+	 * @param {number} n The number of bits to shift
+	 * @return {Int_64} The x shifted circularly by n bits
+	 */
 	function rotl_64(x, n)
 	{
 		if (n > 32)
@@ -1590,13 +1696,9 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		{
 			for (x = 0; x < block.length; x+=2)
 			{
-				/* Transform pair of big-endian integers to little-endian Int_64 */
 				state[(x >>> 1) % 5][((x >>> 1) / 5) | 0] = xor_64(
 					state[(x >>> 1) % 5][((x >>> 1) / 5) | 0],
-					new Int_64(
-						(block[x + 1] & 0xFF) << 24 | (block[x + 1] & 0xFF00) << 8 | (block[x + 1] & 0xFF0000) >>> 8 | block[x + 1] >>> 24,
-						(block[x] & 0xFF) << 24 | (block[x] & 0xFF00) << 8 | (block[x] & 0xFF0000) >>> 8 | block[x] >>> 24
-					)
+					new Int_64(block[x + 1], block[x])
 				);
 			}
 		}
@@ -1672,11 +1774,11 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 * @param {Array<Array<Int_64>>} state The state from a previous round
 	 * @param {number} blockSize The block size/rate of the variant in bits
 	 * @param {number} delimiter The delimiter value for the variant
-	 * @param {number} ouputLen The output length for the variant in bits
+	 * @param {number} outputLen The output length for the variant in bits
 	 * @return {Array<number>} The array of integers representing the SHA-3
 	 *   hash of message
 	 */
-	function finalizeSHA3(remainder, remainderBinLen, processedBinLen, state, blockSize, delimiter, ouputLen)
+	function finalizeSHA3(remainder, remainderBinLen, processedBinLen, state, blockSize, delimiter, outputLen)
 	{
 		var i, retVal = [], binaryStringInc = blockSize >>> 5, state_offset = 0,
 			remainderIntLen = remainderBinLen >>> 5, temp;
@@ -1702,20 +1804,20 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 
 		/* Find the next "empty" byte for the 0x80 and append it via an xor */
 		i = remainderBinLen >>> 3;
-		remainder[i >> 2] ^= delimiter << (24 - (8 * (i % 4)));
+		remainder[i >> 2] ^= delimiter << (8 * (i % 4));
 
-		remainder[binaryStringInc - 1] ^= 0x80;
+		remainder[binaryStringInc - 1] ^= 0x80000000;
 		state = roundSHA3(remainder, state);
 
-		while (retVal.length * 32 < ouputLen)
+		while (retVal.length * 32 < outputLen)
 		{
 			temp = state[state_offset % 5][(state_offset / 5) | 0];
-			retVal.push((temp.lowOrder & 0xFF) << 24 | (temp.lowOrder & 0xFF00) << 8 | (temp.lowOrder & 0xFF0000) >> 8 | temp.lowOrder >>> 24);
-			if (retVal.length * 32 >= ouputLen)
+			retVal.push(temp.lowOrder);
+			if (retVal.length * 32 >= outputLen)
 			{
 				break;
 			}
-			retVal.push((temp.highOrder & 0xFF) << 24 | (temp.highOrder & 0xFF00) << 8 | (temp.highOrder & 0xFF0000) >> 8 | temp.highOrder >>> 24);
+			retVal.push(temp.highOrder);
 			state_offset += 1;
 
 			if (0 === ((state_offset * 64) % blockSize))
@@ -1746,13 +1848,11 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			intermediateState, converterFunc, shaVariant = variant, outputBinLen,
 			variantBlockSize, roundFunc, finalizeFunc, stateCloneFunc,
 			hmacKeySet = false, keyWithIPad = [], keyWithOPad = [], numRounds,
-			updatedCalled = false, inputOptions, isSHAKE = false;
+			updatedCalled = false, inputOptions, isSHAKE = false, bigEndianMod = -1;
 
 		inputOptions = options || {};
 		utfType = inputOptions["encoding"] || "UTF8";
 		numRounds = inputOptions["numRounds"] || 1;
-
-		converterFunc = getStrConverter(inputFormat, utfType);
 
 		if ((numRounds !== parseInt(numRounds, 10)) || (1 > numRounds))
 		{
@@ -1810,6 +1910,8 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 
 			roundFunc = roundSHA3;
 			stateCloneFunc = function(state) { return cloneSHA3State(state);};
+			bigEndianMod = 1;
+
 			if ("SHA3-224" === shaVariant)
 			{
 				variantBlockSize = 1152;
@@ -1858,6 +1960,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		{
 			throw new Error("Chosen SHA variant is not supported");
 		}
+		converterFunc = getStrConverter(inputFormat, utfType, bigEndianMod);
 		intermediateState = getNewState(shaVariant);
 
 		/**
@@ -1894,7 +1997,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			keyOptions = options || {};
 			utfType = keyOptions["encoding"] || "UTF8";
 
-			keyConverterFunc = getStrConverter(inputFormat, utfType);
+			keyConverterFunc = getStrConverter(inputFormat, utfType, bigEndianMod);
 
 			convertRet = keyConverterFunc(key);
 			keyBinLen = convertRet["binLen"];
@@ -2016,13 +2119,13 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			switch (format)
 			{
 			case "HEX":
-				formatFunc = function(binarray) {return binb2hex(binarray, outputBinLen, outputOptions);};
+				formatFunc = function(binarray) {return packed2hex(binarray, outputBinLen, bigEndianMod, outputOptions);};
 				break;
 			case "B64":
-				formatFunc = function(binarray) {return binb2b64(binarray, outputBinLen, outputOptions);};
+				formatFunc = function(binarray) {return packed2b64(binarray, outputBinLen, bigEndianMod, outputOptions);};
 				break;
 			case "BYTES":
-				formatFunc = function(binarray) {return binb2bytes(binarray, outputBinLen);};
+				formatFunc = function(binarray) {return packed2bytes(binarray, outputBinLen, bigEndianMod);};
 				break;
 			case "ARRAYBUFFER":
 				try {
@@ -2030,7 +2133,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 				} catch (ignore) {
 					throw new Error("ARRAYBUFFER not supported by this environment");
 				}
-				formatFunc = function(binarray) {return binb2arraybuffer(binarray, outputBinLen);};
+				formatFunc = function(binarray) {return packed2arraybuffer(binarray, outputBinLen, bigEndianMod);};
 				break;
 			default:
 				throw new Error("format must be HEX, B64, BYTES, or ARRAYBUFFER");
@@ -2047,7 +2150,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 				 */
 				if (((8 & SUPPORTED_ALGS) !== 0) && (isSHAKE === true) && (outputBinLen % 32 !== 0))
 				{
-					finalizedState[finalizedState.length - 1] &= 0xFFFFFF00 << 24 - (outputBinLen % 32);
+					finalizedState[finalizedState.length - 1] &= 0x00FFFFFF >>> 24 - (outputBinLen % 32);
 				}
 				finalizedState = finalizeFunc(finalizedState, outputBinLen, 0, getNewState(shaVariant), outputBinLen);
 			}
@@ -2083,13 +2186,13 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			switch (format)
 			{
 			case "HEX":
-				formatFunc = function(binarray) {return binb2hex(binarray, outputBinLen, outputOptions);};
+				formatFunc = function(binarray) {return packed2hex(binarray, outputBinLen, bigEndianMod, outputOptions);};
 				break;
 			case "B64":
-				formatFunc = function(binarray) {return binb2b64(binarray, outputBinLen, outputOptions);};
+				formatFunc = function(binarray) {return packed2b64(binarray, outputBinLen, bigEndianMod, outputOptions);};
 				break;
 			case "BYTES":
-				formatFunc = function(binarray) {return binb2bytes(binarray, outputBinLen);};
+				formatFunc = function(binarray) {return packed2bytes(binarray, outputBinLen, bigEndianMod);};
 				break;
 			case "ARRAYBUFFER":
 				try {
@@ -2097,7 +2200,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 				} catch(ignore) {
 					throw new Error("ARRAYBUFFER not supported by this environment");
 				}
-				formatFunc = function(binarray) {return binb2arraybuffer(binarray, outputBinLen);};
+				formatFunc = function(binarray) {return packed2arraybuffer(binarray, outputBinLen, bigEndianMod);};
 				break;
 			default:
 				throw new Error("outputFormat must be HEX, B64, BYTES, or ARRAYBUFFER");
