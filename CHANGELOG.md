@@ -1,7 +1,7 @@
 jsSHA - ChangeLog
 =========================
 
-2.3.0 (2016-XX-XX)
+2.3.0 (20XX-XX-XX)
 -------------------------
 - Sped up SHA-3 implementation by adding little-endian capability to
   conversion functions 
