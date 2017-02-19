@@ -1968,7 +1968,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		 * immediately after jsSHA object instantiation
 		 *
 		 * @expose
-		 * @param {string} key The key used to calculate the HMAC
+		 * @param {string|ArrayBuffer} key The key used to calculate the HMAC
 		 * @param {string} inputFormat The format of key, HEX, TEXT, B64, BYTES,
 		 *   or ARRAYBUFFER
 		 * @param {{encoding : (string|undefined)}=} options Associative array
@@ -2053,7 +2053,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		 * rest for either a future update or getHash call.
 		 *
 		 * @expose
-		 * @param {string} srcString The string to be hashed
+		 * @param {string|ArrayBuffer} srcString The string to be hashed
 		 */
 		this.update = function(srcString)
 		{
