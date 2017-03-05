@@ -110,7 +110,7 @@ MUST be done before calling update).  You can stream in the input using the
 the `getHMAC` function with the output type as its argument.  Example to
 calculate the SHA-512 HMAC of the string "This is a test" with the key "abc":
 
-	var shaObj = new jsSHA(hashType, "TEXT");
+	var shaObj = new jsSHA("SHA-512", "TEXT");
 	shaObj.setHMACKey("abc", "TEXT");
 	shaObj.update("This is a test");
 	var hmac = shaObj.getHMAC("HEX");
