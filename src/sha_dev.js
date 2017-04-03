@@ -1128,26 +1128,6 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	}
 
 	/**
-	 * XORs all of the given arguments
-	 *
-	 * @private
-	 * @param {...Int_64} var_args The arguments to be XORed
-	 * @return {Int_64} The XOR of the arguments
-	 */
-	function xor_64(var_args)
-	{
-		/* Use the `arguments` object here, not `var_args` */
-		var lowXor = 0, highXor = 0, i;
-
-		for (i = 0; i < arguments.length; i += 1)
-		{
-			lowXor ^= arguments[i].lowOrder;
-			highXor ^= arguments[i].highOrder;
-		}
-		return new Int_64(highXor, lowXor);
-	}
-
-	/**
 	 * XORs two given arguments.
 	 *
 	 * @private
