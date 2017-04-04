@@ -534,7 +534,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 *	UTF16LE)
 	 * @param {number} bigEndianMod Modifier for whether hash function is
 	 *   big or small endian
-	 * @return {function(string, Array<number>=, number=): {value :
+	 * @return {function((string|ArrayBuffer), Array<number>=, number=): {value :
 	 *   Array<number>, binLen : number}} Function that will convert an input
 	 *   string to a packed int array
 	 */
