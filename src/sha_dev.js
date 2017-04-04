@@ -1128,23 +1128,38 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	}
 
 	/**
-	 * XORs all of the given arguments
+	 * XORs two given arguments.
 	 *
 	 * @private
-	 * @param {...Int_64} var_args The arguments to be XORed
+	 * @param {Int_64} a First argument to be XORed
+	 * @param {Int_64} b Second argument to be XORed
 	 * @return {Int_64} The XOR of the arguments
 	 */
-	function xor_64(var_args)
+	function xor_64_2(a, b)
 	{
-		/* Use the `arguments` object here, not `var_args` */
-		var lowXor = 0, highXor = 0, i;
+		return new Int_64(
+			a.highOrder ^ b.highOrder,
+			a.lowOrder ^ b.lowOrder
+		);
+	}
 
-		for (i = 0; i < arguments.length; i += 1)
-		{
-			lowXor ^= arguments[i].lowOrder;
-			highXor ^= arguments[i].highOrder;
-		}
-		return new Int_64(highXor, lowXor);
+	/**
+	 * XORs five given arguments.
+	 *
+	 * @private
+	 * @param {Int_64} a First argument to be XORed
+	 * @param {Int_64} b Second argument to be XORed
+	 * @param {Int_64} c Third argument to be XORed
+	 * @param {Int_64} d Fourth argument to be XORed
+	 * @param {Int_64} e Fifth argument to be XORed
+	 * @return {Int_64} The XOR of the arguments
+	 */
+	function xor_64_5(a, b, c, d, e)
+	{
+		return new Int_64(
+			a.highOrder ^ b.highOrder ^ c.highOrder ^ d.highOrder ^ e.highOrder,
+			a.lowOrder ^ b.lowOrder ^ c.lowOrder ^ d.lowOrder ^ e.lowOrder
+		);
 	}
 
 	/**
@@ -1696,7 +1711,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		{
 			for (x = 0; x < block.length; x+=2)
 			{
-				state[(x >>> 1) % 5][((x >>> 1) / 5) | 0] = xor_64(
+				state[(x >>> 1) % 5][((x >>> 1) / 5) | 0] = xor_64_2(
 					state[(x >>> 1) % 5][((x >>> 1) / 5) | 0],
 					new Int_64(block[x + 1], block[x])
 				);
@@ -1713,18 +1728,18 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			/* Perform theta step */
 			for (x = 0; x < 5; x += 1)
 			{
-				C[x] = xor_64(state[x][0], state[x][1], state[x][2],
+				C[x] = xor_64_5(state[x][0], state[x][1], state[x][2],
 					state[x][3], state[x][4]);
 			}
 			for (x = 0; x < 5; x += 1)
 			{
-				D[x] = xor_64(C[(x + 4) % 5], rotl_64(C[(x + 1) % 5], 1));
+				D[x] = xor_64_2(C[(x + 4) % 5], rotl_64(C[(x + 1) % 5], 1));
 			}
 			for (x = 0; x < 5; x += 1)
 			{
 				for (y = 0; y < 5; y += 1)
 				{
-					state[x][y] = xor_64(state[x][y], D[x]);
+					state[x][y] = xor_64_2(state[x][y], D[x]);
 				}
 			}
 
@@ -1745,7 +1760,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			{
 				for (y = 0; y < 5; y += 1)
 				{
-					state[x][y] = xor_64(
+					state[x][y] = xor_64_2(
 						B[x][y],
 						new Int_64(
 							~(B[(x + 1) % 5][y].highOrder) & B[(x + 2) % 5][y].highOrder,
@@ -1756,7 +1771,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			}
 
 			/* Perform iota step */
-			state[0][0] = xor_64(state[0][0], rc_sha3[round]);
+			state[0][0] = xor_64_2(state[0][0], rc_sha3[round]);
 		}
 
 		return state;
