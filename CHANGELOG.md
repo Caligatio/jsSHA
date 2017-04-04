@@ -5,6 +5,8 @@ jsSHA - ChangeLog
 -------------------------
 - Sped up SHA-3 implementation by adding little-endian capability to
   conversion functions 
+- Further sped up SHA-3 implementation by decomposing xor_64 function
+  (thanks frostschutz!)
 
 2.2.0 (2016-07-10)
 -------------------------
