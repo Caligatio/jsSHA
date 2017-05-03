@@ -330,12 +330,13 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 */
 	function arraybuffer2packed(arr, existingPacked, existingPackedLen, bigEndianMod)
 	{
-		var packed, i, existingByteLen, intOffset, byteOffset, shiftModifier;
+		var packed, i, existingByteLen, intOffset, byteOffset, shiftModifier, arrView;
 
 		packed = existingPacked || [0];
 		existingPackedLen = existingPackedLen || 0;
 		existingByteLen = existingPackedLen >>> 3;
 		shiftModifier = (bigEndianMod === -1) ? 3 : 0;
+		arrView = new Uint8Array(arr);
 
 		for (i = 0; i < arr.byteLength; i += 1)
 		{
@@ -345,7 +346,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			{
 				packed.push(0);
 			}
-			packed[intOffset] |= arr[i] << (8 * (shiftModifier + bigEndianMod * (byteOffset % 4)));
+			packed[intOffset] |= arrView[i] << (8 * (shiftModifier + bigEndianMod * (byteOffset % 4)));
 		}
 
 		return {"value" : packed, "binLen" : arr.byteLength * 8 + existingPackedLen};
@@ -467,13 +468,14 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 */
 	function packed2arraybuffer(packed, outputLength, bigEndianMod)
 	{
-		var length = outputLength / 8, i, retVal = new ArrayBuffer(length), shiftModifier;
+		var length = outputLength / 8, i, retVal = new ArrayBuffer(length), shiftModifier, arrView;
+		arrView = new Uint8Array(retVal);
 
 		shiftModifier = (bigEndianMod === -1) ? 3 : 0;
 
 		for (i = 0; i < length; i += 1)
 		{
-			retVal[i] = (packed[i >>> 2] >>> (8 * (shiftModifier + bigEndianMod * (i % 4)))) & 0xFF;
+			arrView[i] = (packed[i >>> 2] >>> (8 * (shiftModifier + bigEndianMod * (i % 4)))) & 0xFF;
 		}
 
 		return retVal;
