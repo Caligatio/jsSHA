@@ -7,6 +7,7 @@ jsSHA - ChangeLog
   conversion functions 
 - Further sped up SHA-3 implementation by decomposing xor_64 function
   (thanks frostschutz!)
+- Fixed incorrect results when using ArrayBuffers (thanks conref!)
 
 2.2.0 (2016-07-10)
 -------------------------
