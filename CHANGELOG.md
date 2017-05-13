@@ -1,13 +1,14 @@
 jsSHA - ChangeLog
 =========================
 
-2.3.0 (20XX-XX-XX)
+2.3.0 (2017-05-13)
 -------------------------
 - Sped up SHA-3 implementation by adding little-endian capability to
   conversion functions 
-- Further sped up SHA-3 implementation by decomposing xor_64 function
+- Further sped up SHA-3 implementation by decomposing xor\_64 function
   (thanks frostschutz!)
 - Fixed incorrect results when using ArrayBuffers (thanks conref!)
+- Added externs/sha.js for Google Closure Compiler users (thanks IvanRF!)
 
 2.2.0 (2016-07-10)
 -------------------------
