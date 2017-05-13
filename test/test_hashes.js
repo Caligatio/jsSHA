@@ -8,6 +8,39 @@ if (("undefined" !== typeof module) && module["exports"])
 
 String.prototype.repeat = function(times) {
 	return (new Array(times + 1)).join(this);
+};
+
+function hexToArrayBuffer(hexStr)
+{
+	var arrayBuffer = new ArrayBuffer(hexStr.length / 2), arrView = new Uint8Array(arrayBuffer), i;
+
+	for (i = 0; i < hexStr.length; i += 2)
+	{
+		num = parseInt(hexStr.substr(i, 2), 16);
+		if (!isNaN(num))
+		{
+			arrView[i >>> 1] = num;
+		  }
+		else
+		{
+			throw new Error("String of HEX type contains invalid characters");
+		}
+	}
+
+	return arrayBuffer;
+}
+
+function arrayBufferToHex(arrayBuffer)
+{
+	var hex_tab = "0123456789abcdef", arrView = new Uint8Array(arrayBuffer), i, str = "";
+
+	for (i = 0; i < arrView.length; i += 1)
+	{
+		str += (hex_tab.charAt((arrView[i] >>> 4) & 0xF) +
+			hex_tab.charAt(arrView[i] & 0xF));
+	}
+
+	return str;
 }
 
 /* These are used often so make a global copy that everything can reference */
@@ -481,7 +514,44 @@ var hashTests = [
 			}
 		]
 	}
-]
+];
+
+/* Dynamically build ArrayBuffer tests if the environment supports them */
+try
+{
+	hashTests.forEach(function(testSuite) {
+		testSuite["tests"].forEach(function(test) {
+			var clonedInput = null;
+			var clonedOutputs = [];
+			test["ptInputs"].forEach(function(ptInput) {
+				if (ptInput["type"] === "HEX")
+				{
+					clonedInput = {"type": "ARRAYBUFFER", "value": hexToArrayBuffer(ptInput["value"])};
+				}
+			});
+			test["ptInputs"].push(clonedInput);
+            test["outputs"].forEach(function(output) {
+                if (output["type"] === "HEX")
+                {
+                    /* Can't compare ARRAYBUFFERs so actually use the HEX output directly and convert in the unit test */
+                    if (output.hasOwnProperty("shakeLen"))
+                    {
+                        clonedOutputs.push({"type": "ARRAYBUFFER", "value": output["value"], "shakeLen": output["shakeLen"]});
+                    }
+                    else
+                    {
+                        clonedOutputs.push({"type": "ARRAYBUFFER", "value": output["value"]});
+                    }
+                }
+            });
+            test["outputs"] = test["outputs"].concat(clonedOutputs);
+		});
+	});
+}
+catch (ignore)
+{
+	/* ArrayBuffers may not be supported by the environment */
+}
 
 hashTests.forEach(function(testSuite) {
 	describe("Basic " + testSuite["hash"] + " Tests", function() {
@@ -494,11 +564,20 @@ hashTests.forEach(function(testSuite) {
 						hash.update(ptInput["value"]);
 						if (output.hasOwnProperty("shakeLen"))
 						{
-							options["shakeLen"] = output["shakeLen"]
+							options["shakeLen"] = output["shakeLen"];
 						}
-						it(test["name"] + " " + ptInput["type"] + " Input - " + output["type"] + " Output", function() {
-							chai.assert.equal(hash.getHash(output["type"], options), output["value"]);
-						});
+						if (output["type"] != "ARRAYBUFFER")
+						{
+							it(test["name"] + " " + ptInput["type"] + " Input - " + output["type"] + " Output", function() {
+								chai.assert.equal(hash.getHash(output["type"], options), output["value"]);
+							});
+						}
+						else /* Matching the dynamic build of ArrayBuffer tests, need to use HEX as a comparison medium */
+						{
+							it(test["name"] + " " + ptInput["type"] + " Input - " + output["type"] + " Output", function() {
+								chai.assert.equal(arrayBufferToHex(hash.getHash(output["type"], options)), output["value"]);
+							});
+						}
 					});
 				});
 			});
