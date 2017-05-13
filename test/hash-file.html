@@ -60,18 +60,6 @@
                             progress.innerHTML += '<p>SHA-256: ' + result256 + '</p>';
                             progress.innerHTML += '<p>SHA-384: ' + result384 + '</p>';
                             progress.innerHTML += '<p>SHA-512: ' + result512 + '</p>';
-
-                            // Allow testing on project license file
-                            if (file.name == 'LICENSE') {
-                                progress.innerHTML += ''
-
-                                // Compare with sha384sum util
-                                if (result384 == '74344f93eb1c1cb87f162632a5f8658290e69a997ed4dbe15bd3c56d94c22a4377f235a7a43626dbe9a0c1d8740f790d') {
-                                    progress.innerHTML += '<p>License hash comparison: <span class="correct">PASS</span>'
-                                } else {
-                                    progress.innerHTML += '<p>License hash comparison: <span class="incorrect">FAIL</span>'
-                                }
-                            }
                         } else {
                             readFile(hasher1, hasher224, hasher256, hasher384, hasher512, file, start + chunkSize, stop + chunkSize)
                         }
