@@ -71,7 +71,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	function str2packed(str, utfType, existingPacked, existingPackedLen, bigEndianMod)
 	{
 		var packed, codePnt, codePntArr, byteCnt = 0, i, j, existingByteLen,
-			intOffset, byteOffset, shiftModifier;
+			intOffset, byteOffset, shiftModifier, transposeBytes;
 
 		packed = existingPacked || [0];
 		existingPackedLen = existingPackedLen || 0;
@@ -130,11 +130,14 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		else if (("UTF16BE" === utfType) || "UTF16LE" === utfType)
 		{
 			shiftModifier = (bigEndianMod === -1) ? 2 : 0;
+			/* Internally strings are UTF-16BE so transpose bytes under two conditions:
+				* need LE and not switching endianness due to SHA-3
+				* need BE and switching endianness due to SHA-3 */
+			transposeBytes = (("UTF16LE" === utfType) && (bigEndianMod !== 1)) || (("UTF16LE" !== utfType) && (bigEndianMod === 1));
 			for (i = 0; i < str.length; i += 1)
 			{
 				codePnt = str.charCodeAt(i);
-				/* Internally strings are UTF-16BE so only change if UTF-16LE */
-				if ("UTF16LE" === utfType)
+				if (transposeBytes === true)
 				{
 					j = codePnt & 0xFF;
 					codePnt = (j << 8) | (codePnt >>> 8);

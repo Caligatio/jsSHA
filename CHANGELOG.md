@@ -1,6 +1,11 @@
 jsSHA - ChangeLog
 =========================
 
+2.3.1 (2017-XX-XX)
+-------------------------
+- Fix issue with SHA-3 and using a combination of TEXT/UTF-16 input
+  (thanks frostschutz!)
+
 2.3.0 (2017-05-13)
 -------------------------
 - Sped up SHA-3 implementation by adding little-endian capability to

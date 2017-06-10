@@ -16,11 +16,25 @@ def main():
     for hash_name, hash_func in hash_funcs.items():
         for vector_name, vector_value in test_vectors.items():
             for output_len in output_lens:
-                print('%s with %s Input and %d bit Output: %s' % (
+                print('%s with %s UTF-8 Input and %d bit Output: %s' % (
                     hash_name,
                     vector_name,
                     output_len * 8,
-                    binascii.hexlify(hash_func([ord(c) for c in vector_value], output_len))
+                    binascii.hexlify(hash_func(vector_value.encode(), output_len)).decode()
+                    )
+                )
+                print('%s with %s UTF-16BE Input and %d bit Output: %s' % (
+                    hash_name,
+                    vector_name,
+                    output_len * 8,
+                    binascii.hexlify(hash_func(vector_value.encode('UTF-16BE'), output_len)).decode()
+                    )
+                )
+                print('%s with %s UTF-16LE Input and %d bit Output: %s' % (
+                    hash_name,
+                    vector_name,
+                    output_len * 8,
+                    binascii.hexlify(hash_func(vector_value.encode('UTF-16LE'), output_len)).decode()
                     )
                 )
 
