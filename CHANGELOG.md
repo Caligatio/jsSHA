@@ -1,7 +1,7 @@
 jsSHA - ChangeLog
 =========================
 
-2.3.1 (2017-XX-XX)
+2.3.1 (2017-06-10)
 -------------------------
 - Fix issue with SHA-3 and using a combination of TEXT/UTF-16 input
   (thanks frostschutz!)
