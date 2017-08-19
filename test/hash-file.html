@@ -68,7 +68,7 @@
 
                 // Begin read
                 var blob = file.slice(start, stop)
-                reader.readAsBinaryString(blob)
+                reader.readAsArrayBuffer(blob)
             }
 
             function handleFileSelect(input) {
@@ -79,11 +79,11 @@
                 // Get file object from the form
                 var file = input.files[0];
 
-                var hasher1 = new jsSHA('SHA-1', 'BYTES')
-                var hasher224 = new jsSHA('SHA-224', 'BYTES')
-                var hasher256 = new jsSHA('SHA-256', 'BYTES')
-                var hasher384 = new jsSHA('SHA-384', 'BYTES')
-                var hasher512 = new jsSHA('SHA-512', 'BYTES')
+                var hasher1 = new jsSHA('SHA-1', 'ARRAYBUFFER')
+                var hasher224 = new jsSHA('SHA-224', 'ARRAYBUFFER')
+                var hasher256 = new jsSHA('SHA-256', 'ARRAYBUFFER')
+                var hasher384 = new jsSHA('SHA-384', 'ARRAYBUFFER')
+                var hasher512 = new jsSHA('SHA-512', 'ARRAYBUFFER')
 
                 // Read file in chunks
                 readFile(hasher1, hasher224, hasher256, hasher384, hasher512, file, 0, chunkSize)
