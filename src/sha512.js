@@ -3,11 +3,9 @@
  defined in FIPS PUB 180-4 and FIPS PUB 202, as well as the corresponding
  HMAC implementation as defined in FIPS PUB 198a
 
- Copyright Brian Turek 2008-2017
+ Copyright 2008-2018 Brian Turek, 1998-2009 Paul Johnston & Contributors
  Distributed under the BSD License
  See http://caligatio.github.com/jsSHA/ for more information
-
- Several functions taken from Paul Johnston
 */
 'use strict';(function(K){function x(b,a,d){var e=0,g=[],k=0,f,c,m,h,l,p,t,q,y=!1,u=[],r=[],v,A=!1;d=d||{};f=d.encoding||"UTF8";v=d.numRounds||1;if(v!==parseInt(v,10)||1>v)throw Error("numRounds must a integer >= 1");if(0===b.lastIndexOf("SHA-",0))if(p=function(a,d){return B(a,d,b)},t=function(a,d,g,e){var c,k;if("SHA-384"===b||"SHA-512"===b)c=(d+129>>>10<<5)+31,k=32;else throw Error("Unexpected error in SHA-2 implementation");for(;a.length<=c;)a.push(0);a[d>>>5]|=128<<24-d%32;d=d+g;a[c]=d&4294967295;
 a[c-1]=d/4294967296|0;g=a.length;for(d=0;d<g;d+=k)e=B(a.slice(d,d+k),e,b);if("SHA-384"===b)a=[e[0].a,e[0].b,e[1].a,e[1].b,e[2].a,e[2].b,e[3].a,e[3].b,e[4].a,e[4].b,e[5].a,e[5].b];else if("SHA-512"===b)a=[e[0].a,e[0].b,e[1].a,e[1].b,e[2].a,e[2].b,e[3].a,e[3].b,e[4].a,e[4].b,e[5].a,e[5].b,e[6].a,e[6].b,e[7].a,e[7].b];else throw Error("Unexpected error in SHA-2 implementation");return a},q=function(a){return a.slice()},"SHA-384"===b)l=1024,h=384;else if("SHA-512"===b)l=1024,h=512;else throw Error("Chosen SHA variant is not supported");

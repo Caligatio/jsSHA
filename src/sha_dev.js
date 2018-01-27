@@ -3,11 +3,9 @@
  * defined in FIPS PUB 180-4 and FIPS PUB 202, as well as the corresponding
  * HMAC implementation as defined in FIPS PUB 198a
  *
- * Copyright Brian Turek 2008-2017
+ * Copyright 2008-2018 Brian Turek, 1998-2009 Paul Johnston & Contributors
  * Distributed under the BSD License
  * See http://caligatio.github.com/jsSHA/ for more information
- *
- * Several functions taken from Paul Johnston
  */
 
 /*jslint

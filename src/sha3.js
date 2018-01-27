@@ -3,11 +3,9 @@
  defined in FIPS PUB 180-4 and FIPS PUB 202, as well as the corresponding
  HMAC implementation as defined in FIPS PUB 198a
 
- Copyright Brian Turek 2008-2017
+ Copyright 2008-2018 Brian Turek, 1998-2009 Paul Johnston & Contributors
  Distributed under the BSD License
  See http://caligatio.github.com/jsSHA/ for more information
-
- Several functions taken from Paul Johnston
 */
 'use strict';(function(L){function u(d,b,h){var c=0,a=[],l=0,e,m,r,g,k,f,p,v,A=!1,n=[],u=[],w,z=!1,x=!1,t=-1;h=h||{};e=h.encoding||"UTF8";w=h.numRounds||1;if(w!==parseInt(w,10)||1>w)throw Error("numRounds must a integer >= 1");if(0===d.lastIndexOf("SHA3-",0)||0===d.lastIndexOf("SHAKE",0)){var C=6;f=B;v=function(c){var a=[],e;for(e=0;5>e;e+=1)a[e]=c[e].slice();return a};t=1;if("SHA3-224"===d)k=1152,g=224;else if("SHA3-256"===d)k=1088,g=256;else if("SHA3-384"===d)k=832,g=384;else if("SHA3-512"===d)k=
 576,g=512;else if("SHAKE128"===d)k=1344,g=-1,C=31,x=!0;else if("SHAKE256"===d)k=1088,g=-1,C=31,x=!0;else throw Error("Chosen SHA variant is not supported");p=function(c,a,e,g,d){e=k;var b=C,m,l=[],f=e>>>5,h=0,r=a>>>5;for(m=0;m<r&&a>=e;m+=f)g=B(c.slice(m,m+f),g),a-=e;c=c.slice(m);for(a%=e;c.length<f;)c.push(0);m=a>>>3;c[m>>2]^=b<<m%4*8;c[f-1]^=2147483648;for(g=B(c,g);32*l.length<d;){c=g[h%5][h/5|0];l.push(c.b);if(32*l.length>=d)break;l.push(c.a);h+=1;0===64*h%e&&B(null,g)}return l}}else throw Error("Chosen SHA variant is not supported");
