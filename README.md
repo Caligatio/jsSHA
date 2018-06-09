@@ -122,4 +122,4 @@ where FLAG is a bitwise OR of the following values:
 The project's website is located at [https://caligatio.github.com/jsSHA/](https://caligatio.github.com/jsSHA/)
 
 ## Donations
-Feel like donating?  We're now accepting donations through [Pledgie](https://pledgie.com/campaigns/31646) and [Bitcoin](bitcoin:12VMZgRAP2jCP1YCR3vFNAtLR9MvzHzJZb?message=jsSHA%20Donation)!
+Feel like donating?  We're now accepting donations through [Bitcoin](bitcoin:12VMZgRAP2jCP1YCR3vFNAtLR9MvzHzJZb?message=jsSHA%20Donation)!
