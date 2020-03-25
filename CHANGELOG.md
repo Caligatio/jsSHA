@@ -47,7 +47,7 @@ jsSHA - ChangeLog
 
 1.6.1 (2015-06-25)
 -------------------------
-- Fixed issue with SHA-512 family of hashes failing is raw input was a
+- Fixed issue with SHA-512 family of hashes failing if raw input was a
   particular size
 
 1.6.0 (2015-03-08)
