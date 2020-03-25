@@ -8,10 +8,6 @@
  * See http://caligatio.github.com/jsSHA/ for more information
  */
 
-/*jslint
-	bitwise: true, multivar: true, for: true, this: true, sub: true, esversion: 3
-*/
-
  /**
   * SUPPORTED_ALGS is the stub for a compile flag that will cause pruning of
   * functions that are not needed when a limited number of SHA families are
@@ -292,7 +288,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 
 			for (j = 0; j < strPart.length; j += 1)
 			{
-				index = b64Tab.indexOf(strPart[j]);
+				index = b64Tab.indexOf(strPart.charAt(j));
 				tmpInt |= index << (18 - (6 * j));
 			}
 
@@ -331,15 +327,35 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 */
 	function arraybuffer2packed(arr, existingPacked, existingPackedLen, bigEndianMod)
 	{
-		var packed, i, existingByteLen, intOffset, byteOffset, shiftModifier, arrView;
+		return uint8array2packed(new Uint8Array(arr), existingPacked, existingPackedLen, bigEndianMod)
+	}
+
+	/**
+	 * Convert an Uint8Array to an array of big-endian words
+	 *
+	 * @private
+	 * @param {Uint8Array} arr Uint8Array to be converted to binary
+	 *   representation
+	 * @param {Array<number>} existingPacked A packed int array of bytes to
+	 *   append the results to
+	 * @param {number} existingPackedLen The number of bits in the existingPacked
+	 *   array
+	 * @param {number} bigEndianMod Modifier for whether hash function is
+	 *   big or small endian
+	 * @return {{value : Array<number>, binLen : number}} Hash list where
+	 *   "value" contains the output number array and "binLen" is the binary
+	 *   length of "value"
+	 */
+	function uint8array2packed(arr, existingPacked, existingPackedLen, bigEndianMod)
+	{
+		var packed, i, existingByteLen, intOffset, byteOffset, shiftModifier;
 
 		packed = existingPacked || [0];
 		existingPackedLen = existingPackedLen || 0;
 		existingByteLen = existingPackedLen >>> 3;
 		shiftModifier = (bigEndianMod === -1) ? 3 : 0;
-		arrView = new Uint8Array(arr);
 
-		for (i = 0; i < arr.byteLength; i += 1)
+		for (i = 0; i < arr.length; i += 1)
 		{
 			byteOffset = i + existingByteLen;
 			intOffset = byteOffset >>> 2;
@@ -347,10 +363,10 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			{
 				packed.push(0);
 			}
-			packed[intOffset] |= arrView[i] << (8 * (shiftModifier + bigEndianMod * (byteOffset % 4)));
+			packed[intOffset] |= arr[i] << (8 * (shiftModifier + bigEndianMod * (byteOffset % 4)));
 		}
 
-		return {"value" : packed, "binLen" : arr.byteLength * 8 + existingPackedLen};
+		return {"value" : packed, "binLen" : arr.length * 8 + existingPackedLen};
 	}
 
 	/**
@@ -482,6 +498,31 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		return retVal;
 	}
 
+    /**
+	 * Convert an array of big-endian words to an Uint8Array
+	 *
+	 * @private
+	 * @param {Array<number>} packed Array of integers to be converted to
+	 *   an Uint8Array
+	 * @param {number} outputLength Length of output in bits
+	 * @param {number} bigEndianMod Modifier for whether hash function is
+	 *   big or small endian
+	 * @return {Uint8Array} Raw bytes representation of the parameter in an
+	 *   Uint8Array
+	 */
+	function packed2uint8array(packed, outputLength, bigEndianMod)
+	{
+		var length = outputLength / 8, i, retVal = new Uint8Array(length), shiftModifier;
+		shiftModifier = (bigEndianMod === -1) ? 3 : 0;
+
+		for (i = 0; i < length; i += 1)
+		{
+			retVal[i] = (packed[i >>> 2] >>> (8 * (shiftModifier + bigEndianMod * (i % 4)))) & 0xFF;
+		}
+
+		return retVal;
+	}
+
 	/**
 	 * Validate hash list containing output formatting options, ensuring
 	 * presence of every option or adding the default value
@@ -537,7 +578,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 *	UTF16LE)
 	 * @param {number} bigEndianMod Modifier for whether hash function is
 	 *   big or small endian
-	 * @return {function((string|ArrayBuffer), Array<number>=, number=): {value :
+	 * @return {function((string|ArrayBuffer|Uint8Array), Array<number>=, number=): {value :
 	 *   Array<number>, binLen : number}} Function that will convert an input
 	 *   string to a packed int array
 	 */
@@ -648,8 +689,30 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 				   return arraybuffer2packed(arr, existingBin, existingBinLen, bigEndianMod);
 				};
 			break;
+        case "UINT8ARRAY":
+			try {
+				retVal = new Uint8Array(0);
+			} catch(ignore) {
+				throw new Error("UINT8ARRAY not supported by this environment");
+			}
+			/**
+			 * @param {Uint8Array} arr Uint8Array to be converted to binary
+			 *   representation
+			 * @param {Array<number>} existingBin A packed int array of bytes to
+			 *   append the results to
+			 * @param {number} existingBinLen The number of bits in the existingBin
+			 *   array
+			 * @return {{value : Array<number>, binLen : number}} Hash list where
+			 *   "value" contains the output number array and "binLen" is the binary
+			 *   length of "value"
+			 */
+			retVal = function(arr, existingBin, existingBinLen)
+				{
+				   return uint8array2packed(arr, existingBin, existingBinLen, bigEndianMod);
+				};
+			break;
 		default:
-			throw new Error("format must be HEX, TEXT, B64, BYTES, or ARRAYBUFFER");
+			throw new Error("format must be HEX, TEXT, B64, BYTES, ARRAYBUFFER, or UINT8ARRAY");
 		}
 
 		return retVal;
@@ -1856,7 +1919,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 	 * @param {string} variant The desired SHA variant (SHA-1, SHA-224, SHA-256,
 	 *   SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384, or SHA3-512)
 	 * @param {string} inputFormat The format of srcString: HEX, TEXT, B64,
-	 *   BYTES, or ARRAYBUFFER
+	 *   BYTES, ARRAYBUFFER, or UINT8ARRAY
 	 * @param {{encoding: (string|undefined), numRounds: (number|undefined)}=}
 	 *   options Optional values
 	 */
@@ -1986,9 +2049,9 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		 * immediately after jsSHA object instantiation
 		 *
 		 * @expose
-		 * @param {string|ArrayBuffer} key The key used to calculate the HMAC
+		 * @param {string|ArrayBuffer|Uint8Array} key The key used to calculate the HMAC
 		 * @param {string} inputFormat The format of key, HEX, TEXT, B64, BYTES,
-		 *   or ARRAYBUFFER
+		 *   ARRAYBUFFER, or UINT8ARRAY
 		 * @param {{encoding : (string|undefined)}=} options Associative array
 		 *   of input format options
 		 */
@@ -2071,7 +2134,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		 * rest for either a future update or getHash call.
 		 *
 		 * @expose
-		 * @param {string|ArrayBuffer} srcString The string to be hashed
+		 * @param {string|ArrayBuffer|Uint8Array} srcString The string to be hashed
 		 */
 		this.update = function(srcString)
 		{
@@ -2107,10 +2170,10 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		 *
 		 * @expose
 		 * @param {string} format The desired output formatting (B64, HEX,
-		 *   BYTES, or ARRAYBUFFER)
+		 *   BYTES, ARRAYBUFFER, or UINT8ARRAY)
 		 * @param {{outputUpper : (boolean|undefined), b64Pad : (string|undefined),
 		 *   shakeLen : (number|undefined)}=} options Hash list of output formatting options
-		 * @return {string|ArrayBuffer} The string representation of the hash
+		 * @return {string|ArrayBuffer|Uint8Array} The string representation of the hash
 		 *   in the format specified.
 		 */
 		this.getHash = function(format, options)
@@ -2153,8 +2216,16 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 				}
 				formatFunc = function(binarray) {return packed2arraybuffer(binarray, outputBinLen, bigEndianMod);};
 				break;
+			case "UINT8ARRAY":
+				try {
+					i = new Uint8Array(0);
+				} catch (ignore) {
+					throw new Error("UINT8ARRAY not supported by this environment");
+				}
+				formatFunc = function(binarray) {return packed2uint8array(binarray, outputBinLen, bigEndianMod);};
+				break;
 			default:
-				throw new Error("format must be HEX, B64, BYTES, or ARRAYBUFFER");
+				throw new Error("format must be HEX, B64, BYTES, ARRAYBUFFER, or UINT8ARRAY");
 			}
 
 			finalizedState = finalizeFunc(remainder.slice(), remainderLen, processedLen, stateCloneFunc(intermediateState), outputBinLen);
@@ -2182,11 +2253,11 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		 *
 		 * @expose
 		 * @param {string} format The desired output formatting
-		 *   (B64, HEX, BYTES, or ARRAYBUFFER)
+		 *   (B64, HEX, BYTES, ARRAYBUFFER, or UINT8ARRAY)
 		 * @param {{outputUpper : (boolean|undefined), b64Pad : (string|undefined),
 		 *   shakeLen : (number|undefined)}=} options associative array of output
 		 *   formatting options
-		 * @return {string|ArrayBuffer} The string representation of the hash in the
+		 * @return {string|ArrayBuffer|Uint8Array} The string representation of the hash in the
 		 *   format specified.
 		 */
 		this.getHMAC = function(format, options)
@@ -2220,8 +2291,16 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 				}
 				formatFunc = function(binarray) {return packed2arraybuffer(binarray, outputBinLen, bigEndianMod);};
 				break;
+			case "UINT8ARRAY":
+				try {
+					formatFunc = new Uint8Array(0);
+				} catch(ignore) {
+					throw new Error("UINT8ARRAY not supported by this environment");
+				}
+				formatFunc = function(binarray) {return packed2uint8array(binarray, outputBinLen, bigEndianMod);};
+				break;
 			default:
-				throw new Error("outputFormat must be HEX, B64, BYTES, or ARRAYBUFFER");
+				throw new Error("outputFormat must be HEX, B64, BYTES, ARRAYBUFFER, or UINT8ARRAY");
 			}
 
 			firstHash = finalizeFunc(remainder.slice(), remainderLen, processedLen, stateCloneFunc(intermediateState), outputBinLen);

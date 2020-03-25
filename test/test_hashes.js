@@ -1,8 +1,5 @@
 /* Kind of hack to get the tests working both in the browser and node.js */
 
-/*jslint
-	bitwise: true, multivar: true, for: true, this: true, sub: true, esversion: 3
-*/
 if (("undefined" !== typeof module) && module["exports"])
 {
 	mocha = require("mocha");
@@ -16,7 +13,8 @@ String.prototype.repeat = function(times) {
 
 function hexToArrayBuffer(hexStr)
 {
-	var arrayBuffer = new ArrayBuffer(hexStr.length / 2), arrView = new Uint8Array(arrayBuffer), i;
+	var arrayBuffer = new ArrayBuffer(hexStr.length / 2), arrView = new Uint8Array(arrayBuffer), i, num;
+
 
 	for (i = 0; i < hexStr.length; i += 2)
 	{
@@ -34,6 +32,26 @@ function hexToArrayBuffer(hexStr)
 	return arrayBuffer;
 }
 
+function hexToUint8Array(hexStr)
+{
+	var arrView = new Uint8Array(hexStr.length / 2), i, num;
+
+	for (i = 0; i < hexStr.length; i += 2)
+	{
+		num = parseInt(hexStr.substr(i, 2), 16);
+		if (!isNaN(num))
+		{
+			arrView[i >>> 1] = num;
+		  }
+		else
+		{
+			throw new Error("String of HEX type contains invalid characters");
+		}
+	}
+
+	return arrView;
+}
+
 function arrayBufferToHex(arrayBuffer)
 {
 	var hex_tab = "0123456789abcdef", arrView = new Uint8Array(arrayBuffer), i, str = "";
@@ -42,6 +60,19 @@ function arrayBufferToHex(arrayBuffer)
 	{
 		str += (hex_tab.charAt((arrView[i] >>> 4) & 0xF) +
 			hex_tab.charAt(arrView[i] & 0xF));
+	}
+
+	return str;
+}
+
+function uint8ArrayToHex(arrayBuffer)
+{
+	var hex_tab = "0123456789abcdef", i, str = "";
+
+	for (i = 0; i < arrayBuffer.length; i += 1)
+	{
+		str += (hex_tab.charAt((arrayBuffer[i] >>> 4) & 0xF) +
+			hex_tab.charAt(arrayBuffer[i] & 0xF));
 	}
 
 	return str;
@@ -1161,6 +1192,42 @@ catch (ignore)
 	/* ArrayBuffers may not be supported by the environment */
 }
 
+/* Dynamically build Uint8Array tests if the environment supports them */
+try
+{
+	hashTests.forEach(function(testSuite) {
+		testSuite["tests"].forEach(function(test) {
+			var clonedOutputs = [];
+			test["ptInputs"].forEach(function(ptInput) {
+				if (ptInput["type"] === "HEX")
+				{
+					test["ptInputs"].push({"type": "UINT8ARRAY", "value": hexToUint8Array(ptInput["value"])});
+				}
+			});
+			test["outputs"].forEach(function(output) {
+				if (output["type"] === "HEX")
+				{
+					/* Can't compare UINT8ARRAYs so actually use the HEX output directly and convert in the unit test */
+					if (output.hasOwnProperty("shakeLen"))
+					{
+						clonedOutputs.push({"type": "UINT8ARRAY", "value": output["value"], "shakeLen": output["shakeLen"]});
+					}
+					else
+					{
+						clonedOutputs.push({"type": "UINT8ARRAY", "value": output["value"]});
+					}
+				}
+			});
+			test["outputs"] = test["outputs"].concat(clonedOutputs);
+		});
+	});
+}
+catch (ignore)
+{
+	/* ArrayBuffers may not be supported by the environment */
+}
+
+
 hashTests.forEach(function(testSuite) {
 	describe("Basic " + testSuite["hash"] + " Tests", function() {
 		try
@@ -1182,25 +1249,32 @@ hashTests.forEach(function(testSuite) {
 							outOptions["shakeLen"] = output["shakeLen"];
 						}
 
-						if (output["type"] != "ARRAYBUFFER")
-						{
-							it(test["name"] + " " + ptInput["type"] + " Input - " + output["type"] + " Output", function() {
-								chai.assert.equal(hash.getHash(output["type"], outOptions), output["value"]);
-							});
-						}
-						else /* Matching the dynamic build of ArrayBuffer tests, need to use HEX as a comparison medium */
+						if (output["type"] === "ARRAYBUFFER") /* Matching the dynamic build of ArrayBuffer tests, need to use HEX as a comparison medium */
 						{
 							it(test["name"] + " " + ptInput["type"] + " Input - " + output["type"] + " Output", function() {
 								chai.assert.equal(arrayBufferToHex(hash.getHash(output["type"], outOptions)), output["value"]);
 							});
 						}
+						else if (output["type"] === "UINT8ARRAY") /* Matching the dynamic build of Uint8Array tests, need to use HEX as a comparison medium */
+						{
+							it(test["name"] + " " + ptInput["type"] + " Input - " + output["type"] + " Output", function() {
+								chai.assert.equal(uint8ArrayToHex(hash.getHash(output["type"], outOptions)), output["value"]);
+							});
+						}
+						else
+						{
+							it(test["name"] + " " + ptInput["type"] + " Input - " + output["type"] + " Output", function() {
+								chai.assert.equal(hash.getHash(output["type"], outOptions), output["value"]);
+							});
+						}
+
 					});
 				});
 			});
 		}
 		catch(e)
 		{
-			if (e.message != "Chosen SHA variant is not supported")
+			if (e.message !== "Chosen SHA variant is not supported")
 			{
 				throw new Error("Testing of " + testSuite["hash"] + " failed");
 			}
