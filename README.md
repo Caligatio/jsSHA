@@ -28,11 +28,11 @@ To use the module, first require it using:
 Instantiate a new jsSHA object with the desired hash type, input type, and
 options as parameters.  The hash type can be one of SHA-1, SHA-224, SHA3-224,
 SHA-256, SHA3-256, SHA-384, SHA3-384, SHA-512, SHA3-512, SHAKE128, or SHAKE256.
-The input type can be one of HEX, TEXT, B64, BYTES, or ARRAYBUFFER.  You can
-then stream in input using the `update` object function, calling it multiple
-times if needed.  Finally, simply call `getHash` with the output type as a
-parameter (B64, HEX, BYTES, or ARRAYBUFFER).  Example to calculate the SHA-512
-of "This is a test":
+The input type can be one of HEX, TEXT, B64, BYTES, ARRAYBUFFER, or UINT8ARRAY.
+You can then stream in input using the `update` object function, calling it
+multiple times if needed.  Finally, simply call `getHash` with the output type
+as a parameter (B64, HEX, BYTES, ARRAYBUFFER, or UINT8ARRAY).  Example to
+calculate the SHA-512 of "This is a test":
 
     var shaObj = new jsSHA("SHA-512", "TEXT");
     shaObj.update("This is a ");
