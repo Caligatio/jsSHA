@@ -227,7 +227,7 @@ var SUPPORTED_ALGS = 4 | 2 | 1;
 
 			for (j = 0; j < strPart.length; j += 1)
 			{
-				index = b64Tab.indexOf(strPart[j]);
+				index = b64Tab.indexOf(strPart.charAt(j));
 				tmpInt |= index << (18 - (6 * j));
 			}
 
