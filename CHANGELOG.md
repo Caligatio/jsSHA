@@ -1,6 +1,15 @@
 jsSHA - ChangeLog
 =========================
 
+2.4.0 (2020-03-26)
+-------------------------
+- Reduced ECMAScript dependency to v3 (thanks TitusInfo!)
+- Added support for Uint8Array input/output as UINT8ARRAY (thanks nazar-pc!)
+
+1.6.3 (2020-03-26)
+-------------------------
+- Reduced ECMAScript dependency to v3 (thanks TitusInfo!)
+
 2.3.1 (2017-06-10)
 -------------------------
 - Fix issue with SHA-3 and using a combination of TEXT/UTF-16 input
