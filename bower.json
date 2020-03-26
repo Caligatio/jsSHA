@@ -45,7 +45,7 @@
 		"src/sha_dev.js"
 	],
 	"devDependencies": {
-		"chai": "^3.5.0",
-		"mocha": "^2.5.3"
+		"chai": "^4.2.0",
+		"mocha": "^7.1.1"
 	}
 }

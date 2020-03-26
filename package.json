@@ -45,8 +45,8 @@
   "homepage": "https://github.com/Caligatio/jsSHA",
   "dependencies": {},
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^2.5.3"
+    "chai": "^4.2.0",
+    "mocha": "^7.1.1"
   },
   "scripts": {
     "test": "mocha --reporter spec"
