@@ -1,6 +1,10 @@
 -------------------------
     jsSHA - ChangeLog
 -------------------------
+1.6.3 (2020-03-26)
+=========================
+- Reduced ECMAScript dependency to v3 (thanks TitusInfo!)
+
 1.6.2 (2016-05-13)
 =========================
 - Fixed problem with hashing strings over 4 billion bits (thanks Eicar!)
