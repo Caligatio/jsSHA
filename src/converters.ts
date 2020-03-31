@@ -22,10 +22,7 @@ export function getStrConverter(
   format: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
   utfType: "UTF8" | "UTF16BE" | "UTF16LE",
   bigEndianMod: -1 | 1
-):
-  | ((input: string, existingBin: number[], existingBinLen: number) => packedValue)
-  | ((input: ArrayBuffer, existingBin: number[], existingBinLen: number) => packedValue)
-  | ((input: Uint8Array, existingBin: number[], existingBinLen: number) => packedValue) {
+): (input: any, existingBin?: number[], existingBinLen?: number) => packedValue {
   let retVal;
 
   /* Validate encoding */
@@ -54,7 +51,7 @@ export function getStrConverter(
        *   "value" contains the output number array and "binLen" is the binary
        *   length of "value"
        */
-      retVal = function (str: string, existingBin: number[], existingBinLen: number): packedValue {
+      retVal = function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
         return hex2packed(str, existingBin, existingBinLen, bigEndianMod);
       };
       break;
@@ -69,7 +66,7 @@ export function getStrConverter(
        *   "value" contains the output number array and "binLen" is the binary
        *   length of "value"
        */
-      retVal = function (str: string, existingBin: number[], existingBinLen: number): packedValue {
+      retVal = function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
         return str2packed(str, utfType, existingBin, existingBinLen, bigEndianMod);
       };
       break;
@@ -84,7 +81,7 @@ export function getStrConverter(
        *   "value" contains the output number array and "binLen" is the binary
        *   length of "value"
        */
-      retVal = function (str: string, existingBin: number[], existingBinLen: number): packedValue {
+      retVal = function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
         return b642packed(str, existingBin, existingBinLen, bigEndianMod);
       };
       break;
@@ -99,7 +96,7 @@ export function getStrConverter(
        *   "value" contains the output number array and "binLen" is the binary
        *   length of "value"
        */
-      retVal = function (str: string, existingBin: number[], existingBinLen: number): packedValue {
+      retVal = function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
         return bytes2packed(str, existingBin, existingBinLen, bigEndianMod);
       };
       break;
@@ -120,7 +117,7 @@ export function getStrConverter(
        *   "value" contains the output number array and "binLen" is the binary
        *   length of "value"
        */
-      retVal = function (arr: ArrayBuffer, existingBin: number[], existingBinLen: number): packedValue {
+      retVal = function (arr: ArrayBuffer, existingBin?: number[], existingBinLen?: number): packedValue {
         return arraybuffer2packed(arr, existingBin, existingBinLen, bigEndianMod);
       };
       break;
@@ -141,7 +138,7 @@ export function getStrConverter(
        *   "value" contains the output number array and "binLen" is the binary
        *   length of "value"
        */
-      retVal = function (arr: Uint8Array, existingBin: number[], existingBinLen: number): packedValue {
+      retVal = function (arr: Uint8Array, existingBin?: number[], existingBinLen?: number): packedValue {
         return uint8array2packed(arr, existingBin, existingBinLen, bigEndianMod);
       };
       break;
@@ -150,6 +147,67 @@ export function getStrConverter(
   }
 
   return retVal;
+}
+
+/**
+ * Function that takes an output format and associated parameters and returns a function that converts packed integers
+ * to that format.
+ *
+ * @param format The desired output formatting (B64, HEX,
+ *   BYTES, ARRAYBUFFER, or UINT8ARRAY)
+ * @param outputBinLen Output length, in bits.
+ * @param bigEndianMod Modifier for whether hash function is
+ *   big or small endian
+ * @param options Hash list of output formatting options
+ * @returns Function that will convert a packed integer array to desired format.
+ */
+export function getOutputConverter(
+  format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
+  outputBinLen: number,
+  bigEndianMod: -1 | 1,
+  outputOptions: { outputUpper: boolean; b64Pad: string; shakeLen: number }
+): (binarray: number[]) => any {
+  switch (format) {
+    case "HEX":
+      return function (binarray) {
+        return packed2hex(binarray, outputBinLen, bigEndianMod, outputOptions);
+      };
+      break;
+    case "B64":
+      return function (binarray) {
+        return packed2b64(binarray, outputBinLen, bigEndianMod, outputOptions);
+      };
+      break;
+    case "BYTES":
+      return function (binarray) {
+        return packed2bytes(binarray, outputBinLen, bigEndianMod);
+      };
+      break;
+    case "ARRAYBUFFER":
+      try {
+        /* Need to test ArrayBuffer support */
+        new ArrayBuffer(0);
+      } catch (ignore) {
+        throw new Error("ARRAYBUFFER not supported by this environment");
+      }
+      return function (binarray) {
+        return packed2arraybuffer(binarray, outputBinLen, bigEndianMod);
+      };
+      break;
+    case "UINT8ARRAY":
+      try {
+        /* Need to test Uint8Array support */
+        new Uint8Array(0);
+      } catch (ignore) {
+        throw new Error("UINT8ARRAY not supported by this environment");
+      }
+      return function (binarray) {
+        return packed2uint8array(binarray, outputBinLen, bigEndianMod);
+      };
+      break;
+    default:
+      throw new Error("format must be HEX, B64, BYTES, ARRAYBUFFER, or UINT8ARRAY");
+  }
 }
 
 /**
@@ -176,8 +234,8 @@ export function getStrConverter(
 function str2packed(
   str: string,
   utfType: string,
-  existingPacked: number[],
-  existingPackedLen: number,
+  existingPacked: number[] | undefined,
+  existingPackedLen: number | undefined,
   bigEndianMod: -1 | 1
 ): packedValue {
   let packed: number[],
@@ -272,8 +330,8 @@ function str2packed(
  */
 function hex2packed(
   str: string,
-  existingPacked: number[] | null,
-  existingPackedLen: number | null,
+  existingPacked: number[] | undefined,
+  existingPackedLen: number | undefined,
   bigEndianMod: -1 | 1
 ): packedValue {
   let packed: number[],
@@ -327,8 +385,8 @@ function hex2packed(
  */
 function bytes2packed(
   str: string,
-  existingPacked: number[] | null,
-  existingPackedLen: number | null,
+  existingPacked: number[] | undefined,
+  existingPackedLen: number | undefined,
   bigEndianMod: -1 | 1
 ): packedValue {
   let packed: number[],
@@ -373,8 +431,8 @@ function bytes2packed(
  */
 function b642packed(
   str: string,
-  existingPacked: number[] | null,
-  existingPackedLen: number | null,
+  existingPacked: number[] | undefined,
+  existingPackedLen: number | undefined,
   bigEndianMod: -1 | 1
 ): packedValue {
   let packed,
@@ -447,8 +505,8 @@ function b642packed(
  */
 function arraybuffer2packed(
   arr: ArrayBuffer,
-  existingPacked: number[] | null,
-  existingPackedLen: number | null,
+  existingPacked: number[] | undefined,
+  existingPackedLen: number | undefined,
   bigEndianMod: -1 | 1
 ): packedValue {
   return uint8array2packed(new Uint8Array(arr), existingPacked, existingPackedLen, bigEndianMod);
@@ -472,8 +530,8 @@ function arraybuffer2packed(
  */
 function uint8array2packed(
   arr: Uint8Array,
-  existingPacked: number[] | null,
-  existingPackedLen: number | null,
+  existingPacked: number[] | undefined,
+  existingPackedLen: number | undefined,
   bigEndianMod: -1 | 1
 ): packedValue {
   let packed: number[],
