@@ -1,7 +1,7 @@
 /**
  * Return type for all the *2packed functions
  */
-interface packedValue {
+export interface packedValue {
   value: number[];
   binLen: number;
 }
@@ -21,7 +21,7 @@ interface packedValue {
 export function getStrConverter(
   format: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
   utfType: "UTF8" | "UTF16BE" | "UTF16LE",
-  bigEndianMod: number
+  bigEndianMod: -1 | 1
 ):
   | ((input: string, existingBin: number[], existingBinLen: number) => packedValue)
   | ((input: ArrayBuffer, existingBin: number[], existingBinLen: number) => packedValue)
@@ -178,7 +178,7 @@ function str2packed(
   utfType: string,
   existingPacked: number[],
   existingPackedLen: number,
-  bigEndianMod: number
+  bigEndianMod: -1 | 1
 ): packedValue {
   let packed: number[],
     codePnt: number,
@@ -272,9 +272,9 @@ function str2packed(
  */
 function hex2packed(
   str: string,
-  existingPacked: number[],
-  existingPackedLen: number,
-  bigEndianMod: number
+  existingPacked: number[] | null,
+  existingPackedLen: number | null,
+  bigEndianMod: -1 | 1
 ): packedValue {
   let packed: number[],
     length = str.length,
@@ -327,9 +327,9 @@ function hex2packed(
  */
 function bytes2packed(
   str: string,
-  existingPacked: number[],
-  existingPackedLen: number,
-  bigEndianMod: number
+  existingPacked: number[] | null,
+  existingPackedLen: number | null,
+  bigEndianMod: -1 | 1
 ): packedValue {
   let packed: number[],
     codePnt: number,
@@ -373,9 +373,9 @@ function bytes2packed(
  */
 function b642packed(
   str: string,
-  existingPacked: number[],
-  existingPackedLen: number,
-  bigEndianMod: number
+  existingPacked: number[] | null,
+  existingPackedLen: number | null,
+  bigEndianMod: -1 | 1
 ): packedValue {
   let packed,
     byteCnt = 0,
@@ -447,9 +447,9 @@ function b642packed(
  */
 function arraybuffer2packed(
   arr: ArrayBuffer,
-  existingPacked: number[],
-  existingPackedLen: number,
-  bigEndianMod: number
+  existingPacked: number[] | null,
+  existingPackedLen: number | null,
+  bigEndianMod: -1 | 1
 ): packedValue {
   return uint8array2packed(new Uint8Array(arr), existingPacked, existingPackedLen, bigEndianMod);
 }
@@ -472,9 +472,9 @@ function arraybuffer2packed(
  */
 function uint8array2packed(
   arr: Uint8Array,
-  existingPacked: number[],
-  existingPackedLen: number,
-  bigEndianMod: number
+  existingPacked: number[] | null,
+  existingPackedLen: number | null,
+  bigEndianMod: -1 | 1
 ): packedValue {
   let packed: number[],
     i: number,
@@ -516,7 +516,7 @@ function uint8array2packed(
 export function packed2hex(
   packed: number[],
   outputLength: number,
-  bigEndianMod: number,
+  bigEndianMod: -1 | 1,
   formatOpts: { outputUpper: boolean; b64Pad: string }
 ): string {
   let hex_tab = "0123456789abcdef",
@@ -553,7 +553,7 @@ export function packed2hex(
 export function packed2b64(
   packed: number[],
   outputLength: number,
-  bigEndianMod: number,
+  bigEndianMod: -1 | 1,
   formatOpts: { outputUpper: boolean; b64Pad: string }
 ): string {
   let str = "",
@@ -597,7 +597,7 @@ export function packed2b64(
  * @returns Raw bytes representation of the parameter in string
  *   form
  */
-export function packed2bytes(packed: number[], outputLength: number, bigEndianMod: number): string {
+export function packed2bytes(packed: number[], outputLength: number, bigEndianMod: -1 | 1): string {
   let str = "",
     length = outputLength / 8,
     i: number,
@@ -625,7 +625,7 @@ export function packed2bytes(packed: number[], outputLength: number, bigEndianMo
  * @returns Raw bytes representation of the parameter in an
  *   ArrayBuffer
  */
-export function packed2arraybuffer(packed: number[], outputLength: number, bigEndianMod: number): ArrayBuffer {
+export function packed2arraybuffer(packed: number[], outputLength: number, bigEndianMod: -1 | 1): ArrayBuffer {
   let length = outputLength / 8,
     i: number,
     retVal: ArrayBuffer,
@@ -654,7 +654,7 @@ export function packed2arraybuffer(packed: number[], outputLength: number, bigEn
  * @returns Raw bytes representation of the parameter in an
  *   Uint8Array
  */
-export function packed2uint8array(packed: number[], outputLength: number, bigEndianMod: number): Uint8Array {
+export function packed2uint8array(packed: number[], outputLength: number, bigEndianMod: -1 | 1): Uint8Array {
   let length = outputLength / 8,
     i: number,
     retVal: Uint8Array,
