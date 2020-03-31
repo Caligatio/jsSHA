@@ -206,7 +206,7 @@ export default class jsSHA extends jsSHABase<number[], "SHA-224" | "SHA-256"> {
 
     this.intermediateState = getNewState256(variant);
     this.variantBlockSize = 512;
-    this.outputBinLen = ("SHA-224" === variant) ? 224 : 256;
+    this.outputBinLen = "SHA-224" === variant ? 224 : 256;
     this.isSHAKE = false;
   }
 }

@@ -216,7 +216,7 @@ function finalizeSHA3(
 export default class jsSHA extends jsSHABase<
   Int_64[][],
   "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256"
-  > {
+> {
   intermediateState: Int_64[][];
   variantBlockSize: number;
   bigEndianMod: -1 | 1;
