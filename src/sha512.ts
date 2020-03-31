@@ -233,7 +233,7 @@ function finalizeSHA512(
   H: Int_64[],
   variant: "SHA-384" | "SHA-512"
 ): number[] {
-  var i, appendedMessageLength, offset, retVal, binaryStringInc, totalLen;
+  let i, appendedMessageLength, offset, retVal, binaryStringInc, totalLen;
 
   /* The 129 addition is a hack but it works.  The correct number is
     actually 136 (128 + 8) but the below math fails if
@@ -312,6 +312,7 @@ export default class jsSHA extends jsSHABase<Int_64[], "SHA-384" | "SHA-512"> {
   outputBinLen: number;
   isSHAKE: boolean;
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
   roundFunc: (block: number[], H: Int_64[]) => Int_64[];
   finalizeFunc: (remainder: number[], remainderBinLen: number, processedBinLen: number, H: Int_64[]) => number[];
@@ -332,11 +333,11 @@ export default class jsSHA extends jsSHABase<Int_64[], "SHA-384" | "SHA-512"> {
     this.bigEndianMod = -1;
     this.converterFunc = getStrConverter(inputFormat, this.utfType, this.bigEndianMod);
     this.roundFunc = roundSHA512;
-    this.stateCloneFunc = function (state) {
+    this.stateCloneFunc = function (state): Int_64[] {
       return state.slice();
     };
     this.newStateFunc = getNewState512;
-    this.finalizeFunc = function (remainder, remainderBinLen, processedBinLen, H) {
+    this.finalizeFunc = function (remainder, remainderBinLen, processedBinLen, H): number[] {
       return finalizeSHA512(remainder, remainderBinLen, processedBinLen, H, this.shaVariant);
     };
 

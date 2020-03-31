@@ -48,7 +48,7 @@ export default class jsSHA {
    *
    * @param srcString The string to be hashed
    */
-  update(srcString: string | ArrayBuffer | Uint8Array) {
+  update(srcString: string | ArrayBuffer | Uint8Array): void {
     this.shaObj.update(srcString);
   }
 
@@ -83,7 +83,7 @@ export default class jsSHA {
     key: string | ArrayBuffer | Uint8Array,
     inputFormat: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
     options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE" }
-  ) {
+  ): void {
     this.shaObj.setHMACKey(key, inputFormat, options);
   }
 

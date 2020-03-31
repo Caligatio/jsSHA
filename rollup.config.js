@@ -1,8 +1,8 @@
-let fs = require("fs");
+import fs from "fs";
 import typescript from "@rollup/plugin-typescript";
 import { terser } from "rollup-plugin-terser";
 
-let licenseHeader = fs.readFileSync("src/license_header.txt", { encoding: "utf8" });
+const licenseHeader = fs.readFileSync("src/license_header.txt", { encoding: "utf8" });
 
 export default [
   {

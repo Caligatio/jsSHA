@@ -8,7 +8,7 @@ import { ch_32, parity_32, maj_32, rotl_32, safeAdd_32_2, safeAdd_32_5 } from ".
  * @param _variant: Unused
  * @returns The initial state values
  */
-function getNewState(_variant: "SHA-1"): number[] {
+function getNewState(_variant: "SHA-1"): number[] { /* eslint-disable-line @typescript-eslint/no-unused-vars */
   return [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0];
 }
 
@@ -130,6 +130,7 @@ export default class jsSHA extends jsSHABase<number[], "SHA-1"> {
   outputBinLen: number;
   isSHAKE: boolean;
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
   roundFunc: (block: number[], H: number[]) => number[];
   finalizeFunc: (remainder: number[], remainderBinLen: number, processedBinLen: number, H: number[]) => number[];

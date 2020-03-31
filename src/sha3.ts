@@ -82,7 +82,7 @@ function cloneSHA3State(state: Int_64[][]): Int_64[][] {
  * @returns The resulting state value
  */
 function roundSHA3(block: number[] | null, state: Int_64[][]): Int_64[][] {
-  var round,
+  let round,
     x,
     y,
     B,
@@ -166,7 +166,7 @@ function finalizeSHA3(
   delimiter: number,
   outputLen: number
 ): number[] {
-  var i,
+  let i,
     retVal = [],
     binaryStringInc = blockSize >>> 5,
     state_offset = 0,
@@ -216,13 +216,14 @@ function finalizeSHA3(
 export default class jsSHA extends jsSHABase<
   Int_64[][],
   "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256"
-> {
+  > {
   intermediateState: Int_64[][];
   variantBlockSize: number;
   bigEndianMod: -1 | 1;
   outputBinLen: number;
   isSHAKE: boolean;
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
   roundFunc: (block: number[], H: Int_64[][]) => Int_64[][];
   finalizeFunc: (
@@ -277,7 +278,7 @@ export default class jsSHA extends jsSHABase<
     this.roundFunc = roundSHA3;
     this.stateCloneFunc = cloneSHA3State;
     this.newStateFunc = getNewState;
-    this.finalizeFunc = function (remainder, remainderBinLen, processedBinLen, state) {
+    this.finalizeFunc = function (remainder, remainderBinLen, processedBinLen, state): number[] {
       return finalizeSHA3(
         remainder,
         remainderBinLen,

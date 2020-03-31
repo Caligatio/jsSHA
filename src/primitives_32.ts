@@ -86,7 +86,7 @@ export function sigma0_32(x: number): number {
  * @returns The sum of a + b
  */
 export function safeAdd_32_2(a: number, b: number): number {
-  let lsw = (a & 0xffff) + (b & 0xffff),
+  const lsw = (a & 0xffff) + (b & 0xffff),
     msw = (a >>> 16) + (b >>> 16) + (lsw >>> 16);
 
   return ((msw & 0xffff) << 16) | (lsw & 0xffff);
@@ -103,7 +103,7 @@ export function safeAdd_32_2(a: number, b: number): number {
  * @returns The sum of a + b + c + d
  */
 export function safeAdd_32_4(a: number, b: number, c: number, d: number): number {
-  let lsw = (a & 0xffff) + (b & 0xffff) + (c & 0xffff) + (d & 0xffff),
+  const lsw = (a & 0xffff) + (b & 0xffff) + (c & 0xffff) + (d & 0xffff),
     msw = (a >>> 16) + (b >>> 16) + (c >>> 16) + (d >>> 16) + (lsw >>> 16);
 
   return ((msw & 0xffff) << 16) | (lsw & 0xffff);
@@ -121,7 +121,7 @@ export function safeAdd_32_4(a: number, b: number, c: number, d: number): number
  * @returns The sum of a + b + c + d + e
  */
 export function safeAdd_32_5(a: number, b: number, c: number, d: number, e: number): number {
-  let lsw = (a & 0xffff) + (b & 0xffff) + (c & 0xffff) + (d & 0xffff) + (e & 0xffff),
+  const lsw = (a & 0xffff) + (b & 0xffff) + (c & 0xffff) + (d & 0xffff) + (e & 0xffff),
     msw = (a >>> 16) + (b >>> 16) + (c >>> 16) + (d >>> 16) + (e >>> 16) + (lsw >>> 16);
 
   return ((msw & 0xffff) << 16) | (lsw & 0xffff);

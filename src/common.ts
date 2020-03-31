@@ -90,9 +90,8 @@ export function getOutputOpts(options?: {
   b64Pad?: string;
   shakeLen?: number;
 }): { outputUpper: boolean; b64Pad: string; shakeLen: number } {
-  let retVal = { outputUpper: false, b64Pad: "=", shakeLen: -1 },
-    outputOptions: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number };
-  outputOptions = options || {};
+  const retVal = { outputUpper: false, b64Pad: "=", shakeLen: -1 },
+    outputOptions: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number } = options || {};
 
   retVal["outputUpper"] = outputOptions["outputUpper"] || false;
 
@@ -143,6 +142,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
   abstract isSHAKE: boolean;
 
   /* Functions */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   abstract converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
   abstract roundFunc: (block: number[], H: StateType) => StateType;
   abstract finalizeFunc: (
@@ -165,6 +165,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     this.utfType = this.inputOptions["encoding"] || "UTF8";
     this.numRounds = this.inputOptions["numRounds"] || 1;
 
+    /* eslint-disable-next-line @typescript-eslint/ban-ts-ignore */
     // @ts-ignore - Need to use parseInt as a type-check
     if (this.numRounds !== parseInt(this.numRounds, 10) || 1 > this.numRounds) {
       throw new Error("numRounds must a integer >= 1");
@@ -186,14 +187,14 @@ export abstract class jsSHABase<StateType, VariantTypes> {
    *
    * @param srcString The string to be hashed
    */
-  update(srcString: string | ArrayBuffer | Uint8Array) {
+  update(srcString: string | ArrayBuffer | Uint8Array): void {
     let convertRet,
       chunkBinLen,
       chunkIntLen,
       chunk,
       i,
-      updateProcessedLen = 0,
-      variantBlockIntInc = this.variantBlockSize >>> 5;
+      updateProcessedLen = 0;
+    const variantBlockIntInc = this.variantBlockSize >>> 5;
 
     convertRet = this.converterFunc(srcString, this.remainder, this.remainderLen);
     chunkBinLen = convertRet["binLen"];
@@ -280,7 +281,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     key: string | ArrayBuffer | Uint8Array,
     inputFormat: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
     options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE" }
-  ) {
+  ): void {
     let keyConverterFunc,
       convertRet,
       keyBinLen,

@@ -24,6 +24,7 @@ export function getStrConverter(
   format: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
   utfType: "UTF8" | "UTF16BE" | "UTF16LE",
   bigEndianMod: -1 | 1
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ): (input: any, existingBin?: number[], existingBinLen?: number) => packedValue {
   let retVal;
 
@@ -168,20 +169,21 @@ export function getOutputConverter(
   outputBinLen: number,
   bigEndianMod: -1 | 1,
   outputOptions: { outputUpper: boolean; b64Pad: string; shakeLen: number }
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ): (binarray: number[]) => any {
   switch (format) {
     case "HEX":
-      return function (binarray) {
+      return function (binarray): string {
         return packed2hex(binarray, outputBinLen, bigEndianMod, outputOptions);
       };
       break;
     case "B64":
-      return function (binarray) {
+      return function (binarray): string {
         return packed2b64(binarray, outputBinLen, bigEndianMod, outputOptions);
       };
       break;
     case "BYTES":
-      return function (binarray) {
+      return function (binarray): string {
         return packed2bytes(binarray, outputBinLen, bigEndianMod);
       };
       break;
@@ -192,7 +194,7 @@ export function getOutputConverter(
       } catch (ignore) {
         throw new Error("ARRAYBUFFER not supported by this environment");
       }
-      return function (binarray) {
+      return function (binarray): ArrayBuffer {
         return packed2arraybuffer(binarray, outputBinLen, bigEndianMod);
       };
       break;
@@ -203,7 +205,7 @@ export function getOutputConverter(
       } catch (ignore) {
         throw new Error("UINT8ARRAY not supported by this environment");
       }
-      return function (binarray) {
+      return function (binarray): Uint8Array {
         return packed2uint8array(binarray, outputBinLen, bigEndianMod);
       };
       break;
@@ -450,12 +452,12 @@ function b642packed(
     byteOffset: number,
     shiftModifier: number;
 
-  if (-1 === str.search(/^[a-zA-Z0-9=+\/]+$/)) {
+  if (-1 === str.search(/^[a-zA-Z0-9=+/]+$/)) {
     throw new Error("Invalid character in base-64 string");
   }
 
   firstEqual = str.indexOf("=");
-  str = str.replace(/\=/g, "");
+  str = str.replace(/=/g, "");
   if (-1 !== firstEqual && firstEqual < str.length) {
     throw new Error("Invalid '=' found in base-64 string");
   }
