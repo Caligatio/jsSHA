@@ -1,13 +1,3 @@
-/**
- * @preserve A JavaScript implementation of the SHA family of hashes, as
- * defined in FIPS PUB 180-4 and FIPS PUB 202, as well as the corresponding
- * HMAC implementation as defined in FIPS PUB 198a
- *
- * Copyright 2008-2020 Brian Turek, 1998-2009 Paul Johnston & Contributors
- * Distributed under the BSD License
- * See http://caligatio.github.com/jsSHA/ for more information
- */
-
 import { getOutputOpts, TWO_PWR_32 } from "./common";
 import { packedValue, getStrConverter } from "./converters";
 import { ch_32, gamma0_32, gamma1_32, parity_32, maj_32, rotl_32, safeAdd_32_2, safeAdd_32_4, safeAdd_32_5, sigma0_32, sigma1_32 } from "./primitives_32";
@@ -644,7 +634,7 @@ function finalizeSHA3(remainder: number[], remainderBinLen: number, processedBin
  *   BYTES, ARRAYBUFFER, or UINT8ARRAY
  * @param options Optional values
  */
-var jsSHA = function (variant: "SHA-1" | "SHA-224" | "SHA-256" | "SHA-384" | "SHA-512" | "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256", inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY", options: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE", numRounds?: number }) {
+var jsSHA = function (variant: "SHA-1" | "SHA-224" | "SHA-256" | "SHA-384" | "SHA-512" | "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256", inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY", options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE", numRounds?: number }) {
   let processedLen = 0, remainder: number[] | Int_64[] = [], remainderLen = 0, utfType: "UTF8" | "UTF16BE" | "UTF16LE",
     intermediateState: number[] | Int_64[], converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue, shaVariant = variant, outputBinLen: number,
     variantBlockSize: number, roundFunc, finalizeFunc, stateCloneFunc,
