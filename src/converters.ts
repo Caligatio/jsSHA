@@ -6,6 +6,8 @@ export interface packedValue {
   binLen: number;
 }
 
+const b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
 /**
  * Function that takes an input format and UTF encoding and returns the
  * appropriate function used to convert the input.
@@ -443,7 +445,6 @@ function b642packed(
     tmpInt: number,
     strPart: string,
     firstEqual: number,
-    b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
     existingByteLen: number,
     intOffset: number,
     byteOffset: number,
@@ -577,8 +578,8 @@ export function packed2hex(
   bigEndianMod: -1 | 1,
   formatOpts: { outputUpper: boolean; b64Pad: string }
 ): string {
-  let hex_tab = "0123456789abcdef",
-    str = "",
+  const hex_tab = "0123456789abcdef";
+  let str = "",
     length = outputLength / 8,
     i: number,
     srcByte: number,
@@ -621,8 +622,7 @@ export function packed2b64(
     triplet: number,
     int1: number,
     int2: number,
-    shiftModifier: number,
-    b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    shiftModifier: number;
 
   shiftModifier = bigEndianMod === -1 ? 3 : 0;
 

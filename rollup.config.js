@@ -20,6 +20,7 @@ export default [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
         sourcemap: true,
+        compress: { inline: false },
         output: { comments: /Copyright/ },
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
       }),
