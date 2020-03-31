@@ -516,7 +516,6 @@ function arraybuffer2packed(
 /**
  * Convert an Uint8Array to an array of big-endian words
  *
- * @private
  * @param arr Uint8Array to be converted to binary
  *   representation
  * @param existingPacked A packed int array of bytes to

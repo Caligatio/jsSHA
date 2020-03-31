@@ -79,7 +79,6 @@ function shr_64(x: Int_64, n: number): Int_64 {
 /**
  * The 64-bit implementation of the NIST specified Ch function
  *
- * @private
  * @param x The first 64-bit integer argument
  * @param y The second 64-bit integer argument
  * @param z The third 64-bit integer argument
@@ -95,7 +94,6 @@ export function ch_64(x: Int_64, y: Int_64, z: Int_64): Int_64 {
 /**
  * The 64-bit implementation of the NIST specified Maj function
  *
- * @private
  * @param x The first 64-bit integer argument
  * @param y The second 64-bit integer argument
  * @param z The third 64-bit integer argument
@@ -111,7 +109,6 @@ export function maj_64(x: Int_64, y: Int_64, z: Int_64): Int_64 {
 /**
  * The 64-bit implementation of the NIST specified Sigma0 function
  *
- * @private
  * @param x The 64-bit integer argument
  * @returns The NIST specified output of the function
  */
@@ -130,7 +127,6 @@ export function sigma0_64(x: Int_64): Int_64 {
  * Add two 64-bit integers, wrapping at 2^64. This uses 16-bit operations
  * internally to work around bugs in some JS interpreters.
  *
- * @private
  * @param x The first 64-bit integer argument to be added
  * @param y The second 64-bit integer argument to be added
  * @returns The sum of x + y
@@ -153,7 +149,6 @@ export function safeAdd_64_2(x: Int_64, y: Int_64): Int_64 {
  * Add four 64-bit integers, wrapping at 2^64. This uses 16-bit operations
  * internally to work around bugs in some JS interpreters.
  *
- * @private
  * @param a The first 64-bit integer argument to be added
  * @param b The second 64-bit integer argument to be added
  * @param c The third 64-bit integer argument to be added
@@ -179,7 +174,6 @@ export function safeAdd_64_4(a: Int_64, b: Int_64, c: Int_64, d: Int_64): Int_64
  * Add five 64-bit integers, wrapping at 2^64. This uses 16-bit operations
  * internally to work around bugs in some JS interpreters.
  *
- * @private
  * @param a The first 64-bit integer argument to be added
  * @param b The second 64-bit integer argument to be added
  * @param c The third 64-bit integer argument to be added
@@ -227,7 +221,6 @@ export function safeAdd_64_5(a: Int_64, b: Int_64, c: Int_64, d: Int_64, e: Int_
 /**
  * XORs two given arguments.
  *
- * @private
  * @param a First argument to be XORed
  * @param b Second argument to be XORed
  * @returns The XOR of the arguments
@@ -239,7 +232,6 @@ export function xor_64_2(a: Int_64, b: Int_64): Int_64 {
 /**
  * XORs five given arguments.
  *
- * @private
  * @param a First argument to be XORed
  * @param b Second argument to be XORed
  * @param c Third argument to be XORed
@@ -257,7 +249,6 @@ export function xor_64_5(a: Int_64, b: Int_64, c: Int_64, d: Int_64, e: Int_64):
 /**
  * The 64-bit implementation of the NIST specified Gamma1 function
  *
- * @private
  * @param x The 64-bit integer argument
  * @returns The NIST specified output of the function
  */
@@ -275,7 +266,6 @@ export function gamma1_64(x: Int_64): Int_64 {
 /**
  * The 64-bit implementation of the NIST specified Gamma0 function
  *
- * @private
  * @param x The 64-bit integer argument
  * @returns The NIST specified output of the function
  */
@@ -293,7 +283,6 @@ export function gamma0_64(x: Int_64): Int_64 {
 /**
  * The 64-bit implementation of the NIST specified Sigma1 function
  *
- * @private
  * @param x The 64-bit integer argument
  * @returns The NIST specified output of the function
  */

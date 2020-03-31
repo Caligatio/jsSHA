@@ -1,7 +1,6 @@
 /**
  * The 32-bit implementation of circular rotate left
  *
- * @private
  * @param x The 32-bit integer argument
  * @param n The number of bits to shift
  * @returns The x shifted circularly by n bits
@@ -13,7 +12,6 @@ export function rotl_32(x: number, n: number): number {
 /**
  * The 32-bit implementation of circular rotate right
  *
- * @private
  * @param x The 32-bit integer argument
  * @param n The number of bits to shift
  * @returns The x shifted circularly by n bits
@@ -25,7 +23,6 @@ function rotr_32(x: number, n: number): number {
 /**
  * The 32-bit implementation of shift right
  *
- * @private
  * @param x The 32-bit integer argument
  * @param n The number of bits to shift
  * @returns The x shifted by n bits
@@ -37,7 +34,6 @@ function shr_32(x: number, n: number): number {
 /**
  * The 32-bit implementation of the NIST specified Parity function
  *
- * @private
  * @param x The first 32-bit integer argument
  * @param y The second 32-bit integer argument
  * @param z The third 32-bit integer argument
@@ -50,7 +46,6 @@ export function parity_32(x: number, y: number, z: number): number {
 /**
  * The 32-bit implementation of the NIST specified Ch function
  *
- * @private
  * @param x The first 32-bit integer argument
  * @param y The second 32-bit integer argument
  * @param z The third 32-bit integer argument
@@ -63,7 +58,6 @@ export function ch_32(x: number, y: number, z: number): number {
 /**
  * The 32-bit implementation of the NIST specified Maj function
  *
- * @private
  * @param x The first 32-bit integer argument
  * @param y The second 32-bit integer argument
  * @param z The third 32-bit integer argument
@@ -76,7 +70,6 @@ export function maj_32(x: number, y: number, z: number): number {
 /**
  * The 32-bit implementation of the NIST specified Sigma0 function
  *
- * @private
  * @param x The 32-bit integer argument
  * @returns The NIST specified output of the function
  */
@@ -88,7 +81,6 @@ export function sigma0_32(x: number): number {
  * Add two 32-bit integers, wrapping at 2^32. This uses 16-bit operations
  * internally to work around bugs in some JS interpreters.
  *
- * @private
  * @param a The first 32-bit integer argument to be added
  * @param b The second 32-bit integer argument to be added
  * @returns The sum of a + b
@@ -104,7 +96,6 @@ export function safeAdd_32_2(a: number, b: number): number {
  * Add four 32-bit integers, wrapping at 2^32. This uses 16-bit operations
  * internally to work around bugs in some JS interpreters.
  *
- * @private
  * @param a The first 32-bit integer argument to be added
  * @param b The second 32-bit integer argument to be added
  * @param c The third 32-bit integer argument to be added
@@ -122,7 +113,6 @@ export function safeAdd_32_4(a: number, b: number, c: number, d: number): number
  * Add five 32-bit integers, wrapping at 2^32. This uses 16-bit operations
  * internally to work around bugs in some JS interpreters.
  *
- * @private
  * @param a The first 32-bit integer argument to be added
  * @param b The second 32-bit integer argument to be added
  * @param c The third 32-bit integer argument to be added
@@ -140,7 +130,6 @@ export function safeAdd_32_5(a: number, b: number, c: number, d: number, e: numb
 /**
  * The 32-bit implementation of the NIST specified Gamma1 function
  *
- * @private
  * @param x The 32-bit integer argument
  * @returns The NIST specified output of the function
  */
@@ -151,7 +140,6 @@ export function gamma1_32(x: number): number {
 /**
  * The 32-bit implementation of the NIST specified Gamma0 function
  *
- * @private
  * @param x The 32-bit integer argument
  * @returns The NIST specified output of the function
  */
@@ -162,7 +150,6 @@ export function gamma0_32(x: number): number {
 /**
  * The 32-bit implementation of the NIST specified Sigma1 function
  *
- * @private
  * @param x The 32-bit integer argument
  * @returns The NIST specified output of the function
  */
