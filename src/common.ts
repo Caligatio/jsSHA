@@ -9,7 +9,7 @@ export const TWO_PWR_32 = 4294967296;
  * @returns Validated
  *   hash list containing output formatting options
  */
-export function getOutputOpts(options: {
+export function getOutputOpts(options?: {
   outputUpper?: boolean;
   b64Pad?: string;
   shakeLen?: number;
