@@ -1,10 +1,11 @@
-import { getOutputOpts, TWO_PWR_32 } from "./common";
-import { packedValue, getStrConverter, getOutputConverter } from "./converters";
+import { jsSHABase, TWO_PWR_32 } from "./common";
+import { packedValue, getStrConverter } from "./converters";
 import { ch_32, parity_32, maj_32, rotl_32, safeAdd_32_2, safeAdd_32_5 } from "./primitives_32";
 
 /**
  * Gets the state values for the specified SHA variant
  *
+ * @param _variant: Unused
  * @returns The initial state values
  */
 function getNewState(_variant: "SHA-1"): number[] {
@@ -14,12 +15,11 @@ function getNewState(_variant: "SHA-1"): number[] {
 /**
  * Performs a round of SHA-1 hashing over a 512-byte block
  *
- * @private
  * @param block The binary array representation of the
  *   block to hash
  * @param H The intermediate H values from a previous
  *   round
- * @return The resulting H values
+ * @returns The resulting H values
  */
 function roundSHA1(block: number[], H: number[]): number[] {
   let W: number[] = [],
@@ -86,17 +86,10 @@ function roundSHA1(block: number[], H: number[]): number[] {
  *   processed
  * @param H The intermediate H values from a previous
  *   round
- * @param outputLen Unused for this variant
- * @return The array of integers representing the SHA-1
+ * @returns The array of integers representing the SHA-1
  *   hash of message
  */
-function finalizeSHA1(
-  remainder: number[],
-  remainderBinLen: number,
-  processedBinLen: number,
-  H: number[],
-  _outputLen: number
-): number[] {
+function finalizeSHA1(remainder: number[], remainderBinLen: number, processedBinLen: number, H: number[]): number[] {
   let i: number, appendedMessageLength: number, offset: number, totalLen: number;
 
   /* The 65 addition is a hack but it works.  The correct number is
@@ -130,254 +123,40 @@ function finalizeSHA1(
   return H;
 }
 
-export default class jsSHA {
-  shaVariant: "SHA-1";
-  inputOptions: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number };
-  utfType: "UTF8" | "UTF16BE" | "UTF16LE";
-  numRounds: number;
+export default class jsSHA extends jsSHABase<number[], "SHA-1"> {
   intermediateState: number[];
-  keyWithIPad: number[];
-  keyWithOPad: number[];
-  converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
-  remainder: number[];
-  remainderLen: number;
   variantBlockSize: number;
-  updatedCalled: boolean;
-  processedLen: number;
-  roundFunc: (block: number[], H: number[]) => number[];
-  finalizeFunc: (
-    remainder: number[],
-    remainderBinLen: number,
-    processedBinLen: number,
-    H: number[],
-    _outputLen: number
-  ) => number[];
-  stateCloneFunc: (state: number[]) => number[];
-  outputBinLen: number;
   bigEndianMod: -1 | 1;
-  hmacKeySet: boolean;
+  outputBinLen: number;
+
+  converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
+  roundFunc: (block: number[], H: number[]) => number[];
+  finalizeFunc: (remainder: number[], remainderBinLen: number, processedBinLen: number, H: number[]) => number[];
+  stateCloneFunc: (state: number[]) => number[];
+  newStateFunc: (variant: "SHA-1") => number[];
 
   constructor(
     variant: "SHA-1",
     inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
     options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
   ) {
-    this.inputOptions = options || {};
-    this.utfType = this.inputOptions["encoding"] || "UTF8";
-    this.numRounds = this.inputOptions["numRounds"] || 1;
-
     if ("SHA-1" !== variant) {
       throw new Error("Chosen SHA variant is not supported");
     }
 
-    // @ts-ignore - Need to use parseInt as a type-check
-    if (this.numRounds !== parseInt(this.numRounds, 10) || 1 > this.numRounds) {
-      throw new Error("numRounds must a integer >= 1");
-    }
+    super(variant, inputFormat, options);
 
-    this.shaVariant = variant;
-    this.intermediateState = getNewState(variant);
     this.converterFunc = getStrConverter(inputFormat, this.utfType, -1);
-    this.remainder = [];
-    this.remainderLen = 0;
-    this.variantBlockSize = 512;
-    this.updatedCalled = false;
-    this.processedLen = 0;
     this.roundFunc = roundSHA1;
     this.stateCloneFunc = function (state: number[]): number[] {
       return state.slice();
     };
+    this.newStateFunc = getNewState;
     this.finalizeFunc = finalizeSHA1;
+
+    this.intermediateState = getNewState(variant);
+    this.variantBlockSize = 512;
     this.outputBinLen = 160;
     this.bigEndianMod = -1;
-    this.hmacKeySet = false;
-    this.keyWithIPad = [];
-    this.keyWithOPad = [];
   }
-
-  /**
-   * Takes strString and hashes as many blocks as possible.  Stores the
-   * rest for either a future update or getHash call.
-   *
-   * @param srcString The string to be hashed
-   */
-  update(srcString: string | ArrayBuffer | Uint8Array) {
-    let convertRet,
-      chunkBinLen,
-      chunkIntLen,
-      chunk,
-      i,
-      updateProcessedLen = 0,
-      variantBlockIntInc = this.variantBlockSize >>> 5;
-
-    convertRet = this.converterFunc(srcString, this.remainder, this.remainderLen);
-    chunkBinLen = convertRet["binLen"];
-    chunk = convertRet["value"];
-
-    chunkIntLen = chunkBinLen >>> 5;
-    for (i = 0; i < chunkIntLen; i += variantBlockIntInc) {
-      if (updateProcessedLen + this.variantBlockSize <= chunkBinLen) {
-        this.intermediateState = this.roundFunc(chunk.slice(i, i + variantBlockIntInc), this.intermediateState);
-        updateProcessedLen += this.variantBlockSize;
-      }
-    }
-    this.processedLen += updateProcessedLen;
-    this.remainder = chunk.slice(updateProcessedLen >>> 5);
-    this.remainderLen = chunkBinLen % this.variantBlockSize;
-    this.updatedCalled = true;
-  }
-
-  /**
-   * Returns the desired SHA hash of the string specified at instantiation
-   * using the specified parameters
-   *
-   * @param format The desired output formatting (B64, HEX,
-   *   BYTES, ARRAYBUFFER, or UINT8ARRAY)
-   * @param options Hash list of output formatting options
-   * @return {string|ArrayBuffer|Uint8Array} The string representation of the hash
-   *   in the format specified.
-   */
-  getHash(
-    format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-    options?: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number }
-  ): string | ArrayBuffer | Uint8Array {
-    let formatFunc, i, outputOptions: { outputUpper: boolean; b64Pad: string; shakeLen: number }, finalizedState;
-
-    if (true === this.hmacKeySet) {
-      throw new Error("Cannot call getHash after setting HMAC key");
-    }
-
-    outputOptions = getOutputOpts(options);
-    formatFunc = getOutputConverter(format, this.outputBinLen, this.bigEndianMod, outputOptions);
-
-    finalizedState = this.finalizeFunc(
-      this.remainder.slice(),
-      this.remainderLen,
-      this.processedLen,
-      this.stateCloneFunc(this.intermediateState),
-      this.outputBinLen
-    );
-    for (i = 1; i < this.numRounds; i += 1) {
-      finalizedState = this.finalizeFunc(
-        finalizedState,
-        this.outputBinLen,
-        0,
-        getNewState(this.shaVariant),
-        this.outputBinLen
-      );
-    }
-
-    return formatFunc(finalizedState);
-  }
-
-  /**
-   * Sets the HMAC key for an eventual getHMAC call.  Must be called
-   * immediately after jsSHA object instantiation
-   *
-   * @expose
-   * @param {string|ArrayBuffer|Uint8Array} key The key used to calculate the HMAC
-   * @param {string} inputFormat The format of key, HEX, TEXT, B64, BYTES,
-   *   ARRAYBUFFER, or UINT8ARRAY
-   * @param {{encoding : (string|undefined)}=} options Associative array
-   *   of input format options
-   */
-  setHMACKey(
-    key: string | ArrayBuffer | Uint8Array,
-    inputFormat: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-    options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE" }
-  ) {
-    let keyConverterFunc,
-      convertRet,
-      keyBinLen,
-      keyToUse,
-      blockByteSize,
-      i,
-      lastArrayIndex,
-      keyOptions,
-      utfType: "UTF8" | "UTF16BE" | "UTF16LE";
-
-    if (true === this.hmacKeySet) {
-      throw new Error("HMAC key already set");
-    }
-
-    if (true === this.updatedCalled) {
-      throw new Error("Cannot set HMAC key after calling update");
-    }
-
-    keyOptions = options || {};
-    utfType = keyOptions["encoding"] || "UTF8";
-
-    keyConverterFunc = getStrConverter(inputFormat, utfType, this.bigEndianMod);
-
-    convertRet = keyConverterFunc(key);
-    keyBinLen = convertRet["binLen"];
-    keyToUse = convertRet["value"];
-
-    blockByteSize = this.variantBlockSize >>> 3;
-
-    /* These are used multiple times, calculate and store them */
-    lastArrayIndex = blockByteSize / 4 - 1;
-
-    /* Figure out what to do with the key based on its size relative to
-     * the hash's block size */
-    if (blockByteSize < keyBinLen / 8) {
-      keyToUse = this.finalizeFunc(keyToUse, keyBinLen, 0, getNewState(this.shaVariant), this.outputBinLen);
-      /* For all variants, the block size is bigger than the output
-       * size so there will never be a useful byte at the end of the
-       * string */
-      while (keyToUse.length <= lastArrayIndex) {
-        keyToUse.push(0);
-      }
-      keyToUse[lastArrayIndex] &= 0xffffff00;
-    } else if (blockByteSize > keyBinLen / 8) {
-      /* If the blockByteSize is greater than the key length, there
-       * will always be at LEAST one "useless" byte at the end of the
-       * string */
-      while (keyToUse.length <= lastArrayIndex) {
-        keyToUse.push(0);
-      }
-      keyToUse[lastArrayIndex] &= 0xffffff00;
-    }
-
-    /* Create ipad and opad */
-    for (i = 0; i <= lastArrayIndex; i += 1) {
-      this.keyWithIPad[i] = keyToUse[i] ^ 0x36363636;
-      this.keyWithOPad[i] = keyToUse[i] ^ 0x5c5c5c5c;
-    }
-
-    this.intermediateState = this.roundFunc(this.keyWithIPad, this.intermediateState);
-    this.processedLen = this.variantBlockSize;
-
-    this.hmacKeySet = true;
-  }
-
-  /**
- * Returns the the HMAC in the specified format using the key given by
- * a previous setHMACKey call.
- *
- * @param {string} format The desired output formatting
- *   (B64, HEX, BYTES, ARRAYBUFFER, or UINT8ARRAY)
- * @param {{outputUpper : (boolean|undefined), b64Pad : (string|undefined),
-  *   shakeLen : (number|undefined)}=} options associative array of output
-  *   formatting options
-  * @return {string|ArrayBuffer|Uint8Array} The string representation of the hash in the
-  *   format specified.
-  */
-  getHMAC(format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY", options?: { outputUpper?: boolean, b64Pad?: string, shakeLen?: number }): string | ArrayBuffer | Uint8Array {
-    let formatFunc, firstHash, outputOptions, finalizedState;
-
-    if (false === this.hmacKeySet) {
-      throw new Error("Cannot call getHMAC without first setting HMAC key");
-    }
-
-    outputOptions = getOutputOpts(options);
-    formatFunc = getOutputConverter(format, this.outputBinLen, this.bigEndianMod, outputOptions);
-
-    firstHash = this.finalizeFunc(this.remainder.slice(), this.remainderLen, this.processedLen, this.stateCloneFunc(this.intermediateState), this.outputBinLen);
-    finalizedState = this.roundFunc(this.keyWithOPad, getNewState(this.shaVariant));
-    finalizedState = this.finalizeFunc(firstHash, this.outputBinLen, this.variantBlockSize, finalizedState, this.outputBinLen);
-
-    return formatFunc(finalizedState);
-  };
-
 }
