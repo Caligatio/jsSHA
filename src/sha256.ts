@@ -1,4 +1,4 @@
-import { jsSHABase, TWO_PWR_32, H_trunc, H_full, K_sha2 } from "./common";
+import { jsSHABase, TWO_PWR_32, H_full, H_trunc, K_sha2 } from "./common";
 import { packedValue, getStrConverter } from "./converters";
 import {
   ch_32,
@@ -23,10 +23,10 @@ function getNewState256(variant: "SHA-224" | "SHA-256"): number[] {
 
   switch (variant) {
     case "SHA-224":
-      return H_trunc;
+      retVal = H_trunc.slice();
       break;
     case "SHA-256":
-      return H_full;
+      retVal = H_full.slice();
       break;
     default:
       throw new Error("No SHA variants supported");
@@ -174,6 +174,7 @@ export default class jsSHA extends jsSHABase<number[], "SHA-224" | "SHA-256"> {
   variantBlockSize: number;
   bigEndianMod: -1 | 1;
   outputBinLen: number;
+  isSHAKE: boolean;
 
   converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
   roundFunc: (block: number[], H: number[]) => number[];
@@ -192,7 +193,8 @@ export default class jsSHA extends jsSHABase<number[], "SHA-224" | "SHA-256"> {
       throw new Error("Chosen SHA variant is not supported");
     }
 
-    this.converterFunc = getStrConverter(inputFormat, this.utfType, -1);
+    this.bigEndianMod = -1;
+    this.converterFunc = getStrConverter(inputFormat, this.utfType, this.bigEndianMod);
     this.roundFunc = roundSHA256;
     this.stateCloneFunc = function (state) {
       return state.slice();
@@ -204,7 +206,7 @@ export default class jsSHA extends jsSHABase<number[], "SHA-224" | "SHA-256"> {
 
     this.intermediateState = getNewState256(variant);
     this.variantBlockSize = 512;
-    this.outputBinLen = 160;
-    this.bigEndianMod = -1;
+    this.outputBinLen = ("SHA-224" === variant) ? 224 : 256;
+    this.isSHAKE = false;
   }
 }

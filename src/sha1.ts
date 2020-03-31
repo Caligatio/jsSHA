@@ -128,6 +128,7 @@ export default class jsSHA extends jsSHABase<number[], "SHA-1"> {
   variantBlockSize: number;
   bigEndianMod: -1 | 1;
   outputBinLen: number;
+  isSHAKE: boolean;
 
   converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
   roundFunc: (block: number[], H: number[]) => number[];
@@ -146,7 +147,8 @@ export default class jsSHA extends jsSHABase<number[], "SHA-1"> {
 
     super(variant, inputFormat, options);
 
-    this.converterFunc = getStrConverter(inputFormat, this.utfType, -1);
+    this.bigEndianMod = -1;
+    this.converterFunc = getStrConverter(inputFormat, this.utfType, this.bigEndianMod);
     this.roundFunc = roundSHA1;
     this.stateCloneFunc = function (state: number[]): number[] {
       return state.slice();
@@ -157,6 +159,6 @@ export default class jsSHA extends jsSHABase<number[], "SHA-1"> {
     this.intermediateState = getNewState(variant);
     this.variantBlockSize = 512;
     this.outputBinLen = 160;
-    this.bigEndianMod = -1;
+    this.isSHAKE = false;
   }
 }

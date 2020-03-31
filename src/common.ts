@@ -76,6 +76,7 @@ export const H_trunc = [0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939, 0xffc00b
 /* Constant used in SHA-2 families */
 export const H_full = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
 
+export const sha_variant_error = "Chosen SHA variant is not supported";
 /**
  * Validate hash list containing output formatting options, ensuring
  * presence of every option or adding the default value
@@ -88,9 +89,9 @@ export function getOutputOpts(options?: {
   outputUpper?: boolean;
   b64Pad?: string;
   shakeLen?: number;
-}): { outputUpper: boolean; b64Pad: string; shakeLen: number; } {
+}): { outputUpper: boolean; b64Pad: string; shakeLen: number } {
   let retVal = { outputUpper: false, b64Pad: "=", shakeLen: -1 },
-    outputOptions: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number; };
+    outputOptions: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number };
   outputOptions = options || {};
 
   retVal["outputUpper"] = outputOptions["outputUpper"] || false;
@@ -120,7 +121,7 @@ export function getOutputOpts(options?: {
 export abstract class jsSHABase<StateType, VariantTypes> {
   /* Needed inputs */
   shaVariant: VariantTypes;
-  inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY"
+  inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY";
   inputOptions: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number };
   utfType: "UTF8" | "UTF16BE" | "UTF16LE";
   numRounds: number;
@@ -139,6 +140,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
   abstract variantBlockSize: number;
   abstract bigEndianMod: -1 | 1;
   abstract outputBinLen: number;
+  abstract isSHAKE: boolean;
 
   /* Functions */
   abstract converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
@@ -158,7 +160,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
     options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
   ) {
-    this.inputFormat = inputFormat
+    this.inputFormat = inputFormat;
     this.inputOptions = options || {};
     this.utfType = this.inputOptions["encoding"] || "UTF8";
     this.numRounds = this.inputOptions["numRounds"] || 1;
@@ -217,7 +219,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
    * @param format The desired output formatting (B64, HEX,
    *   BYTES, ARRAYBUFFER, or UINT8ARRAY)
    * @param options Hash list of output formatting options
-   * @return The string representation of the hash
+   * @returns The string representation of the hash
    *   in the format specified.
    */
   getHash(
@@ -231,6 +233,14 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     }
 
     outputOptions = getOutputOpts(options);
+
+    if (this.isSHAKE === true) {
+      if (outputOptions["shakeLen"] === -1) {
+        throw new Error("shakeLen must be specified in options");
+      }
+      this.outputBinLen = outputOptions["shakeLen"];
+    }
+
     formatFunc = getOutputConverter(format, this.outputBinLen, this.bigEndianMod, outputOptions);
 
     finalizedState = this.finalizeFunc(
@@ -241,6 +251,9 @@ export abstract class jsSHABase<StateType, VariantTypes> {
       this.outputBinLen
     );
     for (i = 1; i < this.numRounds; i += 1) {
+      if (this.isSHAKE === true && this.outputBinLen % 32 !== 0) {
+        finalizedState[finalizedState.length - 1] &= 0x00ffffff >>> (24 - (this.outputBinLen % 32));
+      }
       finalizedState = this.finalizeFunc(
         finalizedState,
         this.outputBinLen,
@@ -284,6 +297,10 @@ export abstract class jsSHABase<StateType, VariantTypes> {
 
     if (true === this.updatedCalled) {
       throw new Error("Cannot set HMAC key after calling update");
+    }
+
+    if (this.isSHAKE === true) {
+      throw new Error("SHAKE is not supported for HMAC");
     }
 
     keyOptions = options || {};
@@ -334,17 +351,20 @@ export abstract class jsSHABase<StateType, VariantTypes> {
   }
 
   /**
- * Returns the the HMAC in the specified format using the key given by
- * a previous setHMACKey call.
- *
- * @param format The desired output formatting
- *   (B64, HEX, BYTES, ARRAYBUFFER, or UINT8ARRAY)
- * @param options associative array of output
-  *   formatting options
-  * @return The string representation of the hash in the
-  *   format specified.
-  */
-  getHMAC(format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY", options?: { outputUpper?: boolean, b64Pad?: string, shakeLen?: number }): string | ArrayBuffer | Uint8Array {
+   * Returns the the HMAC in the specified format using the key given by
+   * a previous setHMACKey call.
+   *
+   * @param format The desired output formatting
+   *   (B64, HEX, BYTES, ARRAYBUFFER, or UINT8ARRAY)
+   * @param options associative array of output
+   *   formatting options
+   * @returns The string representation of the hash in the
+   *   format specified.
+   */
+  getHMAC(
+    format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
+    options?: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number }
+  ): string | ArrayBuffer | Uint8Array {
     let formatFunc, firstHash, outputOptions, finalizedState;
 
     if (false === this.hmacKeySet) {
@@ -354,11 +374,22 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     outputOptions = getOutputOpts(options);
     formatFunc = getOutputConverter(format, this.outputBinLen, this.bigEndianMod, outputOptions);
 
-    firstHash = this.finalizeFunc(this.remainder.slice(), this.remainderLen, this.processedLen, this.stateCloneFunc(this.intermediateState), this.outputBinLen);
+    firstHash = this.finalizeFunc(
+      this.remainder.slice(),
+      this.remainderLen,
+      this.processedLen,
+      this.stateCloneFunc(this.intermediateState),
+      this.outputBinLen
+    );
     finalizedState = this.roundFunc(this.keyWithOPad, this.newStateFunc(this.shaVariant));
-    finalizedState = this.finalizeFunc(firstHash, this.outputBinLen, this.variantBlockSize, finalizedState, this.outputBinLen);
+    finalizedState = this.finalizeFunc(
+      firstHash,
+      this.outputBinLen,
+      this.variantBlockSize,
+      finalizedState,
+      this.outputBinLen
+    );
 
     return formatFunc(finalizedState);
-  };
-
+  }
 }

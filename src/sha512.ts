@@ -146,7 +146,7 @@ function getNewState512(variant: "SHA-384" | "SHA-512"): Int_64[] {
  * @param variant The desired SHA-512 variant
  * @returns The resulting H values
  */
-function roundSHA2(block: number[], H: Int_64[]): Int_64[] {
+function roundSHA512(block: number[], H: Int_64[]): Int_64[] {
   let a,
     b,
     c,
@@ -188,7 +188,6 @@ function roundSHA2(block: number[], H: Int_64[]): Int_64[] {
     } else {
       W[t] = safeAdd_64_4(gamma1_64(W[t - 2]), W[t - 7], gamma0_64(W[t - 15]), W[t - 16]);
     }
-
     T1 = safeAdd_64_5(h, sigma1_64(e), ch_64(e, f, g), K_sha512[t], W[t]);
     T2 = safeAdd_64_2(sigma0_64(a), maj_64(a, b, c));
     h = g;
@@ -261,7 +260,7 @@ function finalizeSHA512(
 
   /* This will always be at least 1 full chunk */
   for (i = 0; i < appendedMessageLength; i += binaryStringInc) {
-    H = roundSHA2(remainder.slice(i, i + binaryStringInc), H);
+    H = roundSHA512(remainder.slice(i, i + binaryStringInc), H);
   }
 
   if ("SHA-384" === variant) {
@@ -311,6 +310,7 @@ export default class jsSHA extends jsSHABase<Int_64[], "SHA-384" | "SHA-512"> {
   variantBlockSize: number;
   bigEndianMod: -1 | 1;
   outputBinLen: number;
+  isSHAKE: boolean;
 
   converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
   roundFunc: (block: number[], H: Int_64[]) => Int_64[];
@@ -329,8 +329,9 @@ export default class jsSHA extends jsSHABase<Int_64[], "SHA-384" | "SHA-512"> {
       throw new Error("Chosen SHA variant is not supported");
     }
 
-    this.converterFunc = getStrConverter(inputFormat, this.utfType, -1);
-    this.roundFunc = roundSHA2;
+    this.bigEndianMod = -1;
+    this.converterFunc = getStrConverter(inputFormat, this.utfType, this.bigEndianMod);
+    this.roundFunc = roundSHA512;
     this.stateCloneFunc = function (state) {
       return state.slice();
     };
@@ -342,6 +343,6 @@ export default class jsSHA extends jsSHABase<Int_64[], "SHA-384" | "SHA-512"> {
     this.intermediateState = getNewState512(variant);
     this.variantBlockSize = 1024;
     this.outputBinLen = "SHA-384" === variant ? 384 : 512;
-    this.bigEndianMod = -1;
+    this.isSHAKE = false;
   }
 }
