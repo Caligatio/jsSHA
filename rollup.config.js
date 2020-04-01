@@ -31,14 +31,12 @@ export default [
       name: "jsSHA",
       banner: licenseHeader,
       format: "umd",
-      sourcemap: true,
       dir: "dist",
       entryFileNames: "[name].umd.js"
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
-        sourcemap: true,
         compress: { inline: false },
         output: { comments: /BSD/ },
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
@@ -51,14 +49,12 @@ export default [
       name: "jsSHA",
       banner: licenseHeader,
       format: "umd",
-      sourcemap: true,
       dir: "dist",
       entryFileNames: "[name].umd.js"
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
-        sourcemap: true,
         compress: { inline: false },
         output: { comments: /BSD/ },
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
@@ -71,14 +67,12 @@ export default [
       name: "jsSHA",
       banner: licenseHeader,
       format: "umd",
-      sourcemap: true,
       dir: "dist",
       entryFileNames: "[name].umd.js"
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
-        sourcemap: true,
         compress: { inline: false },
         output: { comments: /BSD/ },
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
@@ -91,14 +85,12 @@ export default [
       name: "jsSHA",
       banner: licenseHeader,
       format: "umd",
-      sourcemap: true,
       dir: "dist",
       entryFileNames: "[name].umd.js"
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
-        sourcemap: true,
         compress: { inline: false },
         output: { comments: /BSD/ },
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
