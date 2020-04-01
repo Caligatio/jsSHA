@@ -65,7 +65,8 @@
     },
     "scripts": {
         "build": "rollup -c",
-        "test": "mocha"
+        "test": "mocha",
+        "coverage": "nyc mocha"
     },
     "mocha": {
         "spec": "test/*.ts",
