@@ -39,18 +39,17 @@ export function rotl_64(x: Int_64, n: number): Int_64 {
  * @returns The x shifted circularly by n bits
  */
 function rotr_64(x: Int_64, n: number): Int_64 {
-  let retVal: Int_64,
-    tmp = new Int_64(x.highOrder, x.lowOrder);
+  let retVal: Int_64;
 
   if (32 >= n) {
     retVal = new Int_64(
-      (tmp.highOrder >>> n) | ((tmp.lowOrder << (32 - n)) & 0xffffffff),
-      (tmp.lowOrder >>> n) | ((tmp.highOrder << (32 - n)) & 0xffffffff)
+      (x.highOrder >>> n) | ((x.lowOrder << (32 - n)) & 0xffffffff),
+      (x.lowOrder >>> n) | ((x.highOrder << (32 - n)) & 0xffffffff)
     );
   } else {
     retVal = new Int_64(
-      (tmp.lowOrder >>> (n - 32)) | ((tmp.highOrder << (64 - n)) & 0xffffffff),
-      (tmp.highOrder >>> (n - 32)) | ((tmp.lowOrder << (64 - n)) & 0xffffffff)
+      (x.lowOrder >>> (n - 32)) | ((x.highOrder << (64 - n)) & 0xffffffff),
+      (x.highOrder >>> (n - 32)) | ((x.lowOrder << (64 - n)) & 0xffffffff)
     );
   }
 
@@ -113,7 +112,7 @@ export function maj_64(x: Int_64, y: Int_64, z: Int_64): Int_64 {
  * @returns The NIST specified output of the function
  */
 export function sigma0_64(x: Int_64): Int_64 {
-  let rotr28 = rotr_64(x, 28),
+  const rotr28 = rotr_64(x, 28),
     rotr34 = rotr_64(x, 34),
     rotr39 = rotr_64(x, 39);
 
@@ -132,15 +131,15 @@ export function sigma0_64(x: Int_64): Int_64 {
  * @returns The sum of x + y
  */
 export function safeAdd_64_2(x: Int_64, y: Int_64): Int_64 {
-  let lsw: number, msw: number, lowOrder: number, highOrder: number;
+  let lsw, msw;
 
   lsw = (x.lowOrder & 0xffff) + (y.lowOrder & 0xffff);
   msw = (x.lowOrder >>> 16) + (y.lowOrder >>> 16) + (lsw >>> 16);
-  lowOrder = ((msw & 0xffff) << 16) | (lsw & 0xffff);
+  const lowOrder = ((msw & 0xffff) << 16) | (lsw & 0xffff);
 
   lsw = (x.highOrder & 0xffff) + (y.highOrder & 0xffff) + (msw >>> 16);
   msw = (x.highOrder >>> 16) + (y.highOrder >>> 16) + (lsw >>> 16);
-  highOrder = ((msw & 0xffff) << 16) | (lsw & 0xffff);
+  const highOrder = ((msw & 0xffff) << 16) | (lsw & 0xffff);
 
   return new Int_64(highOrder, lowOrder);
 }
@@ -156,16 +155,16 @@ export function safeAdd_64_2(x: Int_64, y: Int_64): Int_64 {
  * @returns The sum of a + b + c + d
  */
 export function safeAdd_64_4(a: Int_64, b: Int_64, c: Int_64, d: Int_64): Int_64 {
-  let lsw: number, msw: number, lowOrder: number, highOrder: number;
+  let lsw, msw;
 
   lsw = (a.lowOrder & 0xffff) + (b.lowOrder & 0xffff) + (c.lowOrder & 0xffff) + (d.lowOrder & 0xffff);
   msw = (a.lowOrder >>> 16) + (b.lowOrder >>> 16) + (c.lowOrder >>> 16) + (d.lowOrder >>> 16) + (lsw >>> 16);
-  lowOrder = ((msw & 0xffff) << 16) | (lsw & 0xffff);
+  const lowOrder = ((msw & 0xffff) << 16) | (lsw & 0xffff);
 
   lsw =
     (a.highOrder & 0xffff) + (b.highOrder & 0xffff) + (c.highOrder & 0xffff) + (d.highOrder & 0xffff) + (msw >>> 16);
   msw = (a.highOrder >>> 16) + (b.highOrder >>> 16) + (c.highOrder >>> 16) + (d.highOrder >>> 16) + (lsw >>> 16);
-  highOrder = ((msw & 0xffff) << 16) | (lsw & 0xffff);
+  const highOrder = ((msw & 0xffff) << 16) | (lsw & 0xffff);
 
   return new Int_64(highOrder, lowOrder);
 }
@@ -182,7 +181,7 @@ export function safeAdd_64_4(a: Int_64, b: Int_64, c: Int_64, d: Int_64): Int_64
  * @returns The sum of a + b + c + d + e
  */
 export function safeAdd_64_5(a: Int_64, b: Int_64, c: Int_64, d: Int_64, e: Int_64): Int_64 {
-  let lsw: number, msw: number, lowOrder: number, highOrder: number;
+  let lsw, msw;
 
   lsw =
     (a.lowOrder & 0xffff) +
@@ -197,7 +196,7 @@ export function safeAdd_64_5(a: Int_64, b: Int_64, c: Int_64, d: Int_64, e: Int_
     (d.lowOrder >>> 16) +
     (e.lowOrder >>> 16) +
     (lsw >>> 16);
-  lowOrder = ((msw & 0xffff) << 16) | (lsw & 0xffff);
+  const lowOrder = ((msw & 0xffff) << 16) | (lsw & 0xffff);
 
   lsw =
     (a.highOrder & 0xffff) +
@@ -213,7 +212,7 @@ export function safeAdd_64_5(a: Int_64, b: Int_64, c: Int_64, d: Int_64, e: Int_
     (d.highOrder >>> 16) +
     (e.highOrder >>> 16) +
     (lsw >>> 16);
-  highOrder = ((msw & 0xffff) << 16) | (lsw & 0xffff);
+  const highOrder = ((msw & 0xffff) << 16) | (lsw & 0xffff);
 
   return new Int_64(highOrder, lowOrder);
 }
@@ -253,7 +252,7 @@ export function xor_64_5(a: Int_64, b: Int_64, c: Int_64, d: Int_64, e: Int_64):
  * @returns The NIST specified output of the function
  */
 export function gamma1_64(x: Int_64): Int_64 {
-  let rotr19 = rotr_64(x, 19),
+  const rotr19 = rotr_64(x, 19),
     rotr61 = rotr_64(x, 61),
     shr6 = shr_64(x, 6);
 
@@ -270,7 +269,7 @@ export function gamma1_64(x: Int_64): Int_64 {
  * @returns The NIST specified output of the function
  */
 export function gamma0_64(x: Int_64): Int_64 {
-  let rotr1 = rotr_64(x, 1),
+  const rotr1 = rotr_64(x, 1),
     rotr8 = rotr_64(x, 8),
     shr7 = shr_64(x, 7);
 
@@ -287,7 +286,7 @@ export function gamma0_64(x: Int_64): Int_64 {
  * @returns The NIST specified output of the function
  */
 export function sigma1_64(x: Int_64): Int_64 {
-  let rotr14 = rotr_64(x, 14),
+  const rotr14 = rotr_64(x, 14),
     rotr18 = rotr_64(x, 18),
     rotr41 = rotr_64(x, 41);
 
