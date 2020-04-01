@@ -188,19 +188,14 @@ export abstract class jsSHABase<StateType, VariantTypes> {
    * @param srcString The string to be hashed
    */
   update(srcString: string | ArrayBuffer | Uint8Array): void {
-    let convertRet,
-      chunkBinLen,
-      chunkIntLen,
-      chunk,
-      i,
+    let i,
       updateProcessedLen = 0;
-    const variantBlockIntInc = this.variantBlockSize >>> 5;
+    const variantBlockIntInc = this.variantBlockSize >>> 5,
+      convertRet = this.converterFunc(srcString, this.remainder, this.remainderLen),
+      chunkBinLen = convertRet["binLen"],
+      chunk = convertRet["value"],
+      chunkIntLen = chunkBinLen >>> 5;
 
-    convertRet = this.converterFunc(srcString, this.remainder, this.remainderLen);
-    chunkBinLen = convertRet["binLen"];
-    chunk = convertRet["value"];
-
-    chunkIntLen = chunkBinLen >>> 5;
     for (i = 0; i < chunkIntLen; i += variantBlockIntInc) {
       if (updateProcessedLen + this.variantBlockSize <= chunkBinLen) {
         this.intermediateState = this.roundFunc(chunk.slice(i, i + variantBlockIntInc), this.intermediateState);
@@ -227,13 +222,13 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
     options?: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number }
   ): string | ArrayBuffer | Uint8Array {
-    let formatFunc, i, outputOptions: { outputUpper: boolean; b64Pad: string; shakeLen: number }, finalizedState;
+    let i, finalizedState;
 
     if (true === this.hmacKeySet) {
       throw new Error("Cannot call getHash after setting HMAC key");
     }
 
-    outputOptions = getOutputOpts(options);
+    const outputOptions = getOutputOpts(options);
 
     if (this.isSHAKE === true) {
       if (outputOptions["shakeLen"] === -1) {
@@ -242,7 +237,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
       this.outputBinLen = outputOptions["shakeLen"];
     }
 
-    formatFunc = getOutputConverter(format, this.outputBinLen, this.bigEndianMod, outputOptions);
+    const formatFunc = getOutputConverter(format, this.outputBinLen, this.bigEndianMod, outputOptions);
 
     finalizedState = this.finalizeFunc(
       this.remainder.slice(),
@@ -282,15 +277,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     inputFormat: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
     options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE" }
   ): void {
-    let keyConverterFunc,
-      convertRet,
-      keyBinLen,
-      keyToUse,
-      blockByteSize,
-      i,
-      lastArrayIndex,
-      keyOptions,
-      utfType: "UTF8" | "UTF16BE" | "UTF16LE";
+    let keyToUse, i;
 
     if (true === this.hmacKeySet) {
       throw new Error("HMAC key already set");
@@ -304,19 +291,17 @@ export abstract class jsSHABase<StateType, VariantTypes> {
       throw new Error("SHAKE is not supported for HMAC");
     }
 
-    keyOptions = options || {};
-    utfType = keyOptions["encoding"] || "UTF8";
+    const keyOptions = options || {},
+      utfType = keyOptions["encoding"] || "UTF8",
+      keyConverterFunc = getStrConverter(inputFormat, utfType, this.bigEndianMod),
+      convertRet = keyConverterFunc(key),
+      keyBinLen = convertRet["binLen"],
+      blockByteSize = this.variantBlockSize >>> 3,
+      lastArrayIndex = blockByteSize / 4 - 1;
 
-    keyConverterFunc = getStrConverter(inputFormat, utfType, this.bigEndianMod);
-
-    convertRet = keyConverterFunc(key);
-    keyBinLen = convertRet["binLen"];
     keyToUse = convertRet["value"];
 
-    blockByteSize = this.variantBlockSize >>> 3;
-
     /* These are used multiple times, calculate and store them */
-    lastArrayIndex = blockByteSize / 4 - 1;
 
     /* Figure out what to do with the key based on its size relative to
      * the hash's block size */
@@ -366,22 +351,21 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
     options?: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number }
   ): string | ArrayBuffer | Uint8Array {
-    let formatFunc, firstHash, outputOptions, finalizedState;
+    let finalizedState;
 
     if (false === this.hmacKeySet) {
       throw new Error("Cannot call getHMAC without first setting HMAC key");
     }
 
-    outputOptions = getOutputOpts(options);
-    formatFunc = getOutputConverter(format, this.outputBinLen, this.bigEndianMod, outputOptions);
-
-    firstHash = this.finalizeFunc(
-      this.remainder.slice(),
-      this.remainderLen,
-      this.processedLen,
-      this.stateCloneFunc(this.intermediateState),
-      this.outputBinLen
-    );
+    const outputOptions = getOutputOpts(options),
+      formatFunc = getOutputConverter(format, this.outputBinLen, this.bigEndianMod, outputOptions),
+      firstHash = this.finalizeFunc(
+        this.remainder.slice(),
+        this.remainderLen,
+        this.processedLen,
+        this.stateCloneFunc(this.intermediateState),
+        this.outputBinLen
+      );
     finalizedState = this.roundFunc(this.keyWithOPad, this.newStateFunc(this.shaVariant));
     finalizedState = this.finalizeFunc(
       firstHash,
