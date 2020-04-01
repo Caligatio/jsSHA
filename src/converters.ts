@@ -85,7 +85,8 @@ function str2packed(
         byteCnt += 1;
       }
     }
-  } else if ("UTF16BE" === utfType || "UTF16LE" === utfType) {
+  } else {
+    /* UTF16BE or UTF16LE */
     shiftModifier = bigEndianMod === -1 ? 2 : 0;
     /* Internally strings are UTF-16BE so transpose bytes under two conditions:
      * need LE and not switching endianness due to SHA-3
