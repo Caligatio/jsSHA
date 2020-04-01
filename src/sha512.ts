@@ -147,28 +147,11 @@ function getNewState512(variant: "SHA-384" | "SHA-512"): Int_64[] {
  * @returns The resulting H values
  */
 function roundSHA512(block: number[], H: Int_64[]): Int_64[] {
-  let a,
-    b,
-    c,
-    d,
-    e,
-    f,
-    g,
-    h,
-    T1,
-    T2,
-    numRounds,
-    t,
-    binaryStringMult,
-    W: Int_64[] = [],
-    int1,
-    int2,
-    offset;
+  let a, b, c, d, e, f, g, h, T1, T2, t, int1, int2, offset;
 
-  /* Set up the various function handles and variable for the specific
-   * variant */
-  numRounds = 80;
-  binaryStringMult = 2;
+  const W: Int_64[] = [],
+    numRounds = 80,
+    binaryStringMult = 2;
 
   a = H[0];
   b = H[1];
@@ -233,14 +216,15 @@ function finalizeSHA512(
   H: Int_64[],
   variant: "SHA-384" | "SHA-512"
 ): number[] {
-  let i, appendedMessageLength, offset, retVal, binaryStringInc, totalLen;
+  let i, retVal;
 
   /* The 129 addition is a hack but it works.  The correct number is
     actually 136 (128 + 8) but the below math fails if
     remainderBinLen + 136 % 1024 = 0. Since remainderBinLen % 8 = 0,
     "shorting" the addition is OK. */
-  offset = (((remainderBinLen + 129) >>> 10) << 5) + 31;
-  binaryStringInc = 32;
+  const offset = (((remainderBinLen + 129) >>> 10) << 5) + 31,
+    binaryStringInc = 32,
+    totalLen = remainderBinLen + processedBinLen;
 
   while (remainder.length <= offset) {
     remainder.push(0);
@@ -250,16 +234,14 @@ function finalizeSHA512(
   /* Append length of binary string in the position such that the new
    * length is correct. JavaScript numbers are limited to 2^53 so it's
    * "safe" to treat the totalLen as a 64-bit integer. */
-  totalLen = remainderBinLen + processedBinLen;
+
   remainder[offset] = totalLen & 0xffffffff;
   /* Bitwise operators treat the operand as a 32-bit number so need to
    * use hacky division and round to get access to upper 32-ish bits */
   remainder[offset - 1] = (totalLen / TWO_PWR_32) | 0;
 
-  appendedMessageLength = remainder.length;
-
   /* This will always be at least 1 full chunk */
-  for (i = 0; i < appendedMessageLength; i += binaryStringInc) {
+  for (i = 0; i < remainder.length; i += binaryStringInc) {
     H = roundSHA512(remainder.slice(i, i + binaryStringInc), H);
   }
 
