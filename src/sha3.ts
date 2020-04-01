@@ -46,9 +46,9 @@ const r_sha3 = [
 function getNewState(
   _variant: "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256"
 ): Int_64[][] {
-  let retVal, i;
+  let i;
+  const retVal = [];
 
-  retVal = [];
   for (i = 0; i < 5; i += 1) {
     retVal[i] = [new Int_64(0, 0), new Int_64(0, 0), new Int_64(0, 0), new Int_64(0, 0), new Int_64(0, 0)];
   }
@@ -63,8 +63,8 @@ function getNewState(
  * @returns The cloned state
  */
 function cloneSHA3State(state: Int_64[][]): Int_64[][] {
-  let clone: Int_64[][] = [],
-    i: number;
+  let i;
+  const clone = [];
   for (i = 0; i < 5; i += 1) {
     clone[i] = state[i].slice();
   }
@@ -82,11 +82,8 @@ function cloneSHA3State(state: Int_64[][]): Int_64[][] {
  * @returns The resulting state value
  */
 function roundSHA3(block: number[] | null, state: Int_64[][]): Int_64[][] {
-  let round,
-    x,
-    y,
-    B,
-    C = [],
+  let round, x, y, B;
+  const C = [],
     D = [];
 
   if (null !== block) {
@@ -167,11 +164,11 @@ function finalizeSHA3(
   outputLen: number
 ): number[] {
   let i,
-    retVal = [],
-    binaryStringInc = blockSize >>> 5,
     state_offset = 0,
-    remainderIntLen = remainderBinLen >>> 5,
     temp;
+  const retVal = [],
+    binaryStringInc = blockSize >>> 5,
+    remainderIntLen = remainderBinLen >>> 5;
 
   /* Process as many blocks as possible, some may be here for multiple rounds
 		with SHAKE
@@ -216,7 +213,7 @@ function finalizeSHA3(
 export default class jsSHA extends jsSHABase<
   Int_64[][],
   "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256"
-  > {
+> {
   intermediateState: Int_64[][];
   variantBlockSize: number;
   bigEndianMod: -1 | 1;
