@@ -31,7 +31,7 @@ const b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
  */
 function str2packed(
   str: string,
-  utfType: string,
+  utfType: "UTF8" | "UTF16BE" | "UTF16LE",
   existingPacked: number[] | undefined,
   existingPackedLen: number | undefined,
   bigEndianMod: -1 | 1
