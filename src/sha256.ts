@@ -45,27 +45,11 @@ function getNewState256(variant: "SHA-224" | "SHA-256"): number[] {
  * @returns The resulting H values
  */
 function roundSHA256(block: number[], H: number[]): number[] {
-  let a,
-    b,
-    c,
-    d,
-    e,
-    f,
-    g,
-    h,
-    T1,
-    T2,
-    numRounds,
-    t,
-    binaryStringMult,
-    W: number[] = [],
-    int1,
-    offset;
+  let a, b, c, d, e, f, g, h, T1, T2, t, int1, offset;
 
-  /* Set up the various function handles and variable for the specific
-   * variant */
-  numRounds = 64;
-  binaryStringMult = 1;
+  const numRounds = 64,
+    binaryStringMult = 1,
+    W: number[] = [];
 
   a = H[0];
   b = H[1];
@@ -129,14 +113,15 @@ function finalizeSHA256(
   H: number[],
   variant: "SHA-224" | "SHA-256"
 ): number[] {
-  let i, appendedMessageLength, offset, retVal, binaryStringInc, totalLen;
+  let i, retVal;
 
   /* The 65 addition is a hack but it works.  The correct number is
     actually 72 (64 + 8) but the below math fails if
     remainderBinLen + 72 % 512 = 0. Since remainderBinLen % 8 = 0,
     "shorting" the addition is OK. */
-  offset = (((remainderBinLen + 65) >>> 9) << 4) + 15;
-  binaryStringInc = 16;
+  const offset = (((remainderBinLen + 65) >>> 9) << 4) + 15,
+    binaryStringInc = 16,
+    totalLen = remainderBinLen + processedBinLen;
 
   while (remainder.length <= offset) {
     remainder.push(0);
@@ -146,16 +131,14 @@ function finalizeSHA256(
   /* Append length of binary string in the position such that the new
    * length is correct. JavaScript numbers are limited to 2^53 so it's
    * "safe" to treat the totalLen as a 64-bit integer. */
-  totalLen = remainderBinLen + processedBinLen;
+
   remainder[offset] = totalLen & 0xffffffff;
   /* Bitwise operators treat the operand as a 32-bit number so need to
    * use hacky division and round to get access to upper 32-ish bits */
   remainder[offset - 1] = (totalLen / TWO_PWR_32) | 0;
 
-  appendedMessageLength = remainder.length;
-
   /* This will always be at least 1 full chunk */
-  for (i = 0; i < appendedMessageLength; i += binaryStringInc) {
+  for (i = 0; i < remainder.length; i += binaryStringInc) {
     H = roundSHA256(remainder.slice(i, i + binaryStringInc), H);
   }
 
