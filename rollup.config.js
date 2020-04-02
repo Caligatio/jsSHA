@@ -2,18 +2,19 @@ import fs from "fs";
 import typescript from "@rollup/plugin-typescript";
 import { terser } from "rollup-plugin-terser";
 
-const licenseHeader = fs.readFileSync("src/license_header.txt", { encoding: "utf8" });
+const licenseHeaderES3 = fs.readFileSync("src/license_header.es3.txt", { encoding: "utf8" }),
+  licenseHeaderES6 = fs.readFileSync("src/license_header.es6.txt", { encoding: "utf8" });
 
 export default [
   {
     input: "src/sha.ts",
     output: {
       name: "jsSHA",
-      banner: licenseHeader,
+      banner: licenseHeaderES3,
       format: "umd",
       sourcemap: true,
       dir: "dist",
-      entryFileNames: "[name].umd.js"
+      entryFileNames: "[name].umd.js",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
@@ -29,10 +30,10 @@ export default [
     input: "src/sha1.ts",
     output: {
       name: "jsSHA",
-      banner: licenseHeader,
+      banner: licenseHeaderES3,
       format: "umd",
       dir: "dist",
-      entryFileNames: "[name].umd.js"
+      entryFileNames: "[name].umd.js",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
@@ -47,10 +48,10 @@ export default [
     input: "src/sha256.ts",
     output: {
       name: "jsSHA",
-      banner: licenseHeader,
+      banner: licenseHeaderES3,
       format: "umd",
       dir: "dist",
-      entryFileNames: "[name].umd.js"
+      entryFileNames: "[name].umd.js",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
@@ -65,10 +66,10 @@ export default [
     input: "src/sha512.ts",
     output: {
       name: "jsSHA",
-      banner: licenseHeader,
+      banner: licenseHeaderES3,
       format: "umd",
       dir: "dist",
-      entryFileNames: "[name].umd.js"
+      entryFileNames: "[name].umd.js",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
@@ -83,13 +84,31 @@ export default [
     input: "src/sha3.ts",
     output: {
       name: "jsSHA",
-      banner: licenseHeader,
+      banner: licenseHeaderES3,
       format: "umd",
       dir: "dist",
-      entryFileNames: "[name].umd.js"
+      entryFileNames: "[name].umd.js",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
+      terser({
+        compress: { inline: false },
+        output: { comments: /BSD/ },
+        mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
+      }),
+    ],
+  },
+  {
+    input: "src/sha.ts",
+    output: {
+      name: "jsSHA",
+      banner: licenseHeaderES6,
+      format: "es",
+      dir: "dist",
+      entryFileNames: "[name].esm.js",
+    },
+    plugins: [
+      typescript({ lib: ["es6"], target: "es6" }),
       terser({
         compress: { inline: false },
         output: { comments: /BSD/ },
