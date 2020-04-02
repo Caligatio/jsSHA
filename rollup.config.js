@@ -104,12 +104,14 @@ export default [
       name: "jsSHA",
       banner: licenseHeaderES6,
       format: "es",
+      sourcemap: true,
       dir: "dist",
       entryFileNames: "[name].esm.js",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es6" }),
       terser({
+        sourcemap: true,
         compress: { inline: false },
         output: { comments: /BSD/ },
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
