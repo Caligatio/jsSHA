@@ -350,8 +350,6 @@ export function getStrConverter(
   bigEndianMod: -1 | 1
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ): (input: any, existingBin?: number[], existingBinLen?: number) => packedValue {
-  let retVal;
-
   /* Validate encoding */
   switch (utfType) {
     case "UTF8":
@@ -378,10 +376,9 @@ export function getStrConverter(
        *   "value" contains the output number array and "binLen" is the binary
        *   length of "value"
        */
-      retVal = function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
+      return function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
         return hex2packed(str, existingBin, existingBinLen, bigEndianMod);
       };
-      break;
     case "TEXT":
       /**
        * @param str String of raw bytes to be converted to binary representation
@@ -393,10 +390,9 @@ export function getStrConverter(
        *   "value" contains the output number array and "binLen" is the binary
        *   length of "value"
        */
-      retVal = function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
+      return function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
         return str2packed(str, utfType, existingBin, existingBinLen, bigEndianMod);
       };
-      break;
     case "B64":
       /**
        * @param str String of raw bytes to be converted to binary representation
@@ -408,10 +404,9 @@ export function getStrConverter(
        *   "value" contains the output number array and "binLen" is the binary
        *   length of "value"
        */
-      retVal = function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
+      return function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
         return b642packed(str, existingBin, existingBinLen, bigEndianMod);
       };
-      break;
     case "BYTES":
       /**
        * @param str String of raw bytes to be converted to binary representation
@@ -423,13 +418,12 @@ export function getStrConverter(
        *   "value" contains the output number array and "binLen" is the binary
        *   length of "value"
        */
-      retVal = function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
+      return function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
         return bytes2packed(str, existingBin, existingBinLen, bigEndianMod);
       };
-      break;
     case "ARRAYBUFFER":
       try {
-        retVal = new ArrayBuffer(0);
+        new ArrayBuffer(0);
       } catch (ignore) {
         throw new Error("ARRAYBUFFER not supported by this environment");
       }
@@ -444,13 +438,12 @@ export function getStrConverter(
        *   "value" contains the output number array and "binLen" is the binary
        *   length of "value"
        */
-      retVal = function (arr: ArrayBuffer, existingBin?: number[], existingBinLen?: number): packedValue {
+      return function (arr: ArrayBuffer, existingBin?: number[], existingBinLen?: number): packedValue {
         return arraybuffer2packed(arr, existingBin, existingBinLen, bigEndianMod);
       };
-      break;
     case "UINT8ARRAY":
       try {
-        retVal = new Uint8Array(0);
+        new Uint8Array(0);
       } catch (ignore) {
         throw new Error("UINT8ARRAY not supported by this environment");
       }
@@ -465,15 +458,12 @@ export function getStrConverter(
        *   "value" contains the output number array and "binLen" is the binary
        *   length of "value"
        */
-      retVal = function (arr: Uint8Array, existingBin?: number[], existingBinLen?: number): packedValue {
+      return function (arr: Uint8Array, existingBin?: number[], existingBinLen?: number): packedValue {
         return uint8array2packed(arr, existingBin, existingBinLen, bigEndianMod);
       };
-      break;
     default:
       throw new Error("format must be HEX, TEXT, B64, BYTES, ARRAYBUFFER, or UINT8ARRAY");
   }
-
-  return retVal;
 }
 
 /**
@@ -659,17 +649,14 @@ export function getOutputConverter(
       return function (binarray): string {
         return packed2hex(binarray, outputBinLen, bigEndianMod, outputOptions);
       };
-      break;
     case "B64":
       return function (binarray): string {
         return packed2b64(binarray, outputBinLen, bigEndianMod, outputOptions);
       };
-      break;
     case "BYTES":
       return function (binarray): string {
         return packed2bytes(binarray, outputBinLen, bigEndianMod);
       };
-      break;
     case "ARRAYBUFFER":
       try {
         /* Need to test ArrayBuffer support */
@@ -680,7 +667,6 @@ export function getOutputConverter(
       return function (binarray): ArrayBuffer {
         return packed2arraybuffer(binarray, outputBinLen, bigEndianMod);
       };
-      break;
     case "UINT8ARRAY":
       try {
         /* Need to test Uint8Array support */
@@ -691,7 +677,6 @@ export function getOutputConverter(
       return function (binarray): Uint8Array {
         return packed2uint8array(binarray, outputBinLen, bigEndianMod);
       };
-      break;
     default:
       throw new Error("format must be HEX, B64, BYTES, ARRAYBUFFER, or UINT8ARRAY");
   }
