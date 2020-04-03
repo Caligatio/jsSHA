@@ -30,9 +30,7 @@ def main():
                         hash_name,
                         vector_name,
                         output_len * 8,
-                        binascii.hexlify(
-                            hash_func(vector_value.encode("UTF-16BE"), output_len)
-                        ).decode(),
+                        binascii.hexlify(hash_func(vector_value.encode("UTF-16BE"), output_len)).decode(),
                     )
                 )
                 print(
@@ -40,9 +38,7 @@ def main():
                         hash_name,
                         vector_name,
                         output_len * 8,
-                        binascii.hexlify(
-                            hash_func(vector_value.encode("UTF-16LE"), output_len)
-                        ).decode(),
+                        binascii.hexlify(hash_func(vector_value.encode("UTF-16LE"), output_len)).decode(),
                     )
                 )
 

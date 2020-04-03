@@ -18,12 +18,12 @@ def main():
         digest = sha_func("abc".encode()).digest()
 
         # Only loop 4 times since an iteration was done above
-        for x in range(0, 4):
+        for _ in range(0, 4):
             digest = sha_func(digest).digest()
         print("{:>8} with  5 Rounds: {}".format(sha_type, binascii.hexlify(digest).decode()))
 
         # Loop another 5 times to get to 10
-        for x in range(0, 5):
+        for _ in range(0, 5):
             digest = sha_func(digest).digest()
         print("{:>8} with 10 Rounds: {}".format(sha_type, binascii.hexlify(digest).decode()))
 
@@ -40,12 +40,12 @@ def main():
         digest = sha_func([ord(c) for c in "abc"])
 
         # Only loop 4 times since an iteration was done above
-        for x in range(0, 4):
+        for _ in range(0, 4):
             digest = sha_func(digest)
         print("{:>8} with  5 Rounds: {}".format(sha_type, binascii.hexlify(digest).decode()))
 
         # Loop another 5 times to get to 10
-        for x in range(0, 5):
+        for _ in range(0, 5):
             digest = sha_func(digest)
         print("{:>8} with 10 Rounds: {}".format(sha_type, binascii.hexlify(digest).decode()))
 
@@ -55,12 +55,12 @@ def main():
         digest = sha_func([ord(c) for c in "abc"], 31)
 
         # Only loop 4 times since an iteration was done above
-        for x in range(0, 4):
+        for _ in range(0, 4):
             digest = sha_func(digest, 31)
         print("{:>8} with  5 Rounds: {}".format(sha_type, binascii.hexlify(digest).decode()))
 
         # Loop another 5 times to get to 10
-        for x in range(0, 5):
+        for _ in range(0, 5):
             digest = sha_func(digest, 31)
         print("{:>8} with 10 Rounds: {}".format(sha_type, binascii.hexlify(digest).decode()))
 
