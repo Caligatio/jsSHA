@@ -102,17 +102,6 @@ describe("Test jsSHABase", () => {
     }
   }
 
-  class jsSHAATestShake extends jsSHAATest {
-    constructor(
-      variant: "SHA-TEST",
-      inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-      options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
-    ) {
-      super(variant, inputFormat, options);
-      this.isSHAKE = true;
-    }
-  }
-
   it("Test Constructor with Empty Options", () => {
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
 
@@ -175,7 +164,7 @@ describe("Test jsSHABase", () => {
     stubbedJsSHA.update(inputStr);
     // Check #1 again to make sure state is being passed correctly
     assert.equal(stubbedStrConverter.callCount, 2);
-    assert.isTrue(stubbedStrConverter.getCall(1).calledWith(inputStr, [0x00112233], 32));
+    assert.isTrue(stubbedStrConverter.getCall(1).calledWithExactly(inputStr, [0x00112233], 32));
     // Check #4
     assert.isTrue(stubbedRound.calledOnceWith([0x00112233, 0x00112233], [0, 0]));
 
@@ -187,8 +176,9 @@ describe("Test jsSHABase", () => {
   });
 
   it("Test getHash Without Needed shakeLen ", () => {
-    const stubbedJsSHA = new jsSHAATestShake("SHA-TEST", "HEX");
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
 
+    stubbedJsSHA.setter("isSHAKE", true);
     assert.throws(() => {
       stubbedJsSHA.getHash("HEX", {});
     }, "shakeLen must be specified in options");
@@ -246,7 +236,8 @@ describe("Test jsSHABase", () => {
      *   1. The output of getHash should equal the first shakeLen bits of the output of finalizeFunc
      *   2. finalize should be called once with the correct inputs
      */
-    const stubbedJsSHA = new jsSHAATestShake("SHA-TEST", "HEX");
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
+    stubbedJsSHA.setter("isSHAKE", true);
     sinon.reset();
     stubbedFinalize.returns([0x00112233, 0xaabbccdd]);
     stubbedStateClone.returns([0xdeadc0de, 0xfacefeed]);
@@ -261,5 +252,45 @@ describe("Test jsSHABase", () => {
 
     // Check #2
     assert.isTrue(stubbedFinalize.calledOnceWith([0xbaddcafe], 32, 64, [0xdeadc0de, 0xfacefeed], 32));
+  });
+
+  it("Test getHash for numRounds=3", () => {
+    /*
+     * Check a few basic things:
+     *   1. The output of getHash should equal the output of last finalizeFunc call
+     *   2. finalizeFunc should be called numRound times
+     */
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX", { numRounds: 3 });
+    sinon.reset();
+    stubbedFinalize.returns([0x00112233, 0xaabbccdd]).onCall(2).returns([0xdeadc0de, 0xfacefeed]);
+
+    // Check #1
+    assert.equal(stubbedJsSHA.getHash("HEX"), "deadc0defacefeed");
+
+    // Check #2
+    assert.equal(stubbedFinalize.callCount, 3);
+  });
+
+  it("Test getHash for SHAKE numRounds=3", () => {
+    /*
+     * Check a few basic things:
+     *   1. The output of getHash should equal the output of last finalizeFunc call
+     *   2. finalizeFunc should be called numRound times
+     *   3. The last numRound-1 calls of finalizeFunc should have the last 32-shakeLen bits 0ed out
+     */
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX", { numRounds: 3 });
+    stubbedJsSHA.setter("isSHAKE", true);
+    sinon.reset();
+    stubbedFinalize.returns([0x00112233, 0xaabbccdd]).onCall(2).returns([0xdeadc0de, 0xfacefeed]);
+
+    // Check #1
+    assert.equal(stubbedJsSHA.getHash("HEX", { shakeLen: 24 }), "deadc0");
+
+    // Check #2
+    assert.equal(stubbedFinalize.callCount, 3);
+
+    // Check #3
+    stubbedFinalize.getCall(1).calledWith([0x00112233, 0x00bbccdd], 24);
+    stubbedFinalize.getCall(2).calledWith([0x00112233, 0x00bbccdd], 24);
   });
 });
