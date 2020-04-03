@@ -75,7 +75,7 @@ describe("Test jsSHABase", () => {
       this.newStateFunc = (stubbedNewState as unknown) as (variant: "SHA-TEST") => number[];
       this.finalizeFunc = stubbedFinalize;
 
-      this.intermediateState = [0];
+      this.intermediateState = [0, 0];
       this.variantBlockSize = 64;
       this.outputBinLen = 64;
       this.isSHAKE = false;
@@ -85,28 +85,49 @@ describe("Test jsSHABase", () => {
      * Dirty hack function to expose the protected members of jsSHABase
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    propertySpy(propName: string): any {
+    getter(propName: string): any {
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       return this[propName];
+    }
+
+    /*
+     * Dirty hack function to expose the protected members of jsSHABase
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setter(propName: string, value: any): void {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      this[propName] = value;
+    }
+  }
+
+  class jsSHAATestShake extends jsSHAATest {
+    constructor(
+      variant: "SHA-TEST",
+      inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
+      options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
+    ) {
+      super(variant, inputFormat, options);
+      this.isSHAKE = true;
     }
   }
 
   it("Test Constructor with Empty Options", () => {
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
 
-    assert.equal(stubbedJsSHA.propertySpy("inputFormat"), "HEX");
-    assert.equal(stubbedJsSHA.propertySpy("utfType"), "UTF8");
-    assert.equal(stubbedJsSHA.propertySpy("shaVariant"), "SHA-TEST");
-    assert.equal(stubbedJsSHA.propertySpy("numRounds"), 1);
-    assert.equal(stubbedJsSHA.propertySpy("remainderLen"), 0);
-    assert.equal(stubbedJsSHA.propertySpy("processedLen"), 0);
-    assert.isFalse(stubbedJsSHA.propertySpy("updateCalled"));
-    assert.isFalse(stubbedJsSHA.propertySpy("hmacKeySet"));
-    assert.deepEqual(stubbedJsSHA.propertySpy("inputOptions"), {});
-    assert.deepEqual(stubbedJsSHA.propertySpy("remainder"), []);
-    assert.deepEqual(stubbedJsSHA.propertySpy("keyWithIPad"), []);
-    assert.deepEqual(stubbedJsSHA.propertySpy("keyWithOPad"), []);
+    assert.equal(stubbedJsSHA.getter("inputFormat"), "HEX");
+    assert.equal(stubbedJsSHA.getter("utfType"), "UTF8");
+    assert.equal(stubbedJsSHA.getter("shaVariant"), "SHA-TEST");
+    assert.equal(stubbedJsSHA.getter("numRounds"), 1);
+    assert.equal(stubbedJsSHA.getter("remainderLen"), 0);
+    assert.equal(stubbedJsSHA.getter("processedLen"), 0);
+    assert.isFalse(stubbedJsSHA.getter("updateCalled"));
+    assert.isFalse(stubbedJsSHA.getter("hmacKeySet"));
+    assert.deepEqual(stubbedJsSHA.getter("inputOptions"), {});
+    assert.deepEqual(stubbedJsSHA.getter("remainder"), []);
+    assert.deepEqual(stubbedJsSHA.getter("keyWithIPad"), []);
+    assert.deepEqual(stubbedJsSHA.getter("keyWithOPad"), []);
   });
 
   it("Test Constructor with Bad numRounds", () => {
@@ -117,5 +138,128 @@ describe("Test jsSHABase", () => {
     assert.throws(() => {
       new jsSHAATest("SHA-TEST", "HEX", { numRounds: -1 });
     }, "numRounds must a integer >= 1");
+  });
+
+  it("Test update", () => {
+    /*
+     * This is rather difficult to test so we want to check a few basic things:
+     *   1. It passed the input to the string conversion function correctly
+     *   2. It did *not* call the round function when the input was smaller than the block size
+     *   3. Intermediate state was untouched but remainder variables are updated
+     *   4. It *did* call the round function when the input was greater than or equal to than the block size
+     *   5. Intermediate state and associated variables are set correctly
+     */
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX"),
+      inputStr = "ABCD";
+    sinon.reset();
+
+    stubbedStrConverter
+      .onFirstCall()
+      .returns({ value: [0x00112233], binLen: 32 })
+      .onSecondCall()
+      .returns({ value: [0x00112233, 0x00112233], binLen: 64 });
+    stubbedRound.returns([0x00112233, 0xaabbccdd]);
+
+    stubbedJsSHA.update(inputStr);
+    // Check #1
+    assert.isTrue(stubbedStrConverter.calledOnceWith(inputStr, [], 0));
+    // Check #2
+    assert.isFalse(stubbedRound.called);
+    // Check #3
+    assert.deepEqual(stubbedJsSHA.getter("intermediateState"), [0, 0]);
+    assert.deepEqual(stubbedJsSHA.getter("remainder"), [0x00112233]);
+    assert.equal(stubbedJsSHA.getter("remainderLen"), 32);
+    assert.equal(stubbedJsSHA.getter("processedLen"), 0);
+    assert.isTrue(stubbedJsSHA.getter("updateCalled"));
+
+    stubbedJsSHA.update(inputStr);
+    // Check #1 again to make sure state is being passed correctly
+    assert.equal(stubbedStrConverter.callCount, 2);
+    assert.isTrue(stubbedStrConverter.getCall(1).calledWith(inputStr, [0x00112233], 32));
+    // Check #4
+    assert.isTrue(stubbedRound.calledOnceWith([0x00112233, 0x00112233], [0, 0]));
+
+    // Check #5
+    assert.deepEqual(stubbedJsSHA.getter("intermediateState"), [0x00112233, 0xaabbccdd]);
+    assert.deepEqual(stubbedJsSHA.getter("remainder"), []);
+    assert.equal(stubbedJsSHA.getter("remainderLen"), 0);
+    assert.equal(stubbedJsSHA.getter("processedLen"), 64);
+  });
+
+  it("Test getHash Without Needed shakeLen ", () => {
+    const stubbedJsSHA = new jsSHAATestShake("SHA-TEST", "HEX");
+
+    assert.throws(() => {
+      stubbedJsSHA.getHash("HEX", {});
+    }, "shakeLen must be specified in options");
+  });
+
+  it("Test getHash After setHMACKey Called", () => {
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
+    sinon.reset();
+
+    // Bare minimum stubs for function not to throw exceptions
+    stubbedStrConverter.returns({ value: [0x00112233], binLen: 32 });
+    stubbedNewState.returns({ value: [0x00112233], binLen: 32 });
+    stubbedFinalize.returns([0x00112233, 0xaabbccdd]);
+
+    stubbedJsSHA.setHMACKey("ABCD", "HEX");
+
+    assert.throws(() => {
+      stubbedJsSHA.getHash("HEX");
+    }, "Cannot call getHash after setting HMAC key");
+  });
+
+  it("Test getHash", () => {
+    /*
+     * Check a few basic things:
+     *   1. The output of getHash should equal the first outputBinLen bits of the output of finalizeFunc
+     *   2. intermediateState and remainder should not be changed by calling getHash
+     *   3. finalize should be called once with the correct inputs
+     */
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
+    sinon.reset();
+    stubbedFinalize.returns([0x00112233, 0xaabbccdd]);
+    stubbedStateClone.returns([0xdeadc0de, 0xfacefeed]);
+
+    stubbedJsSHA.setter("intermediateState", [0xdeadbeef]);
+    const intermediateState = stubbedJsSHA.getter("intermediateState");
+    stubbedJsSHA.setter("remainder", [0xbaddcafe]);
+    const remainder = stubbedJsSHA.getter("remainder");
+    stubbedJsSHA.setter("remainderLen", 32);
+    stubbedJsSHA.setter("processedLen", 64);
+
+    // Check #1
+    assert.equal(stubbedJsSHA.getHash("HEX"), "00112233aabbccdd");
+
+    // Check #2, note deliberate use of equal vs deepEqual
+    assert.equal(intermediateState, stubbedJsSHA.getter("intermediateState"));
+    assert.equal(remainder, stubbedJsSHA.getter("remainder"));
+
+    // Check #3
+    assert.isTrue(stubbedFinalize.calledOnceWith([0xbaddcafe], 32, 64, [0xdeadc0de, 0xfacefeed], 64));
+  });
+
+  it("Test getHash for SHAKE", () => {
+    /*
+     * Check a few basic things:
+     *   1. The output of getHash should equal the first shakeLen bits of the output of finalizeFunc
+     *   2. finalize should be called once with the correct inputs
+     */
+    const stubbedJsSHA = new jsSHAATestShake("SHA-TEST", "HEX");
+    sinon.reset();
+    stubbedFinalize.returns([0x00112233, 0xaabbccdd]);
+    stubbedStateClone.returns([0xdeadc0de, 0xfacefeed]);
+
+    stubbedJsSHA.setter("intermediateState", [0xdeadbeef]);
+    stubbedJsSHA.setter("remainder", [0xbaddcafe]);
+    stubbedJsSHA.setter("remainderLen", 32);
+    stubbedJsSHA.setter("processedLen", 64);
+
+    // Check #1
+    assert.equal(stubbedJsSHA.getHash("HEX", { shakeLen: 32 }), "00112233");
+
+    // Check #2
+    assert.isTrue(stubbedFinalize.calledOnceWith([0xbaddcafe], 32, 64, [0xdeadc0de, 0xfacefeed], 32));
   });
 });
