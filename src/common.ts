@@ -119,41 +119,41 @@ export function getOutputOpts(options?: {
 
 export abstract class jsSHABase<StateType, VariantTypes> {
   /* Needed inputs */
-  shaVariant: VariantTypes;
-  inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY";
-  inputOptions: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number };
-  utfType: "UTF8" | "UTF16BE" | "UTF16LE";
-  numRounds: number;
+  protected readonly shaVariant: VariantTypes;
+  protected readonly inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY";
+  protected readonly inputOptions: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number };
+  protected readonly utfType: "UTF8" | "UTF16BE" | "UTF16LE";
+  protected readonly numRounds: number;
 
   /* State */
-  abstract intermediateState: StateType;
-  keyWithIPad: number[];
-  keyWithOPad: number[];
-  remainder: number[];
-  remainderLen: number;
-  updatedCalled: boolean;
-  processedLen: number;
-  hmacKeySet: boolean;
+  protected abstract intermediateState: StateType;
+  protected keyWithIPad: number[];
+  protected keyWithOPad: number[];
+  protected remainder: number[];
+  protected remainderLen: number;
+  protected updateCalled: boolean;
+  protected processedLen: number;
+  protected hmacKeySet: boolean;
 
   /* Variant specifics */
-  abstract variantBlockSize: number;
-  abstract bigEndianMod: -1 | 1;
-  abstract outputBinLen: number;
-  abstract isSHAKE: boolean;
+  protected abstract readonly variantBlockSize: number;
+  protected abstract readonly bigEndianMod: -1 | 1;
+  protected abstract outputBinLen: number;
+  protected abstract readonly isSHAKE: boolean;
 
   /* Functions */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  abstract converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
-  abstract roundFunc: (block: number[], H: StateType) => StateType;
-  abstract finalizeFunc: (
+  protected abstract readonly converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
+  protected abstract readonly roundFunc: (block: number[], H: StateType) => StateType;
+  protected abstract readonly finalizeFunc: (
     remainder: number[],
     remainderBinLen: number,
     processedBinLen: number,
     H: StateType,
     _outputLen: number
   ) => number[];
-  abstract stateCloneFunc: (state: StateType) => StateType;
-  abstract newStateFunc: (variant: VariantTypes) => StateType;
+  protected abstract readonly stateCloneFunc: (state: StateType) => StateType;
+  protected abstract readonly newStateFunc: (variant: VariantTypes) => StateType;
 
   constructor(
     variant: VariantTypes,
@@ -174,7 +174,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     this.shaVariant = variant;
     this.remainder = [];
     this.remainderLen = 0;
-    this.updatedCalled = false;
+    this.updateCalled = false;
     this.processedLen = 0;
     this.hmacKeySet = false;
     this.keyWithIPad = [];
@@ -205,7 +205,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     this.processedLen += updateProcessedLen;
     this.remainder = chunk.slice(updateProcessedLen >>> 5);
     this.remainderLen = chunkBinLen % this.variantBlockSize;
-    this.updatedCalled = true;
+    this.updateCalled = true;
   }
 
   /**
@@ -283,7 +283,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
       throw new Error("HMAC key already set");
     }
 
-    if (true === this.updatedCalled) {
+    if (true === this.updateCalled) {
       throw new Error("Cannot set HMAC key after calling update");
     }
 
@@ -323,7 +323,6 @@ export abstract class jsSHABase<StateType, VariantTypes> {
       }
       keyToUse[lastArrayIndex] &= 0xffffff00;
     }
-
     /* Create ipad and opad */
     for (i = 0; i <= lastArrayIndex; i += 1) {
       this.keyWithIPad[i] = keyToUse[i] ^ 0x36363636;
