@@ -558,9 +558,7 @@ describe("Test getStrConverter", () => {
   });
 
   it("arraybuffer2packed Unsupported", () => {
-    revert = converters.__set__("ArrayBuffer", () => {
-      throw new Error();
-    });
+    revert = converters.__set__("ArrayBuffer", sinon.stub().throws());
     assert.throws(() => {
       getStrConverter("ARRAYBUFFER", "UTF8", -1);
     }, "ARRAYBUFFER not supported by this environment");
@@ -568,9 +566,7 @@ describe("Test getStrConverter", () => {
   });
 
   it("uint8array2packed Unsupported", () => {
-    revert = converters.__set__("Uint8Array", () => {
-      throw new Error();
-    });
+    revert = converters.__set__("Uint8Array", sinon.stub().throws());
     assert.throws(() => {
       getStrConverter("UINT8ARRAY", "UTF8", -1);
     }, "UINT8ARRAY not supported by this environment");
