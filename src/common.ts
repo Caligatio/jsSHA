@@ -247,6 +247,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
       this.outputBinLen
     );
     for (i = 1; i < this.numRounds; i += 1) {
+      /* Need to mask out bits that should be zero due to output not being a multiple of 32 */
       if (this.isSHAKE === true && this.outputBinLen % 32 !== 0) {
         finalizedState[finalizedState.length - 1] &= 0x00ffffff >>> (24 - (this.outputBinLen % 32));
       }
