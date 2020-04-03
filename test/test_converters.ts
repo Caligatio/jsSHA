@@ -528,7 +528,7 @@ describe("Test getStrConverter", () => {
       revert = converters.__set__(mapping.funcName, spy);
       strConverter = getStrConverter(mapping.inputValue, "UTF8", -1);
       strConverter("00", [], 0);
-      assert.isTrue(spy.calledWith("00", [], 0, -1));
+      assert.isTrue(spy.calledWithExactly("00", [], 0, -1));
       revert();
     });
   });
@@ -539,7 +539,7 @@ describe("Test getStrConverter", () => {
     revert = converters.__set__("str2packed", spy);
     strConverter = getStrConverter("TEXT", "UTF8", -1);
     strConverter("00", [], 0);
-    assert.isTrue(spy.calledWith("00", "UTF8", [], 0, -1));
+    assert.isTrue(spy.calledWithExactly("00", "UTF8", [], 0, -1));
     revert();
   });
 
@@ -595,9 +595,9 @@ describe("Test getOutputConverter", () => {
       outputConverter = getOutputConverter(mapping.inputValue, 0, -1, options);
       outputConverter([0]);
       if (mapping.needsOptions === true) {
-        assert.isTrue(spy.calledWith([0], 0, -1, options));
+        assert.isTrue(spy.calledWithExactly([0], 0, -1, options));
       } else {
-        assert.isTrue(spy.calledWith([0], 0, -1));
+        assert.isTrue(spy.calledWithExactly([0], 0, -1));
       }
       revert();
     });
