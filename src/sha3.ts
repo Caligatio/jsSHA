@@ -271,7 +271,7 @@ export default class jsSHA extends jsSHABase<
     }
 
     this.bigEndianMod = 1;
-    this.converterFunc = getStrConverter(inputFormat, this.utfType, this.bigEndianMod);
+    this.converterFunc = getStrConverter(this.inputFormat, this.utfType, this.bigEndianMod);
     this.roundFunc = roundSHA3;
     this.stateCloneFunc = cloneSHA3State;
     this.newStateFunc = getNewState;

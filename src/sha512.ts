@@ -313,7 +313,7 @@ export default class jsSHA extends jsSHABase<Int_64[], "SHA-384" | "SHA-512"> {
     }
 
     this.bigEndianMod = -1;
-    this.converterFunc = getStrConverter(inputFormat, this.utfType, this.bigEndianMod);
+    this.converterFunc = getStrConverter(this.inputFormat, this.utfType, this.bigEndianMod);
     this.roundFunc = roundSHA512;
     this.stateCloneFunc = function (state): Int_64[] {
       return state.slice();

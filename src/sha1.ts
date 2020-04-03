@@ -136,7 +136,7 @@ export default class jsSHA extends jsSHABase<number[], "SHA-1"> {
     super(variant, inputFormat, options);
 
     this.bigEndianMod = -1;
-    this.converterFunc = getStrConverter(inputFormat, this.utfType, this.bigEndianMod);
+    this.converterFunc = getStrConverter(this.inputFormat, this.utfType, this.bigEndianMod);
     this.roundFunc = roundSHA1;
     this.stateCloneFunc = function (state: number[]): number[] {
       return state.slice();
