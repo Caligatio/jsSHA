@@ -1,4 +1,4 @@
-import { jsSHABase, TWO_PWR_32, H_trunc, H_full, K_sha2 } from "./common";
+import { jsSHABase, TWO_PWR_32, H_trunc, H_full, K_sha2, sha_variant_error } from "./common";
 import { packedValue, getStrConverter } from "./converters";
 import {
   ch_64,
@@ -105,33 +105,29 @@ const K_sha512 = [
 function getNewState512(variant: "SHA-384" | "SHA-512"): Int_64[] {
   let retVal;
 
-  switch (variant) {
-    case "SHA-384":
-      retVal = [
-        new Int_64(0xcbbb9d5d, H_trunc[0]),
-        new Int_64(0x0629a292a, H_trunc[1]),
-        new Int_64(0x9159015a, H_trunc[2]),
-        new Int_64(0x0152fecd8, H_trunc[3]),
-        new Int_64(0x67332667, H_trunc[4]),
-        new Int_64(0x98eb44a87, H_trunc[5]),
-        new Int_64(0xdb0c2e0d, H_trunc[6]),
-        new Int_64(0x047b5481d, H_trunc[7]),
-      ];
-      break;
-    case "SHA-512":
-      retVal = [
-        new Int_64(H_full[0], 0xf3bcc908),
-        new Int_64(H_full[1], 0x84caa73b),
-        new Int_64(H_full[2], 0xfe94f82b),
-        new Int_64(H_full[3], 0x5f1d36f1),
-        new Int_64(H_full[4], 0xade682d1),
-        new Int_64(H_full[5], 0x2b3e6c1f),
-        new Int_64(H_full[6], 0xfb41bd6b),
-        new Int_64(H_full[7], 0x137e2179),
-      ];
-      break;
-    default:
-      throw new Error("No SHA variants supported");
+  if ("SHA-384" === variant) {
+    retVal = [
+      new Int_64(0xcbbb9d5d, H_trunc[0]),
+      new Int_64(0x0629a292a, H_trunc[1]),
+      new Int_64(0x9159015a, H_trunc[2]),
+      new Int_64(0x0152fecd8, H_trunc[3]),
+      new Int_64(0x67332667, H_trunc[4]),
+      new Int_64(0x98eb44a87, H_trunc[5]),
+      new Int_64(0xdb0c2e0d, H_trunc[6]),
+      new Int_64(0x047b5481d, H_trunc[7]),
+    ];
+  } else {
+    /* SHA-512 */
+    retVal = [
+      new Int_64(H_full[0], 0xf3bcc908),
+      new Int_64(H_full[1], 0x84caa73b),
+      new Int_64(H_full[2], 0xfe94f82b),
+      new Int_64(H_full[3], 0x5f1d36f1),
+      new Int_64(H_full[4], 0xade682d1),
+      new Int_64(H_full[5], 0x2b3e6c1f),
+      new Int_64(H_full[6], 0xfb41bd6b),
+      new Int_64(H_full[7], 0x137e2179),
+    ];
   }
   return retVal;
 }
@@ -261,7 +257,8 @@ function finalizeSHA512(
       H[5].highOrder,
       H[5].lowOrder,
     ];
-  } else if ("SHA-512" === variant) {
+  } else {
+    /* SHA-512 */
     retVal = [
       H[0].highOrder,
       H[0].lowOrder,
@@ -280,10 +277,7 @@ function finalizeSHA512(
       H[7].highOrder,
       H[7].lowOrder,
     ];
-  } else {
-    throw new Error("Unexpected error in SHA-512 implementation");
   }
-
   return retVal;
 }
 
@@ -309,7 +303,7 @@ export default class jsSHA extends jsSHABase<Int_64[], "SHA-384" | "SHA-512"> {
     super(variant, inputFormat, options);
 
     if (false === ("SHA-384" === variant || "SHA-512" === variant)) {
-      throw new Error("Chosen SHA variant is not supported");
+      throw new Error(sha_variant_error);
     }
 
     this.bigEndianMod = -1;

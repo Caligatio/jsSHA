@@ -1,4 +1,4 @@
-import { jsSHABase, TWO_PWR_32, H_full, H_trunc, K_sha2 } from "./common";
+import { jsSHABase, TWO_PWR_32, H_full, H_trunc, K_sha2, sha_variant_error } from "./common";
 import { packedValue, getStrConverter } from "./converters";
 import {
   ch_32,
@@ -21,15 +21,11 @@ import {
 function getNewState256(variant: "SHA-224" | "SHA-256"): number[] {
   let retVal;
 
-  switch (variant) {
-    case "SHA-224":
-      retVal = H_trunc.slice();
-      break;
-    case "SHA-256":
-      retVal = H_full.slice();
-      break;
-    default:
-      throw new Error("No SHA variants supported");
+  if ("SHA-224" == variant) {
+    retVal = H_trunc.slice();
+  } else {
+    /* "SHA-256" */
+    retVal = H_full.slice();
   }
   return retVal;
 }
@@ -144,10 +140,9 @@ function finalizeSHA256(
 
   if ("SHA-224" === variant) {
     retVal = [H[0], H[1], H[2], H[3], H[4], H[5], H[6]];
-  } else if ("SHA-256" === variant) {
+  } else {
+    /* "SHA-256 */
     retVal = H;
-  } /* This should never be reached */ else {
-    throw new Error("Unexpected error in SHA-256 implementation");
   }
 
   return retVal;
@@ -174,7 +169,7 @@ export default class jsSHA extends jsSHABase<number[], "SHA-224" | "SHA-256"> {
     super(variant, inputFormat, options);
 
     if (false === ("SHA-224" === variant || "SHA-256" === variant)) {
-      throw new Error("Chosen SHA variant is not supported");
+      throw new Error(sha_variant_error);
     }
 
     this.bigEndianMod = -1;
