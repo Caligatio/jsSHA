@@ -275,7 +275,7 @@ export default class jsSHA extends jsSHABase<
     this.roundFunc = roundSHA3;
     this.stateCloneFunc = cloneSHA3State;
     this.newStateFunc = getNewState;
-    this.finalizeFunc = function (remainder, remainderBinLen, processedBinLen, state): number[] {
+    this.finalizeFunc = function (remainder, remainderBinLen, processedBinLen, state, outputBinLen): number[] {
       return finalizeSHA3(
         remainder,
         remainderBinLen,
@@ -283,7 +283,7 @@ export default class jsSHA extends jsSHABase<
         state,
         this.variantBlockSize,
         delimiter,
-        this.outputBinLen
+        outputBinLen
       );
     };
     this.intermediateState = getNewState(variant);

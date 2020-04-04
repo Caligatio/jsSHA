@@ -138,7 +138,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
   /* Variant specifics */
   protected abstract readonly variantBlockSize: number;
   protected abstract readonly bigEndianMod: -1 | 1;
-  protected abstract outputBinLen: number;
+  protected abstract readonly outputBinLen: number;
   protected abstract readonly isSHAKE: boolean;
 
   /* Functions */
@@ -150,7 +150,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     remainderBinLen: number,
     processedBinLen: number,
     H: StateType,
-    _outputLen: number
+    outputLen: number
   ) => number[];
   protected abstract readonly stateCloneFunc: (state: StateType) => StateType;
   protected abstract readonly newStateFunc: (variant: VariantTypes) => StateType;
@@ -166,8 +166,9 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     this.numRounds = this.inputOptions["numRounds"] || 1;
 
     /* eslint-disable-next-line @typescript-eslint/ban-ts-ignore */
-    // @ts-ignore - Need to use parseInt as a type-check
-    if (this.numRounds !== parseInt(this.numRounds, 10) || 1 > this.numRounds) {
+    // @ts-ignore - The spec actually says ToString is called on the first parseInt argument so it's OK to use it here
+    // to check if an arugment is an integer. This cheat would break if it's used to get the value of the argument.
+    if (isNaN(this.numRounds) || this.numRounds !== parseInt(this.numRounds, 10) || 1 > this.numRounds) {
       throw new Error("numRounds must a integer >= 1");
     }
 
@@ -222,7 +223,9 @@ export abstract class jsSHABase<StateType, VariantTypes> {
     format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
     options?: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number }
   ): string | ArrayBuffer | Uint8Array {
-    let i, finalizedState;
+    let i,
+      finalizedState,
+      outputBinLen = this.outputBinLen;
 
     if (true === this.hmacKeySet) {
       throw new Error("Cannot call getHash after setting HMAC key");
@@ -234,29 +237,29 @@ export abstract class jsSHABase<StateType, VariantTypes> {
       if (outputOptions["shakeLen"] === -1) {
         throw new Error("shakeLen must be specified in options");
       }
-      this.outputBinLen = outputOptions["shakeLen"];
+      outputBinLen = outputOptions["shakeLen"];
     }
 
-    const formatFunc = getOutputConverter(format, this.outputBinLen, this.bigEndianMod, outputOptions);
+    const formatFunc = getOutputConverter(format, outputBinLen, this.bigEndianMod, outputOptions);
 
     finalizedState = this.finalizeFunc(
       this.remainder.slice(),
       this.remainderLen,
       this.processedLen,
       this.stateCloneFunc(this.intermediateState),
-      this.outputBinLen
+      outputBinLen
     );
     for (i = 1; i < this.numRounds; i += 1) {
       /* Need to mask out bits that should be zero due to output not being a multiple of 32 */
-      if (this.isSHAKE === true && this.outputBinLen % 32 !== 0) {
-        finalizedState[finalizedState.length - 1] &= 0x00ffffff >>> (24 - (this.outputBinLen % 32));
+      if (this.isSHAKE === true && outputBinLen % 32 !== 0) {
+        finalizedState[finalizedState.length - 1] &= 0x00ffffff >>> (24 - (outputBinLen % 32));
       }
       finalizedState = this.finalizeFunc(
         finalizedState,
-        this.outputBinLen,
+        outputBinLen,
         0,
         this.newStateFunc(this.shaVariant),
-        this.outputBinLen
+        outputBinLen
       );
     }
 
@@ -308,21 +311,9 @@ export abstract class jsSHABase<StateType, VariantTypes> {
      * the hash's block size */
     if (blockByteSize < keyBinLen / 8) {
       keyToUse = this.finalizeFunc(keyToUse, keyBinLen, 0, this.newStateFunc(this.shaVariant), this.outputBinLen);
-      /* For all variants, the block size is bigger than the output
-       * size so there will never be a useful byte at the end of the
-       * string */
-      while (keyToUse.length <= lastArrayIndex) {
-        keyToUse.push(0);
-      }
-      keyToUse[lastArrayIndex] &= 0xffffff00;
-    } else if (blockByteSize > keyBinLen / 8) {
-      /* If the blockByteSize is greater than the key length, there
-       * will always be at LEAST one "useless" byte at the end of the
-       * string */
-      while (keyToUse.length <= lastArrayIndex) {
-        keyToUse.push(0);
-      }
-      keyToUse[lastArrayIndex] &= 0xffffff00;
+    }
+    while (keyToUse.length <= lastArrayIndex) {
+      keyToUse.push(0);
     }
     /* Create ipad and opad */
     for (i = 0; i <= lastArrayIndex; i += 1) {
