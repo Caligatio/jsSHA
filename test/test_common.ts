@@ -291,8 +291,8 @@ describe("Test jsSHABase", () => {
     assert.equal(stubbedFinalize.callCount, 3);
 
     // Check #3
-    stubbedFinalize.getCall(1).calledWith([dummyVals[0], dummyVals[1] & 0x00FFFFFF], 24);
-    stubbedFinalize.getCall(2).calledWith([dummyVals[0], dummyVals[1] & 0x00FFFFFF], 24);
+    stubbedFinalize.getCall(1).calledWith([dummyVals[0], dummyVals[1] & 0x00ffffff], 24);
+    stubbedFinalize.getCall(2).calledWith([dummyVals[0], dummyVals[1] & 0x00ffffff], 24);
   });
 
   it("Test setHMACKey with Short Key", () => {
@@ -304,19 +304,36 @@ describe("Test jsSHABase", () => {
      *   4. hmacKeySet was set
      *   5. processedLen was updated
      */
-    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX", { numRounds: 3 });
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
     sinon.reset();
     stubbedRound.returns([dummyVals[0], dummyVals[1]]);
     stubbedJsSHA.setHMACKey("ABCDEFGH", "TEXT");
 
     // Check #1
-    assert.deepEqual(stubbedJsSHA.getter("keyWithIPad"), [0x41424344 ^ 0x36363636, 0x45464748 ^ 0x36363636]);
+    assert.deepEqual(
+      stubbedJsSHA.getter("keyWithIPad"),
+      [0x41424344, 0x45464748].map((val) => {
+        return val ^ 0x36363636;
+      })
+    );
 
     // Check #2
-    assert.deepEqual(stubbedJsSHA.getter("keyWithOPad"), [0x41424344 ^ 0x5c5c5c5c, 0x45464748 ^ 0x5c5c5c5c]);
+    assert.deepEqual(
+      stubbedJsSHA.getter("keyWithOPad"),
+      [0x41424344, 0x45464748].map((val) => {
+        return val ^ 0x5c5c5c5c;
+      })
+    );
 
     // Check #3
-    assert.isTrue(stubbedRound.calledOnceWithExactly([0x41424344 ^ 0x36363636, 0x45464748 ^ 0x36363636], [0, 0]));
+    assert.isTrue(
+      stubbedRound.calledOnceWithExactly(
+        [0x41424344, 0x45464748].map((val) => {
+          return val ^ 0x36363636;
+        }),
+        [0, 0]
+      )
+    );
     assert.deepEqual(stubbedJsSHA.getter("intermediateState"), [dummyVals[0], dummyVals[1]]);
 
     // Check #4
@@ -324,5 +341,85 @@ describe("Test jsSHABase", () => {
 
     // Check #5
     assert.equal(stubbedJsSHA.getter("processedLen"), 64);
+  });
+
+  it("Test setHMACKey with Long Key", () => {
+    /*
+     * Check a few basic things:
+     *   1. Finalize was called with the correct keying material
+     *   2. keyWithIPad is set correctly
+     *   3. keyWithOPad is set correctly
+     *   4. The round function was called with the input set as the output from finalize and its return value stored as intermediateState
+     */
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX"),
+      inputStr = "ABCDEFGHABCD",
+      inputStrPacked = [0x41424344, 0x45464748, 0x41424344];
+    sinon.reset();
+    stubbedFinalize.returns([dummyVals[0], dummyVals[1]]);
+    stubbedRound.returns([dummyVals[2], dummyVals[3]]);
+    stubbedNewState.returns([dummyVals[4], dummyVals[5]]);
+
+    // Need to call setHMACKey with more than 64-bits of key material to test handling of "large" key sizes
+    stubbedJsSHA.setHMACKey(inputStr, "TEXT");
+
+    // Check #1
+    assert.isTrue(stubbedFinalize.calledOnceWithExactly(inputStrPacked, 96, 0, [dummyVals[4], dummyVals[5]], 64));
+
+    // Check #2
+    assert.deepEqual(
+      stubbedJsSHA.getter("keyWithIPad"),
+      [dummyVals[0], dummyVals[1]].map((val) => {
+        return val ^ 0x36363636;
+      })
+    );
+
+    // Check #3
+    assert.deepEqual(
+      stubbedJsSHA.getter("keyWithOPad"),
+      [dummyVals[0], dummyVals[1]].map((val) => {
+        return val ^ 0x5c5c5c5c;
+      })
+    );
+
+    // Check #4
+    assert.isTrue(
+      stubbedRound.calledOnceWithExactly(
+        [dummyVals[0], dummyVals[1]].map((val) => {
+          return val ^ 0x36363636;
+        }),
+        [0, 0]
+      )
+    );
+    assert.deepEqual(stubbedJsSHA.getter("intermediateState"), [dummyVals[2], dummyVals[3]]);
+  });
+
+  it("Test setHMACKey Error on Double Call", () => {
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
+    stubbedJsSHA.setter("hmacKeySet", true);
+    sinon.reset();
+
+    assert.throws(() => {
+      stubbedJsSHA.setHMACKey("ABCD", "TEXT");
+    }, "HMAC key already set");
+  });
+
+  it("Test setHMACKey Error on After update", () => {
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
+    stubbedJsSHA.setter("updateCalled", true);
+    sinon.reset();
+
+    assert.throws(() => {
+      stubbedJsSHA.setHMACKey("ABCD", "TEXT");
+    }, "Cannot set HMAC key after calling update");
+  });
+
+  it("Test setHMACKey Error on SHAKE Variant", () => {
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
+    stubbedJsSHA.setter("isSHAKE", true);
+    sinon.reset();
+
+    assert.throws(() => {
+      stubbedJsSHA.setHMACKey("ABCD", "TEXT");
+    }, "SHAKE is not supported for HMAC");
   });
 });
