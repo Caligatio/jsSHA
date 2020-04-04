@@ -2093,27 +2093,14 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			 * the hash's block size */
 			if (blockByteSize < (keyBinLen / 8))
 			{
-
 				keyToUse = finalizeFunc(keyToUse, keyBinLen, 0,getNewState(shaVariant), outputBinLen);
-				/* For all variants, the block size is bigger than the output
-				 * size so there will never be a useful byte at the end of the
-				 * string */
-				while (keyToUse.length <= lastArrayIndex)
-				{
-					keyToUse.push(0);
-				}
-				keyToUse[lastArrayIndex] &= 0xFFFFFF00;
+
 			}
-			else if (blockByteSize > (keyBinLen / 8))
+
+			/* It's OK to always do this as it's a noop if key length is equal to the block size */
+			while (keyToUse.length <= lastArrayIndex)
 			{
-				/* If the blockByteSize is greater than the key length, there
-				 * will always be at LEAST one "useless" byte at the end of the
-				 * string */
-				while (keyToUse.length <= lastArrayIndex)
-				{
-					keyToUse.push(0);
-				}
-				keyToUse[lastArrayIndex] &= 0xFFFFFF00;
+				keyToUse.push(0);
 			}
 
 			/* Create ipad and opad */
