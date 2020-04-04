@@ -498,7 +498,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 		return retVal;
 	}
 
-    /**
+	/**
 	 * Convert an array of big-endian words to an Uint8Array
 	 *
 	 * @private
@@ -689,7 +689,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 				   return arraybuffer2packed(arr, existingBin, existingBinLen, bigEndianMod);
 				};
 			break;
-        case "UINT8ARRAY":
+		case "UINT8ARRAY":
 			try {
 				retVal = new Uint8Array(0);
 			} catch(ignore) {
