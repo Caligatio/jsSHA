@@ -275,7 +275,7 @@ export abstract class jsSHABase<StateType, VariantTypes> {
    */
   setHMACKey(
     key: string | ArrayBuffer | Uint8Array,
-    inputFormat: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
+    inputFormat: "B64" | "HEX" | "TEXT" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
     options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE" }
   ): void {
     let keyToUse, i;
