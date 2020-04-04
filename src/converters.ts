@@ -469,6 +469,9 @@ export function getStrConverter(
 /**
  * Convert an array of big-endian words to a hex string.
  *
+ * toString() won't work here because it removes preceding zeros (e.g. 0x00000001.toString === "1" rather than
+ * "00000001" and 0.toString(16) === "0" rather than "00").
+ *
  * @param packed Array of integers to be converted to
  *   hexidecimal representation
  * @param outputLength Length of output in bits
