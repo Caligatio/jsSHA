@@ -46,7 +46,20 @@ describe("Test jsSHABase", () => {
     stubbedNewState = sinon.stub(),
     stubbedFinalize = sinon.stub(),
     stubbedStateClone = sinon.stub(),
-    dummyVals = [0x11223344, 0xaabbccdd, 0xdeadbeef, 0xfacefeed, 0xbaddcafe, 0xdeadc0fe];
+    dummyVals = [
+      0x11223344,
+      0xaabbccdd,
+      0xdeadbeef,
+      0xfacefeed,
+      0xbaddcafe,
+      0xdeadcafe,
+      0xdead2bad,
+      0xdeaddead,
+      0xcafed00d,
+      0xdecafbad,
+      0xfee1dead,
+      0xdeadfa11,
+    ];
 
   class jsSHAATest extends jsSHABase<number[], "SHA-TEST"> {
     intermediateState: number[];
@@ -421,5 +434,67 @@ describe("Test jsSHABase", () => {
     assert.throws(() => {
       stubbedJsSHA.setHMACKey("ABCD", "TEXT");
     }, "SHAKE is not supported for HMAC");
+  });
+
+  it("Test getHMAC", () => {
+    /*
+     * Check a few basic things:
+     *   1. It returns the formatted output of the last finalizeFunc call
+     *   2. finalizeFunc was called with a clone of the remainder and correct parameters
+     *   3. roundFunc was called with keyWithOPad
+     *   4. finalizeFunc was called with the output of the previous finalizeFunc's output and the roundFunc's state
+     *   5. remainder, intermediateState, and remainderLen remain untouched
+     */
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX"),
+      intermediateState = [dummyVals[6], dummyVals[7]],
+      remainder = [dummyVals[0]],
+      keyWithOPad = [dummyVals[10], dummyVals[11]],
+      newState = [dummyVals[8], dummyVals[9]],
+      clonedState = [dummyVals[6], dummyVals[7]];
+    sinon.reset();
+
+    stubbedFinalize
+      .onCall(0)
+      .returns([dummyVals[0], dummyVals[1]])
+      .onCall(1)
+      .returns([[dummyVals[2]], dummyVals[3]]);
+    stubbedRound.returns([dummyVals[4], dummyVals[5]]);
+    stubbedStateClone.returns(clonedState);
+    stubbedNewState.returns(newState);
+
+    stubbedJsSHA.setter("hmacKeySet", true);
+    stubbedJsSHA.setter("processedLen", 64);
+    stubbedJsSHA.setter("keyWithOPad", keyWithOPad);
+    stubbedJsSHA.setter("remainder", remainder);
+    stubbedJsSHA.setter("remainderLen", 32);
+    stubbedJsSHA.setter("intermediateState", intermediateState);
+
+    // Check #1
+    assert.equal(stubbedJsSHA.getHMAC("HEX"), "deadbeeffacefeed");
+
+    // Check #2
+    stubbedFinalize.getCall(0).calledWithExactly(remainder, 32, 64, clonedState, 64);
+
+    // Check #3
+    stubbedRound.calledOnceWithExactly(keyWithOPad, newState);
+
+    // Check #4
+    stubbedFinalize
+      .getCall(1)
+      .calledWithExactly([dummyVals[0], dummyVals[1]], 64, 64, [dummyVals[4], dummyVals[5]], 64);
+
+    // Check #5
+    assert.equal(stubbedJsSHA.getter("remainder"), remainder);
+    assert.equal(stubbedJsSHA.getter("remainderLen"), 32);
+    assert.equal(stubbedJsSHA.getter("intermediateState"), intermediateState);
+  });
+
+  it("Test getHMAC Error on Not Setting HMAC Key", () => {
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
+    sinon.reset();
+
+    assert.throws(() => {
+      stubbedJsSHA.getHMAC("HEX");
+    }, "Cannot call getHMAC without first setting HMAC key");
   });
 });
