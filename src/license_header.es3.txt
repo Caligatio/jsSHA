@@ -6,7 +6,7 @@
  * Distributed under the BSD License
  * See http://caligatio.github.com/jsSHA/ for more information
  *
- * Two ECMAScript shim functions carry the following license:
+ * Two ECMAScript polyfill functions carry the following license:
  *
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
