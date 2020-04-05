@@ -101,7 +101,7 @@ describe("Test jsSHABase", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getter(propName: string): any {
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
+      // @ts-ignore - Override "any" ban as this is only used in testing
       return this[propName];
     }
 
@@ -111,7 +111,7 @@ describe("Test jsSHABase", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setter(propName: string, value: any): void {
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
+      // @ts-ignore - Override "any" ban as this is only used in testing
       this[propName] = value;
     }
   }
