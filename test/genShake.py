@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import binascii
-
-import sha3
+import hashlib
 
 
 def main():
@@ -11,7 +10,7 @@ def main():
         "Long": "a" * 1000000,
     }
 
-    hash_funcs = {"SHAKE128": sha3.SHAKE128, "SHAKE256": sha3.SHAKE256}
+    hash_funcs = {"SHAKE128": hashlib.shake_128, "SHAKE256": hashlib.shake_256}
     output_lens = [31, 63]
 
     for hash_name, hash_func in hash_funcs.items():
@@ -22,7 +21,9 @@ def main():
                         hash_name,
                         vector_name,
                         output_len * 8,
-                        binascii.hexlify(hash_func(vector_value.encode(), output_len)).decode(),
+                        binascii.hexlify(
+                            hash_func(vector_value.encode()).digest(output_len)
+                        ).decode(),
                     )
                 )
                 print(
@@ -30,7 +31,9 @@ def main():
                         hash_name,
                         vector_name,
                         output_len * 8,
-                        binascii.hexlify(hash_func(vector_value.encode("UTF-16BE"), output_len)).decode(),
+                        binascii.hexlify(
+                            hash_func(vector_value.encode("UTF-16BE")).digest(output_len)
+                        ).decode(),
                     )
                 )
                 print(
@@ -38,7 +41,9 @@ def main():
                         hash_name,
                         vector_name,
                         output_len * 8,
-                        binascii.hexlify(hash_func(vector_value.encode("UTF-16LE"), output_len)).decode(),
+                        binascii.hexlify(
+                            hash_func(vector_value.encode("UTF-16LE")).digest(output_len)
+                        ).decode(),
                     )
                 )
 
