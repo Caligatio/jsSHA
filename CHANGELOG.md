@@ -1,6 +1,11 @@
 jsSHA - ChangeLog
 =========================
 
+2.4.1 (2020-04-04)
+-------------------------
+- Fixed incorrect HMAC results when using SHA-3 if the key was 1-4 bytes
+  shorter than the internal block size of the chosen SHA-3 variant.
+
 2.4.0 (2020-03-26)
 -------------------------
 - Reduced ECMAScript dependency to v3 (thanks TitusInfo!)
