@@ -1,8 +1,9 @@
 {
   "name": "jssha",
-  "version": "2.4.1",
-  "description": "jsSHA is a JavaScript implementation of the complete Secure Hash Standard family (SHA-1, SHA-224, SHA3-224, SHA-256, SHA3-256, SHA-384, SHA3-384, SHA-512, SHA3-512, SHAKE128, and SHAKE256) as well as HMAC",
-  "main": "src/sha.js",
+  "version": "3.0.0",
+  "description": "jsSHA implements the complete Secure Hash Standard family (SHA-1, SHA-224/256, SHA-384/512, SHA3-224/256/384/512, SHAKE128/256) with HMAC",
+  "main": "dist/sha.umd.js",
+  "module": "dist/sha.esm.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Caligatio/jsSHA.git"
