@@ -86,7 +86,7 @@
       "dist",
       "*.js",
       "coverage",
-      "test/*.js"
+      "test"
     ],
     "reporter": [
       "text",
