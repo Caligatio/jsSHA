@@ -54,6 +54,7 @@
     "@typescript-eslint/eslint-plugin": "^2.26.0",
     "@typescript-eslint/parser": "^2.26.0",
     "chai": "^4.2.0",
+    "coveralls": "^3.0.11",
     "eslint": "^6.8.0",
     "mocha": "^7.1.1",
     "nyc": "^15.0.0",
@@ -68,8 +69,8 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "test": "mocha",
-    "coverage": "nyc mocha"
+    "test": "nyc --reporter=html --reporter=text mocha",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "mocha": {
     "spec": "test/*.ts",
@@ -81,9 +82,16 @@
     "require": [
       "ts-node/register"
     ],
+    "exclude": [
+      "dist",
+      "*.js",
+      "coverage",
+      "test/*.js"
+    ],
     "reporter": [
       "text",
       "html"
-    ]
+    ],
+    "all": true
   }
 }
