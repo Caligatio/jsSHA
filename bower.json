@@ -37,7 +37,7 @@
   "license": "BSD-3-Clause",
   "authors": ["Brian Turek <brian.turek@gmail.com>"],
   "homepage": "http://caligatio.github.com/jsSHA/",
-  "ignore": ["test", "src", "rollup.config.js", "tsconfig.json", "**/.*"],
+  "ignore": ["test", "rollup.config.js", "tsconfig.json", "**/.*"],
   "devDependencies": {
     "chai": "^4.2.0",
     "mocha": "^7.1.1"

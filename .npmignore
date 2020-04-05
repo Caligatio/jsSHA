@@ -1,10 +1,7 @@
-src/
 test/
 coverage/
 *.tgz
 rollup.config.js
 tsconfig.json
-.nyc_output
-.travis.yml
-.eslintrc.js
-
+bower.json
+**/.*
