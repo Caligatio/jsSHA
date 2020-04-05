@@ -241,7 +241,15 @@ describe("Test jsSHABase", () => {
     assert.equal(remainder, stubbedJsSHA.getter("remainder"));
 
     // Check #3
-    assert.isTrue(stubbedFinalize.calledOnceWith([dummyVals[5]], 32, 64, [dummyVals[2], dummyVals[3]], 64));
+    assert.isTrue(
+      stubbedFinalize.calledOnceWith(
+        [dummyVals[5]],
+        32,
+        64,
+        [dummyVals[2], dummyVals[3]],
+        stubbedJsSHA.getter("outputBinLen")
+      )
+    );
   });
 
   it("Test getHash for SHAKE", () => {
@@ -353,7 +361,7 @@ describe("Test jsSHABase", () => {
     assert.isTrue(stubbedJsSHA.getter("hmacKeySet"));
 
     // Check #5
-    assert.equal(stubbedJsSHA.getter("processedLen"), 64);
+    assert.equal(stubbedJsSHA.getter("processedLen"), stubbedJsSHA.getter("variantBlockSize"));
   });
 
   it("Test setHMACKey with Long Key", () => {
@@ -376,7 +384,15 @@ describe("Test jsSHABase", () => {
     stubbedJsSHA.setHMACKey(inputStr, "TEXT");
 
     // Check #1
-    assert.isTrue(stubbedFinalize.calledOnceWithExactly(inputStrPacked, 96, 0, [dummyVals[4], dummyVals[5]], 64));
+    assert.isTrue(
+      stubbedFinalize.calledOnceWithExactly(
+        inputStrPacked,
+        96,
+        0,
+        [dummyVals[4], dummyVals[5]],
+        stubbedJsSHA.getter("outputBinLen")
+      )
+    );
 
     // Check #2
     assert.deepEqual(
@@ -473,7 +489,15 @@ describe("Test jsSHABase", () => {
     assert.equal(stubbedJsSHA.getHMAC("HEX"), "deadbeeffacefeed");
 
     // Check #2
-    stubbedFinalize.getCall(0).calledWithExactly(remainder, 32, 64, clonedState, 64);
+    stubbedFinalize
+      .getCall(0)
+      .calledWithExactly(
+        remainder,
+        32,
+        stubbedJsSHA.getter("outputBinLen"),
+        clonedState,
+        stubbedJsSHA.getter("outputBinLen")
+      );
 
     // Check #3
     stubbedRound.calledOnceWithExactly(keyWithOPad, newState);
@@ -481,7 +505,13 @@ describe("Test jsSHABase", () => {
     // Check #4
     stubbedFinalize
       .getCall(1)
-      .calledWithExactly([dummyVals[0], dummyVals[1]], 64, 64, [dummyVals[4], dummyVals[5]], 64);
+      .calledWithExactly(
+        [dummyVals[0], dummyVals[1]],
+        stubbedJsSHA.getter("outputBinLen"),
+        stubbedJsSHA.getter("variantBlockSize"),
+        [dummyVals[4], dummyVals[5]],
+        stubbedJsSHA.getter("outputBinLen")
+      );
 
     // Check #5
     assert.equal(stubbedJsSHA.getter("remainder"), remainder);
