@@ -75,7 +75,7 @@
   "scripts": {
     "build": "rollup -c",
     "test": "nyc --reporter=html --reporter=text mocha test/src/*.ts",
-    "test_dist": "karma start karma.conf.js --file-variant sha && karma start karma.conf.js --file-variant sha1 && karma start karma.conf.js --file-variant sha256 && karma start karma.conf.js --file-variant sha512 && karma start karma.conf.js --file-variant sha3",
+    "test_dist": "mocha test/dist/test_esm.mjs && karma start karma.conf.js --file-variant sha && karma start karma.conf.js --file-variant sha1 && karma start karma.conf.js --file-variant sha256 && karma start karma.conf.js --file-variant sha512 && karma start karma.conf.js --file-variant sha3",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "mocha": {
