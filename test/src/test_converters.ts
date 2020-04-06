@@ -2,9 +2,9 @@ import { describe, it } from "mocha";
 import rewire from "rewire";
 import sinon from "sinon";
 import { assert } from "chai";
-import { packedValue } from "../src/converters";
+import { packedValue } from "../../src/converters";
 
-const converters = rewire("../src/converters");
+const converters = rewire("../../src/converters");
 
 function newArrayBuffer(bytes: number[]): ArrayBuffer {
   const ab = new ArrayBuffer(bytes.length),

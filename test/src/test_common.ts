@@ -1,8 +1,8 @@
 import { describe, it } from "mocha";
 import sinon from "sinon";
 import { assert } from "chai";
-import { getOutputOpts, jsSHABase } from "../src/common";
-import { packedValue } from "../src/converters";
+import { getOutputOpts, jsSHABase } from "../../src/common";
+import { packedValue } from "../../src/converters";
 
 describe("Test getOutputOpts", () => {
   it("Empty Input", () => {

@@ -56,6 +56,11 @@
     "chai": "^4.2.0",
     "coveralls": "^3.0.11",
     "eslint": "^6.8.0",
+    "karma": "^4.4.1",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-firefox-launcher": "^1.3.0",
+    "karma-mocha": "^1.3.0",
     "mocha": "^7.1.1",
     "nyc": "^15.0.0",
     "prettier": "^2.0.2",
@@ -70,10 +75,11 @@
   "scripts": {
     "build": "rollup -c",
     "test": "nyc --reporter=html --reporter=text mocha",
+    "test_dist": "karma start karma.conf.js --file-variant sha && karma start karma.conf.js --file-variant sha1 && karma start karma.conf.js --file-variant sha256 && karma start karma.conf.js --file-variant sha512 && karma start karma.conf.js --file-variant sha3",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "mocha": {
-    "spec": "test/*.ts",
+    "spec": "test/src/*.ts",
     "require": [
       "ts-node/register"
     ]

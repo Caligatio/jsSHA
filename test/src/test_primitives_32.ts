@@ -12,10 +12,10 @@ import {
   safeAdd_32_5,
   sigma0_32,
   sigma1_32,
-} from "../src/primitives_32";
+} from "../../src/primitives_32";
 import rewire from "rewire";
 
-const primitives_32 = rewire("../src/primitives_32");
+const primitives_32 = rewire("../../src/primitives_32");
 
 describe("Test rotl_32", () => {
   it("With Wrap Around", () => {

@@ -1,0 +1,869 @@
+/* globals module, define, self */
+(function (global, factory) {
+  typeof exports === "object" && typeof module !== "undefined"
+    ? (module.exports = factory())
+    : typeof define === "function" && define.amd
+    ? define(factory)
+    : ((global = global || self), (global.hashData = factory()));
+})(this, function () {
+  "use strict";
+
+  String.prototype.repeat = function (times) {
+    return new Array(times + 1).join(this);
+  };
+
+  /* This is used often so make a global copy that everything can reference */
+  const millionaAscii = "a".repeat(1000000);
+
+  const hash_data = {
+    "SHA-1": [
+      {
+        name: "Short",
+        input: { type: "TEXT", value: "abc", encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "a9993e364706816aba3e25717850c26c9cd0d89d" }],
+      },
+      {
+        name: "Medium",
+        input: { type: "TEXT", value: "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "84983e441c3bd26ebaae4aa1f95129e5e54670f1" }],
+      },
+      {
+        name: "Long",
+        input: { type: "TEXT", value: millionaAscii, encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "34aa973cd4c4daa4f61eeb2bdbad27316534016f" }],
+      },
+      {
+        name: "Short with 5 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 5, encoding: "UTF8" },
+        outputs: [{ type: "HEX", rounds: 5, value: "b5c64925eb9940259be55c005c9cecc7d9897ef9" }],
+      },
+      {
+        name: "Short with 10 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 10, encoding: "UTF8" },
+        outputs: [{ type: "HEX", rounds: 10, value: "94ebc0d3c81b61eb98670666f5fde68560c4e165" }],
+      },
+      {
+        name: "HMAC With Short Key",
+        input: { type: "TEXT", value: "Sample message for keylen<blocklen" },
+        key: { type: "HEX", value: "000102030405060708090A0B0C0D0E0F10111213" },
+        outputs: [{ type: "HEX", value: "4c99ff0cb1b31bd33f8431dbaf4d17fcd356a807" }],
+      },
+      {
+        name: "HMAC With Medium Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+        },
+        outputs: [{ type: "HEX", value: "5fd596ee78d5553c8ff4e72d266dfd192366da29" }],
+      },
+      {
+        name: "HMAC With Long Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263",
+        },
+        outputs: [{ type: "HEX", value: "2d51b2f7750e410584662e38f133435f4c4fd42a" }],
+      },
+    ],
+    "SHA-224": [
+      {
+        name: "Short",
+        input: { type: "TEXT", value: "abc", encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7" }],
+      },
+      {
+        name: "Medium",
+        input: { type: "TEXT", value: "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "75388b16512776cc5dba5da1fd890150b0c6455cb4f58b1952522525" }],
+      },
+      {
+        name: "Long",
+        input: { type: "TEXT", value: millionaAscii, encoding: "UTF8" },
+
+        outputs: [{ type: "HEX", value: "20794655980c91d8bbb4c1ea97618a4bf03f42581948b2ee4ee7ad67" }],
+      },
+      {
+        name: "Short with 5 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 5, encoding: "UTF8" },
+        outputs: [{ type: "HEX", rounds: 5, value: "5b4b17f720d52c6a864229e784fb636184ca48ce7dd848fdad986239" }],
+      },
+      {
+        name: "Short with 10 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 10, encoding: "UTF8" },
+        outputs: [{ type: "HEX", rounds: 10, value: "5230eb37afcc115f4f380a9f50c4743d457bbe586e6faa6bf21696f9" }],
+      },
+      {
+        name: "HMAC With Short Key",
+        input: { type: "TEXT", value: "Sample message for keylen<blocklen" },
+        key: { type: "HEX", value: "000102030405060708090A0B0C0D0E0F101112131415161718191A1B" },
+        outputs: [{ type: "HEX", value: "e3d249a8cfb67ef8b7a169e9a0a599714a2cecba65999a51beb8fbbe" }],
+      },
+      {
+        name: "HMAC With Medium Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+        },
+        outputs: [{ type: "HEX", value: "c7405e3ae058e8cd30b08b4140248581ed174cb34e1224bcc1efc81b" }],
+      },
+      {
+        name: "HMAC With Long Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263",
+        },
+        outputs: [{ type: "HEX", value: "91c52509e5af8531601ae6230099d90bef88aaefb961f4080abc014d" }],
+      },
+    ],
+    "SHA3-224": [
+      {
+        name: "Short",
+        input: { type: "TEXT", value: "abc", encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "e642824c3f8cf24ad09234ee7d3c766fc9a3a5168d0c94ad73b46fdf" }],
+      },
+      {
+        name: "Medium",
+        input: { type: "TEXT", value: "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "8a24108b154ada21c9fd5574494479ba5c7e7ab76ef264ead0fcce33" }],
+      },
+      {
+        name: "Long",
+        input: { type: "TEXT", value: millionaAscii, encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "d69335b93325192e516a912e6d19a15cb51c6ed5c15243e7a7fd653c" }],
+      },
+      {
+        name: "Short with 5 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 5, encoding: "UTF8" },
+        outputs: [{ type: "HEX", rounds: 5, value: "7d208060760d239d9e9b041b5c30ac992b83ff1df658263953c9eff0" }],
+      },
+      {
+        name: "Short with 10 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 10, encoding: "UTF8" },
+        outputs: [{ type: "HEX", rounds: 10, value: "a1b668748fd69b8b6a6453d3bada2b9eb9a06a29b78fbcff5ab530ae" }],
+      },
+      {
+        name: "HMAC With Short Key",
+        input: { type: "TEXT", value: "Sample message for keylen<blocklen" },
+        key: { type: "HEX", value: "000102030405060708090A0B0C0D0E0F101112131415161718191A1B" },
+        outputs: [{ type: "HEX", value: "332cfd59347fdb8e576e77260be4aba2d6dc53117b3bfb52c6d18c04" }],
+      },
+      {
+        name: "HMAC With Medium Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f",
+        },
+        outputs: [{ type: "HEX", value: "d8b733bcf66c644a12323d564e24dcf3fc75f231f3b67968359100c7" }],
+      },
+      {
+        name: "HMAC With Long Key",
+        input: { type: "TEXT", value: "Sample message for keylen>blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaab",
+        },
+        outputs: [{ type: "HEX", value: "078695eecc227c636ad31d063a15dd05a7e819a66ec6d8de1e193e59" }],
+      },
+    ],
+    "SHA-256": [
+      {
+        name: "Short",
+        input: { type: "TEXT", value: "abc", encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" }],
+      },
+      {
+        name: "Medium",
+        input: { type: "TEXT", value: "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1" }],
+      },
+      {
+        name: "Long",
+        input: { type: "TEXT", value: millionaAscii, encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0" }],
+      },
+      {
+        name: "Short with 5 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 5, encoding: "UTF8" },
+        outputs: [
+          { type: "HEX", rounds: 5, value: "184f6d6e82554c051b33f15e7ffffecb0cc0f461a29096c41c214e168e34c21d" },
+        ],
+      },
+      {
+        name: "Short with 10 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 10, encoding: "UTF8" },
+        outputs: [
+          { type: "HEX", rounds: 10, value: "10e286f907c0fe9f02cea3864cbaec04ae47e2c0a13b60473bc9968a4851b219" },
+        ],
+      },
+      {
+        name: "HMAC With Short Key",
+        input: { type: "TEXT", value: "Sample message for keylen<blocklen" },
+        key: { type: "HEX", value: "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F" },
+        outputs: [{ type: "HEX", value: "a28cf43130ee696a98f14a37678b56bcfcbdd9e5cf69717fecf5480f0ebdf790" }],
+      },
+      {
+        name: "HMAC With Medium Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+        },
+        outputs: [{ type: "HEX", value: "8bb9a1db9806f20df7f77b82138c7914d174d59e13dc4d0169c9057b133e1d62" }],
+      },
+      {
+        name: "HMAC With Long Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F60616263",
+        },
+        outputs: [{ type: "HEX", value: "bdccb6c72ddeadb500ae768386cb38cc41c63dbb0878ddb9c7a38a431b78378d" }],
+      },
+    ],
+    "SHA3-256": [
+      {
+        name: "Short",
+        input: { type: "TEXT", value: "abc", encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532" }],
+      },
+      {
+        name: "Medium",
+        input: { type: "TEXT", value: "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "41c0dba2a9d6240849100376a8235e2c82e1b9998a999e21db32dd97496d3376" }],
+      },
+      {
+        name: "Long",
+        input: { type: "TEXT", value: millionaAscii, encoding: "UTF8" },
+        outputs: [{ type: "HEX", value: "5c8875ae474a3634ba4fd55ec85bffd661f32aca75c6d699d0cdcb6c115891c1" }],
+      },
+      {
+        name: "Short with 5 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 5, encoding: "UTF8" },
+        outputs: [
+          { type: "HEX", rounds: 5, value: "fd5ad48a1abf3fd8211ecd2a6a0b0503e745d953def260541fa5db7dc1b3b84f" },
+        ],
+      },
+      {
+        name: "Short with 10 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 10, encoding: "UTF8" },
+        outputs: [
+          { type: "HEX", rounds: 10, value: "5b814fc96d03918994939bccb796945d9683fa90a22f99350d6a964de78a7980" },
+        ],
+      },
+      {
+        name: "HMAC With Short Key",
+        input: { type: "TEXT", value: "Sample message for keylen<blocklen" },
+
+        key: { type: "HEX", value: "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F" },
+        outputs: [{ type: "HEX", value: "4fe8e202c4f058e8dddc23d8c34e467343e23555e24fc2f025d598f558f67205" }],
+      },
+      {
+        name: "HMAC With Medium Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f8081828384858687",
+        },
+        outputs: [{ type: "HEX", value: "68b94e2e538a9be4103bebb5aa016d47961d4d1aa906061313b557f8af2c3faa" }],
+      },
+      {
+        name: "HMAC With Long Key",
+        input: { type: "TEXT", value: "Sample message for keylen>blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7",
+        },
+        outputs: [{ type: "HEX", value: "9bcf2c238e235c3ce88404e813bd2f3a97185ac6f238c63d6229a00b07974258" }],
+      },
+    ],
+    "SHA-384": [
+      {
+        name: "Short",
+        input: { type: "TEXT", value: "abc", encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            value: "cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7",
+          },
+        ],
+      },
+      {
+        name: "Medium",
+        input: {
+          type: "TEXT",
+          value:
+            "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
+          encoding: "UTF8",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value: "09330c33f71147e83d192fc782cd1b4753111b173b3b05d22fa08086e3b0f712fcc7c71a557e2db966c3e9fa91746039",
+          },
+        ],
+      },
+      {
+        name: "Long",
+        input: { type: "TEXT", value: millionaAscii, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            value: "9d0e1809716474cb086e834e310a4a1ced149e9c00f248527972cec5704c2a5b07b8b3dc38ecc4ebae97ddd87f3d8985",
+          },
+        ],
+      },
+      {
+        name: "Short with 5 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 5, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            rounds: 5,
+            value: "a4aa4cd8534aecb2d07765f928303d1d2609835ea85d14312bcee264e99dc5d7dc08bb18ec694053fd7fe6906706d55f",
+          },
+        ],
+      },
+      {
+        name: "Short with 10 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 10, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            rounds: 10,
+            value: "b80c82979453f2f3dcf89ec4cef5c71e89837537de170e3942af8b37757cc790d4cc4ebe16a52164ad19f3a02d192f1c",
+          },
+        ],
+      },
+      {
+        name: "HMAC With Short Key",
+        input: { type: "TEXT", value: "Sample message for keylen<blocklen" },
+        key: {
+          type: "HEX",
+          value: "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value: "6eb242bdbb582ca17bebfa481b1e23211464d2b7f8c20b9ff2201637b93646af5ae9ac316e98db45d9cae773675eeed0",
+          },
+        ],
+      },
+      {
+        name: "HMAC With Medium Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value: "63c5daa5e651847ca897c95814ab830bededc7d25e83eef9195cd45857a37f448947858f5af50cc2b1b730ddf29671a9",
+          },
+        ],
+      },
+      {
+        name: "HMAC With Long Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F808182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9FA0A1A2A3A4A5A6A7A8A9AAABACADAEAFB0B1B2B3B4B5B6B7B8B9BABBBCBDBEBFC0C1C2C3C4C5C6C7",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value: "5b664436df69b0ca22551231a3f0a3d5b4f97991713cfa84bff4d0792eff96c27dccbbb6f79b65d548b40e8564cef594",
+          },
+        ],
+      },
+    ],
+    "SHA3-384": [
+      {
+        name: "Short",
+        input: { type: "TEXT", value: "abc", encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            value: "ec01498288516fc926459f58e2c6ad8df9b473cb0fc08c2596da7cf0e49be4b298d88cea927ac7f539f1edf228376d25",
+          },
+        ],
+      },
+      {
+        name: "Medium",
+        input: {
+          type: "TEXT",
+          value:
+            "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
+          encoding: "UTF8",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value: "79407d3b5916b59c3e30b09822974791c313fb9ecc849e406f23592d04f625dc8c709b98b43b3852b337216179aa7fc7",
+          },
+        ],
+      },
+      {
+        name: "Long",
+        input: { type: "TEXT", value: millionaAscii, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            value: "eee9e24d78c1855337983451df97c8ad9eedf256c6334f8e948d252d5e0e76847aa0774ddb90a842190d2c558b4b8340",
+          },
+        ],
+      },
+      {
+        name: "Short with 5 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 5, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            rounds: 5,
+            value: "be2f2365cecd5df751f3ab7d23cabfb60491ce28bdf80b121f7941ee33227ce86d5d62d6633f5654a4f3ae5381cf1825",
+          },
+        ],
+      },
+      {
+        name: "Short with 10 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 10, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            rounds: 10,
+            value: "4cb125e919d39ab283964e06ce58dd8923fa599046b533958c9353317ab368066b9902c2e1a9c9376d66f321fcc2c0a1",
+          },
+        ],
+      },
+      {
+        name: "HMAC With Short Key",
+        input: { type: "TEXT", value: "Sample message for keylen<blocklen" },
+        key: {
+          type: "HEX",
+          value: "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value: "d588a3c51f3f2d906e8298c1199aa8ff6296218127f6b38a90b6afe2c5617725bc99987f79b22a557b6520db710b7f42",
+          },
+        ],
+      },
+      {
+        name: "HMAC With Medium Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F6061626364656667",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value: "a27d24b592e8c8cbf6d4ce6fc5bf62d8fc98bf2d486640d9eb8099e24047837f5f3bffbe92dcce90b4ed5b1e7e44fa90",
+          },
+        ],
+      },
+      {
+        name: "HMAC With Long Key",
+        input: { type: "TEXT", value: "Sample message for keylen>blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F808182838485868788898A8B8C8D8E8F9091929394959697",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value: "e5ae4c739f455279368ebf36d4f5354c95aa184c899d3870e460ebc288ef1f9470053f73f7c6da2a71bcaec38ce7d6ac",
+          },
+        ],
+      },
+    ],
+    "SHA-512": [
+      {
+        name: "Short",
+        input: { type: "TEXT", value: "abc", encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            value:
+              "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f",
+          },
+        ],
+      },
+      {
+        name: "Medium",
+        input: {
+          type: "TEXT",
+          value:
+            "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
+          encoding: "UTF8",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value:
+              "8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909",
+          },
+        ],
+      },
+      {
+        name: "Long",
+        input: { type: "TEXT", value: millionaAscii, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            value:
+              "e718483d0ce769644e2e42c7bc15b4638e1f98b13b2044285632a803afa973ebde0ff244877ea60a4cb0432ce577c31beb009c5c2c49aa2e4eadb217ad8cc09b",
+          },
+        ],
+      },
+      {
+        name: "Short with 5 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 5, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            rounds: 5,
+            value:
+              "299b2e3ce932e4d0e9005345e37af5a4cc6be21e6b6e21231ce71ccde2a7aba4a6822cd7a9aaf9b13918db05ede70d3f1e6af65f8ad0bda1c4c4fa263e3cabdd",
+          },
+        ],
+      },
+      {
+        name: "Short with 10 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 10, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            rounds: 10,
+            value:
+              "4c3ead8c83442fff47d4386702044f2a6c19730a806de541964b0fa9987cac08641611e02b2e0742ef2600ff82bfe3a711567c8e76dda16b4948f4c76e3c6e9c",
+          },
+        ],
+      },
+      {
+        name: "HMAC With Short Key",
+        input: { type: "TEXT", value: "Sample message for keylen<blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value:
+              "fd44c18bda0bb0a6ce0e82b031bf2818f6539bd56ec00bdc10a8a2d730b3634de2545d639b0f2cf710d0692c72a1896f1f211c2b922d1a96c392e07e7ea9fedc",
+          },
+        ],
+      },
+      {
+        name: "HMAC With Medium Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F",
+        },
+
+        outputs: [
+          {
+            type: "HEX",
+            value:
+              "fc25e240658ca785b7a811a8d3f7b4ca48cfa26a8a366bf2cd1f836b05fcb024bd36853081811d6cea4216ebad79da1cfcb95ea4586b8a0ce356596a55fb1347",
+          },
+        ],
+      },
+      {
+        name: "HMAC With Long Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F808182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9FA0A1A2A3A4A5A6A7A8A9AAABACADAEAFB0B1B2B3B4B5B6B7B8B9BABBBCBDBEBFC0C1C2C3C4C5C6C7",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value:
+              "d93ec8d2de1ad2a9957cb9b83f14e76ad6b5e0cce285079a127d3b14bccb7aa7286d4ac0d4ce64215f2bc9e6870b33d97438be4aaa20cda5c5a912b48b8e27f3",
+          },
+        ],
+      },
+    ],
+    "SHA3-512": [
+      {
+        name: "Short",
+        input: { type: "TEXT", value: "abc", encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            value:
+              "b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e10e116e9192af3c91a7ec57647e3934057340b4cf408d5a56592f8274eec53f0",
+          },
+        ],
+      },
+      {
+        name: "Medium",
+        input: {
+          type: "TEXT",
+          value:
+            "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
+          encoding: "UTF8",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value:
+              "afebb2ef542e6579c50cad06d2e578f9f8dd6881d7dc824d26360feebf18a4fa73e3261122948efcfd492e74e82e2189ed0fb440d187f382270cb455f21dd185",
+          },
+        ],
+      },
+      {
+        name: "Long",
+        input: { type: "TEXT", value: millionaAscii, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            value:
+              "3c3a876da14034ab60627c077bb98f7e120a2a5370212dffb3385a18d4f38859ed311d0a9d5141ce9cc5c66ee689b266a8aa18ace8282a0e0db596c90b0a7b87",
+          },
+        ],
+      },
+      {
+        name: "Short with 5 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 5, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            rounds: 5,
+            value:
+              "8c74189ca608ad188bb96c8c374fb717ce982500dc2c0ce90ad8e5888b498ce9fda0e4bf256feeaaf1674b69e9ea80cf5ed444dfdd5d3eb05cfebd597b4aab67",
+          },
+        ],
+      },
+      {
+        name: "Short with 10 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 10, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            rounds: 10,
+            value:
+              "0e3c0126a211563fdedc96149f1c2334aa5f5b2afcf5590cb71fec0ab348ba522e56c1136f165f525b22890e2546d2f9edbea6b6f5e929237b6c0f395e1b2e9b",
+          },
+        ],
+      },
+      {
+        name: "HMAC With Short Key",
+        input: { type: "TEXT", value: "Sample message for keylen<blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value:
+              "4efd629d6c71bf86162658f29943b1c308ce27cdfa6db0d9c3ce81763f9cbce5f7ebe9868031db1a8f8eb7b6b95e5c5e3f657a8996c86a2f6527e307f0213196",
+          },
+        ],
+      },
+      {
+        name: "HMAC With Medium Key",
+        input: { type: "TEXT", value: "Sample message for keylen=blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F4041424344454647",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value:
+              "544e257ea2a3e5ea19a590e6a24b724ce6327757723fe2751b75bf007d80f6b360744bf1b7a88ea585f9765b47911976d3191cf83c039f5ffab0d29cc9d9b6da",
+          },
+        ],
+      },
+      {
+        name: "HMAC With Long Key",
+        input: { type: "TEXT", value: "Sample message for keylen>blocklen" },
+        key: {
+          type: "HEX",
+          value:
+            "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F8081828384858687",
+        },
+        outputs: [
+          {
+            type: "HEX",
+            value:
+              "5f464f5e5b7848e3885e49b2c385f0694985d0e38966242dc4a5fe3fea4b37d46b65ceced5dcf59438dd840bab22269f0ba7febdb9fcf74602a35666b2a32915",
+          },
+        ],
+      },
+    ],
+    SHAKE128: [
+      {
+        name: "Short",
+        input: { type: "TEXT", value: "abc", encoding: "UTF8" },
+        outputs: [
+          { type: "HEX", value: "5881092dd818bf5cf8a3ddb793fbcba74097d5c526a6d35f97b83351940f2c", shakeLen: 248 },
+          {
+            type: "HEX",
+            value:
+              "5881092dd818bf5cf8a3ddb793fbcba74097d5c526a6d35f97b83351940f2cc844c50af32acd3f2cdd066568706f509bc1bdde58295dae3f891a9a0fca5783",
+            shakeLen: 504,
+          },
+        ],
+      },
+      {
+        name: "Medium",
+        input: {
+          type: "TEXT",
+          value:
+            "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
+          encoding: "UTF8",
+        },
+        outputs: [
+          { type: "HEX", value: "7b6df6ff181173b6d7898d7ff63fb07b7c237daf471a5ae5602adbccef9ccf", shakeLen: 248 },
+          {
+            type: "HEX",
+            value:
+              "7b6df6ff181173b6d7898d7ff63fb07b7c237daf471a5ae5602adbccef9ccf4b37e06b4a3543164ffbe0d0557c02f9b25ad434005526d88ca04a6094b93ee5",
+            shakeLen: 504,
+          },
+        ],
+      },
+      {
+        name: "Long",
+        input: { type: "TEXT", value: millionaAscii, encoding: "UTF8" },
+        outputs: [
+          { type: "HEX", value: "9d222c79c4ff9d092cf6ca86143aa411e369973808ef97093255826c5572ef", shakeLen: 248 },
+          {
+            type: "HEX",
+            value:
+              "9d222c79c4ff9d092cf6ca86143aa411e369973808ef97093255826c5572ef58424c4b5c28475ffdcf981663867fec6321c1262e387bccf8ca676884c4a9d0",
+            shakeLen: 504,
+          },
+        ],
+      },
+      {
+        name: "Short with 5 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 5, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            rounds: 5,
+            value: "99d5aa0763f5bd9464ed4bbc631ecdac6f67e77cbf61c7f7171dd2ffa892ba",
+            shakeLen: 248,
+          },
+        ],
+      },
+      {
+        name: "Short with 10 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 10, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            rounds: 10,
+            value: "5a5aeb2022e0e92ef4da3dc3e261a9303224b65cf6666f87a4d395a4ab94fe",
+            shakeLen: 248,
+          },
+        ],
+      },
+    ],
+    SHAKE256: [
+      {
+        name: "Short",
+        input: { type: "TEXT", value: "abc", encoding: "UTF8" },
+        outputs: [
+          { type: "HEX", value: "483366601360a8771c6863080cc4114d8db44530f8f1e1ee4f94ea37e78b57", shakeLen: 248 },
+          {
+            type: "HEX",
+            value:
+              "483366601360a8771c6863080cc4114d8db44530f8f1e1ee4f94ea37e78b5739d5a15bef186a5386c75744c0527e1faa9f8726e462a12a4feb06bd8801e751",
+            shakeLen: 504,
+          },
+        ],
+      },
+      {
+        name: "Medium",
+        input: {
+          type: "TEXT",
+          value:
+            "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
+          encoding: "UTF8",
+        },
+        outputs: [
+          { type: "HEX", value: "98be04516c04cc73593fef3ed0352ea9f6443942d6950e29a372a681c3deaf", shakeLen: 248 },
+          {
+            type: "HEX",
+            value:
+              "98be04516c04cc73593fef3ed0352ea9f6443942d6950e29a372a681c3deaf4535423709b02843948684e029010badcc0acd8303fc85fdad3eabf4f78cae16",
+            shakeLen: 504,
+          },
+        ],
+      },
+      {
+        name: "Long",
+        input: { type: "TEXT", value: millionaAscii, encoding: "UTF8" },
+        outputs: [
+          { type: "HEX", value: "3578a7a4ca9137569cdf76ed617d31bb994fca9c1bbf8b184013de8234dfd1", shakeLen: 248 },
+          {
+            type: "HEX",
+            value:
+              "3578a7a4ca9137569cdf76ed617d31bb994fca9c1bbf8b184013de8234dfd13a3fd124d4df76c0a539ee7dd2f6e1ec346124c815d9410e145eb561bcd97b18",
+            shakeLen: 504,
+          },
+        ],
+      },
+      {
+        name: "Short with 5 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 5, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            rounds: 5,
+            value: "70368c73548e76dd6405ea6c1b4358eb0aeb4c0efe73526c7c6e1d9a9e4e0a",
+            shakeLen: 248,
+          },
+        ],
+      },
+      {
+        name: "Short with 10 Rounds",
+        input: { type: "TEXT", value: "abc", rounds: 10, encoding: "UTF8" },
+        outputs: [
+          {
+            type: "HEX",
+            rounds: 10,
+            value: "d706c35b6642f39a27635c61c85ab13e76827de8fde4557e25bfc96b445f10",
+            shakeLen: 248,
+          },
+        ],
+      },
+    ],
+  };
+
+  return hash_data;
+});
