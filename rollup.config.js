@@ -106,7 +106,7 @@ export default [
       format: "es",
       sourcemap: true,
       dir: "dist",
-      entryFileNames: "[name].esm.js",
+      entryFileNames: "[name].esm.mjs",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es6" }),

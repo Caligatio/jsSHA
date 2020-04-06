@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "description": "jsSHA implements the complete Secure Hash Standard family (SHA-1, SHA-224/256, SHA-384/512, SHA3-224/256/384/512, and SHAKE128/256) with HMAC",
   "main": "dist/sha.umd.js",
-  "module": "dist/sha.esm.js",
+  "module": "dist/sha.esm.mjs",
   "repository": {
     "type": "git",
     "url": "https://github.com/Caligatio/jsSHA.git"
@@ -74,12 +74,11 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "test": "nyc --reporter=html --reporter=text mocha",
+    "test": "nyc --reporter=html --reporter=text mocha test/src/*.ts",
     "test_dist": "karma start karma.conf.js --file-variant sha && karma start karma.conf.js --file-variant sha1 && karma start karma.conf.js --file-variant sha256 && karma start karma.conf.js --file-variant sha512 && karma start karma.conf.js --file-variant sha3",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "mocha": {
-    "spec": "test/src/*.ts",
     "require": [
       "ts-node/register"
     ]
