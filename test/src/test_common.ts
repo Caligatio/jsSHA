@@ -1,7 +1,13 @@
 import { describe, it } from "mocha";
 import sinon from "sinon";
 import { assert } from "chai";
-import { getOutputOpts, jsSHABase } from "../../src/common";
+import {
+  InputOptionsEncodingType,
+  InputOptionsNoEncodingType,
+  FormatNoTextType,
+  getOutputOpts,
+  jsSHABase,
+} from "../../src/common";
 import { packedValue } from "../../src/converters";
 
 describe("Test getOutputOpts", () => {
@@ -75,11 +81,10 @@ describe("Test jsSHABase", () => {
     stateCloneFunc: (state: number[]) => number[];
     newStateFunc: (variant: "SHA-TEST") => number[];
 
-    constructor(
-      variant: "SHA-TEST",
-      inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-      options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
-    ) {
+    constructor(variant: "SHA-TEST", inputFormat: "TEXT", options?: InputOptionsEncodingType);
+    constructor(variant: "SHA-TEST", inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    constructor(variant: any, inputFormat: any, options?: any) {
       super(variant, inputFormat, options);
 
       this.bigEndianMod = -1;
@@ -127,7 +132,6 @@ describe("Test jsSHABase", () => {
     assert.equal(stubbedJsSHA.getter("processedLen"), 0);
     assert.isFalse(stubbedJsSHA.getter("updateCalled"));
     assert.isFalse(stubbedJsSHA.getter("hmacKeySet"));
-    assert.deepEqual(stubbedJsSHA.getter("inputOptions"), {});
     assert.deepEqual(stubbedJsSHA.getter("remainder"), []);
     assert.deepEqual(stubbedJsSHA.getter("keyWithIPad"), []);
     assert.deepEqual(stubbedJsSHA.getter("keyWithOPad"), []);

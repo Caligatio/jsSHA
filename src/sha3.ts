@@ -1,6 +1,14 @@
-import { jsSHABase, sha_variant_error } from "./common";
+import {
+  InputOptionsEncodingType,
+  InputOptionsNoEncodingType,
+  FormatNoTextType,
+  jsSHABase,
+  sha_variant_error,
+} from "./common";
 import { packedValue, getStrConverter } from "./converters";
 import { Int_64, rotl_64, xor_64_2, xor_64_5 } from "./primitives_64";
+
+type VariantType = "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
 
 const rc_sha3 = [
   new Int_64(0x00000000, 0x00000001),
@@ -43,9 +51,7 @@ const r_sha3 = [
  * @param variant The SHA-3 family variant
  * @returns The initial state values
  */
-function getNewState(
-  _variant: "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256"
-): Int_64[][] {
+function getNewState(_variant: VariantType): Int_64[][] {
   let i;
   const retVal = [];
 
@@ -210,10 +216,7 @@ function finalizeSHA3(
   return retVal;
 }
 
-export default class jsSHA extends jsSHABase<
-  Int_64[][],
-  "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256"
-> {
+export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
   intermediateState: Int_64[][];
   variantBlockSize: number;
   bigEndianMod: -1 | 1;
@@ -231,13 +234,12 @@ export default class jsSHA extends jsSHABase<
     outputLen: number
   ) => number[];
   stateCloneFunc: (state: Int_64[][]) => Int_64[][];
-  newStateFunc: (variant: "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256") => Int_64[][];
+  newStateFunc: (variant: VariantType) => Int_64[][];
 
-  constructor(
-    variant: "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256",
-    inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-    options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
-  ) {
+  constructor(variant: VariantType, inputFormat: "TEXT", options?: InputOptionsEncodingType);
+  constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(variant: any, inputFormat: any, options?: any) {
     let delimiter = 0x06;
     super(variant, inputFormat, options);
 

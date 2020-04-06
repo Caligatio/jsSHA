@@ -1,4 +1,14 @@
-import { jsSHABase, TWO_PWR_32, H_full, H_trunc, K_sha2, sha_variant_error } from "./common";
+import {
+  InputOptionsEncodingType,
+  InputOptionsNoEncodingType,
+  FormatNoTextType,
+  jsSHABase,
+  TWO_PWR_32,
+  H_full,
+  H_trunc,
+  K_sha2,
+  sha_variant_error,
+} from "./common";
 import { packedValue, getStrConverter } from "./converters";
 import {
   ch_32,
@@ -12,13 +22,15 @@ import {
   sigma1_32,
 } from "./primitives_32";
 
+type VariantType = "SHA-224" | "SHA-256";
+
 /**
  * Gets the state values for the specified SHA variant
  *
  * @param variant: The SHA-256 family variant
  * @returns The initial state values
  */
-function getNewState256(variant: "SHA-224" | "SHA-256"): number[] {
+function getNewState256(variant: VariantType): number[] {
   let retVal;
 
   if ("SHA-224" == variant) {
@@ -107,7 +119,7 @@ function finalizeSHA256(
   remainderBinLen: number,
   processedBinLen: number,
   H: number[],
-  variant: "SHA-224" | "SHA-256"
+  variant: VariantType
 ): number[] {
   let i, retVal;
 
@@ -147,7 +159,7 @@ function finalizeSHA256(
 
   return retVal;
 }
-export default class jsSHA extends jsSHABase<number[], "SHA-224" | "SHA-256"> {
+export default class jsSHA extends jsSHABase<number[], VariantType> {
   intermediateState: number[];
   variantBlockSize: number;
   bigEndianMod: -1 | 1;
@@ -159,13 +171,12 @@ export default class jsSHA extends jsSHABase<number[], "SHA-224" | "SHA-256"> {
   roundFunc: (block: number[], H: number[]) => number[];
   finalizeFunc: (remainder: number[], remainderBinLen: number, processedBinLen: number, H: number[]) => number[];
   stateCloneFunc: (state: number[]) => number[];
-  newStateFunc: (variant: "SHA-224" | "SHA-256") => number[];
+  newStateFunc: (variant: VariantType) => number[];
 
-  constructor(
-    variant: "SHA-224" | "SHA-256",
-    inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-    options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
-  ) {
+  constructor(variant: VariantType, inputFormat: "TEXT", options?: InputOptionsEncodingType);
+  constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(variant: any, inputFormat: any, options?: any) {
     super(variant, inputFormat, options);
 
     if (false === ("SHA-224" === variant || "SHA-256" === variant)) {

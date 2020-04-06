@@ -1,27 +1,34 @@
-import { sha_variant_error } from "./common";
+import {
+  EncodingType,
+  InputOptionsEncodingType,
+  InputOptionsNoEncodingType,
+  FormatNoTextType,
+  sha_variant_error,
+} from "./common";
 import jsSHA1 from "./sha1";
 import jsSHA256 from "./sha256";
 import jsSHA512 from "./sha512";
 import jsSHA3 from "./sha3";
 
+type VariantType =
+  | "SHA-1"
+  | "SHA-224"
+  | "SHA-256"
+  | "SHA-384"
+  | "SHA-512"
+  | "SHA3-224"
+  | "SHA3-256"
+  | "SHA3-384"
+  | "SHA3-512"
+  | "SHAKE128"
+  | "SHAKE256";
+
 export default class jsSHA {
   shaObj: jsSHA1 | jsSHA256 | jsSHA512 | jsSHA3;
-  constructor(
-    variant:
-      | "SHA-1"
-      | "SHA-224"
-      | "SHA-256"
-      | "SHA-384"
-      | "SHA-512"
-      | "SHA3-224"
-      | "SHA3-256"
-      | "SHA3-384"
-      | "SHA3-512"
-      | "SHAKE128"
-      | "SHAKE256",
-    inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-    options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
-  ) {
+  constructor(variant: VariantType, inputFormat: "TEXT", options?: InputOptionsEncodingType);
+  constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(variant: any, inputFormat: any, options?: any) {
     if ("SHA-1" == variant) {
       this.shaObj = new jsSHA1(variant, inputFormat, options);
     } else if ("SHA-224" == variant || "SHA-256" == variant) {
@@ -82,7 +89,7 @@ export default class jsSHA {
    * @param options Associative array
    *   of input format options
    */
-  setHMACKey(key: string, inputFormat: "TEXT", options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE" }): void;
+  setHMACKey(key: string, inputFormat: "TEXT", options?: { encoding?: EncodingType }): void;
   setHMACKey(key: string, inputFormat: "B64" | "HEX" | "BYTES"): void;
   setHMACKey(key: ArrayBuffer, inputFormat: "ARRAYBUFFER"): void;
   setHMACKey(key: Uint8Array, inputFormat: "UINT8ARRAY"): void;

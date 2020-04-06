@@ -1,5 +1,10 @@
 import { packedValue, getStrConverter, getOutputConverter } from "./converters";
 
+export type EncodingType = "UTF8" | "UTF16BE" | "UTF16LE";
+export type InputOptionsEncodingType = { encoding?: EncodingType; numRounds?: number };
+export type InputOptionsNoEncodingType = { numRounds?: number };
+export type FormatNoTextType = "HEX" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY";
+
 export const TWO_PWR_32 = 4294967296;
 
 /* Constant used in SHA-2 families */
@@ -117,16 +122,15 @@ export function getOutputOpts(options?: {
   return retVal;
 }
 
-export abstract class jsSHABase<StateType, VariantTypes> {
+export abstract class jsSHABase<StateT, VariantT> {
   /* Needed inputs */
-  protected readonly shaVariant: VariantTypes;
-  protected readonly inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY";
-  protected readonly inputOptions: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number };
-  protected readonly utfType: "UTF8" | "UTF16BE" | "UTF16LE";
+  protected readonly shaVariant: VariantT;
+  protected readonly inputFormat: FormatNoTextType | "TEXT";
+  protected readonly utfType: EncodingType;
   protected readonly numRounds: number;
 
   /* State */
-  protected abstract intermediateState: StateType;
+  protected abstract intermediateState: StateT;
   protected keyWithIPad: number[];
   protected keyWithOPad: number[];
   protected remainder: number[];
@@ -144,26 +148,26 @@ export abstract class jsSHABase<StateType, VariantTypes> {
   /* Functions */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   protected abstract readonly converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
-  protected abstract readonly roundFunc: (block: number[], H: StateType) => StateType;
+  protected abstract readonly roundFunc: (block: number[], H: StateT) => StateT;
   protected abstract readonly finalizeFunc: (
     remainder: number[],
     remainderBinLen: number,
     processedBinLen: number,
-    H: StateType,
+    H: StateT,
     outputLen: number
   ) => number[];
-  protected abstract readonly stateCloneFunc: (state: StateType) => StateType;
-  protected abstract readonly newStateFunc: (variant: VariantTypes) => StateType;
+  protected abstract readonly stateCloneFunc: (state: StateT) => StateT;
+  protected abstract readonly newStateFunc: (variant: VariantT) => StateT;
 
-  constructor(
-    variant: VariantTypes,
-    inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-    options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
-  ) {
+  constructor(variant: VariantT, inputFormat: "TEXT", options?: InputOptionsEncodingType);
+  constructor(variant: VariantT, inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(variant: any, inputFormat: any, options?: any) {
+    const inputOptions = options || {};
     this.inputFormat = inputFormat;
-    this.inputOptions = options || {};
-    this.utfType = this.inputOptions["encoding"] || "UTF8";
-    this.numRounds = this.inputOptions["numRounds"] || 1;
+
+    this.utfType = inputOptions["encoding"] || "UTF8";
+    this.numRounds = inputOptions["numRounds"] || 1;
 
     /* eslint-disable-next-line @typescript-eslint/ban-ts-ignore */
     // @ts-ignore - The spec actually says ToString is called on the first parseInt argument so it's OK to use it here
@@ -224,10 +228,8 @@ export abstract class jsSHABase<StateType, VariantTypes> {
   getHash(format: "BYTES", options?: { shakeLen?: number }): string;
   getHash(format: "UINT8ARRAY", options?: { shakeLen?: number }): Uint8Array;
   getHash(format: "ARRAYBUFFER", options?: { shakeLen?: number }): ArrayBuffer;
-  getHash(
-    format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-    options?: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number }
-  ): string | ArrayBuffer | Uint8Array {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getHash(format: any, options?: any): any {
     let i,
       finalizedState,
       outputBinLen = this.outputBinLen;
@@ -281,15 +283,12 @@ export abstract class jsSHABase<StateType, VariantTypes> {
    * @param options Associative array
    *   of input format options
    */
-  setHMACKey(key: string, inputFormat: "TEXT", options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE" }): void;
+  setHMACKey(key: string, inputFormat: "TEXT", options?: { encoding?: EncodingType }): void;
   setHMACKey(key: string, inputFormat: "B64" | "HEX" | "BYTES"): void;
   setHMACKey(key: ArrayBuffer, inputFormat: "ARRAYBUFFER"): void;
   setHMACKey(key: Uint8Array, inputFormat: "UINT8ARRAY"): void;
-  setHMACKey(
-    key: string | ArrayBuffer | Uint8Array,
-    inputFormat: "B64" | "HEX" | "TEXT" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-    options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE" }
-  ): void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setHMACKey(key: any, inputFormat: any, options?: any): void {
     let keyToUse, i;
 
     if (true === this.hmacKeySet) {
@@ -352,10 +351,8 @@ export abstract class jsSHABase<StateType, VariantTypes> {
   getHMAC(format: "BYTES", options?: { shakeLen?: number }): string;
   getHMAC(format: "UINT8ARRAY", options?: { shakeLen?: number }): Uint8Array;
   getHMAC(format: "ARRAYBUFFER", options?: { shakeLen?: number }): ArrayBuffer;
-  getHMAC(
-    format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-    options?: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number }
-  ): string | ArrayBuffer | Uint8Array {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getHMAC(format: any, options?: any): any {
     let finalizedState;
 
     if (false === this.hmacKeySet) {

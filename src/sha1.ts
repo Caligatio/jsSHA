@@ -1,4 +1,11 @@
-import { jsSHABase, TWO_PWR_32, sha_variant_error } from "./common";
+import {
+  InputOptionsEncodingType,
+  InputOptionsNoEncodingType,
+  FormatNoTextType,
+  jsSHABase,
+  TWO_PWR_32,
+  sha_variant_error,
+} from "./common";
 import { packedValue, getStrConverter } from "./converters";
 import { ch_32, parity_32, maj_32, rotl_32, safeAdd_32_2, safeAdd_32_5 } from "./primitives_32";
 
@@ -124,11 +131,10 @@ export default class jsSHA extends jsSHABase<number[], "SHA-1"> {
   stateCloneFunc: (state: number[]) => number[];
   newStateFunc: (variant: "SHA-1") => number[];
 
-  constructor(
-    variant: "SHA-1",
-    inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-    options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
-  ) {
+  constructor(variant: "SHA-1", inputFormat: "TEXT", options?: InputOptionsEncodingType);
+  constructor(variant: "SHA-1", inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(variant: any, inputFormat: any, options?: any) {
     if ("SHA-1" !== variant) {
       throw new Error(sha_variant_error);
     }

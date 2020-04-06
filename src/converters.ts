@@ -1,3 +1,5 @@
+import { EncodingType, FormatNoTextType } from "./common";
+
 /**
  * Return type for all the *2packed functions
  */
@@ -31,7 +33,7 @@ const b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
  */
 function str2packed(
   str: string,
-  utfType: "UTF8" | "UTF16BE" | "UTF16LE",
+  utfType: EncodingType,
   existingPacked: number[] | undefined,
   existingPackedLen: number | undefined,
   bigEndianMod: -1 | 1
@@ -345,8 +347,8 @@ function arraybuffer2packed(
  *   string to a packed int array
  */
 export function getStrConverter(
-  format: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-  utfType: "UTF8" | "UTF16BE" | "UTF16LE",
+  format: FormatNoTextType | "TEXT",
+  utfType: EncodingType,
   bigEndianMod: -1 | 1
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ): (input: any, existingBin?: number[], existingBinLen?: number) => packedValue {
@@ -641,7 +643,7 @@ export function packed2uint8array(packed: number[], outputLength: number, bigEnd
  * @returns Function that will convert a packed integer array to desired format.
  */
 export function getOutputConverter(
-  format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
+  format: FormatNoTextType,
   outputBinLen: number,
   bigEndianMod: -1 | 1,
   outputOptions: { outputUpper: boolean; b64Pad: string; shakeLen: number }

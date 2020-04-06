@@ -1,4 +1,14 @@
-import { jsSHABase, TWO_PWR_32, H_trunc, H_full, K_sha2, sha_variant_error } from "./common";
+import {
+  InputOptionsEncodingType,
+  InputOptionsNoEncodingType,
+  FormatNoTextType,
+  jsSHABase,
+  TWO_PWR_32,
+  H_trunc,
+  H_full,
+  K_sha2,
+  sha_variant_error,
+} from "./common";
 import { packedValue, getStrConverter } from "./converters";
 import {
   ch_64,
@@ -12,6 +22,8 @@ import {
   sigma0_64,
   sigma1_64,
 } from "./primitives_64";
+
+type VariantType = "SHA-384" | "SHA-512";
 
 const K_sha512 = [
   new Int_64(K_sha2[0], 0xd728ae22),
@@ -102,7 +114,7 @@ const K_sha512 = [
  * @param variant: The SHA-512 family variant
  * @returns The initial state values
  */
-function getNewState512(variant: "SHA-384" | "SHA-512"): Int_64[] {
+function getNewState512(variant: VariantType): Int_64[] {
   let retVal;
 
   if ("SHA-384" === variant) {
@@ -210,7 +222,7 @@ function finalizeSHA512(
   remainderBinLen: number,
   processedBinLen: number,
   H: Int_64[],
-  variant: "SHA-384" | "SHA-512"
+  variant: VariantType
 ): number[] {
   let i, retVal;
 
@@ -281,7 +293,7 @@ function finalizeSHA512(
   return retVal;
 }
 
-export default class jsSHA extends jsSHABase<Int_64[], "SHA-384" | "SHA-512"> {
+export default class jsSHA extends jsSHABase<Int_64[], VariantType> {
   intermediateState: Int_64[];
   variantBlockSize: number;
   bigEndianMod: -1 | 1;
@@ -293,13 +305,12 @@ export default class jsSHA extends jsSHABase<Int_64[], "SHA-384" | "SHA-512"> {
   roundFunc: (block: number[], H: Int_64[]) => Int_64[];
   finalizeFunc: (remainder: number[], remainderBinLen: number, processedBinLen: number, H: Int_64[]) => number[];
   stateCloneFunc: (state: Int_64[]) => Int_64[];
-  newStateFunc: (variant: "SHA-384" | "SHA-512") => Int_64[];
+  newStateFunc: (variant: VariantType) => Int_64[];
 
-  constructor(
-    variant: "SHA-384" | "SHA-512",
-    inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-    options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
-  ) {
+  constructor(variant: VariantType, inputFormat: "TEXT", options?: InputOptionsEncodingType);
+  constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(variant: any, inputFormat: any, options?: any) {
     super(variant, inputFormat, options);
 
     if (false === ("SHA-384" === variant || "SHA-512" === variant)) {
