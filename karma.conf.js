@@ -13,5 +13,10 @@ module.exports = function (config) {
     autoWatch: false,
     singleRun: true,
     concurrency: Infinity,
+    client: {
+      mocha: {
+        timeout: 10000 // 10 seconds - upped from 2 seconds
+      }
+    }
   });
 };
