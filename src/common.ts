@@ -219,6 +219,11 @@ export abstract class jsSHABase<StateType, VariantTypes> {
    * @returns The string representation of the hash
    *   in the format specified.
    */
+  getHash(format: "HEX", options?: { outputUpper?: boolean; shakeLen?: number }): string;
+  getHash(format: "B64", options?: { b64Pad?: string; shakeLen?: number }): string;
+  getHash(format: "BYTES", options?: { shakeLen?: number }): string;
+  getHash(format: "UINT8ARRAY", options?: { shakeLen?: number }): Uint8Array;
+  getHash(format: "ARRAYBUFFER", options?: { shakeLen?: number }): ArrayBuffer;
   getHash(
     format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
     options?: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number }
@@ -276,6 +281,10 @@ export abstract class jsSHABase<StateType, VariantTypes> {
    * @param options Associative array
    *   of input format options
    */
+  setHMACKey(key: string, inputFormat: "TEXT", options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE" }): void;
+  setHMACKey(key: string, inputFormat: "B64" | "HEX" | "BYTES"): void;
+  setHMACKey(key: ArrayBuffer, inputFormat: "ARRAYBUFFER"): void;
+  setHMACKey(key: Uint8Array, inputFormat: "UINT8ARRAY"): void;
   setHMACKey(
     key: string | ArrayBuffer | Uint8Array,
     inputFormat: "B64" | "HEX" | "TEXT" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
@@ -338,6 +347,11 @@ export abstract class jsSHABase<StateType, VariantTypes> {
    * @returns The string representation of the hash in the
    *   format specified.
    */
+  getHMAC(format: "HEX", options?: { outputUpper?: boolean; shakeLen?: number }): string;
+  getHMAC(format: "B64", options?: { b64Pad?: string; shakeLen?: number }): string;
+  getHMAC(format: "BYTES", options?: { shakeLen?: number }): string;
+  getHMAC(format: "UINT8ARRAY", options?: { shakeLen?: number }): Uint8Array;
+  getHMAC(format: "ARRAYBUFFER", options?: { shakeLen?: number }): ArrayBuffer;
   getHMAC(
     format: "B64" | "HEX" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
     options?: { outputUpper?: boolean; b64Pad?: string; shakeLen?: number }
