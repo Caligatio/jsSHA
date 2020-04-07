@@ -54,22 +54,22 @@ describe("Test roundSHA256", () => {
 
 describe("Test finalizeSHA256", () => {
   it("SHA-224 With NIST Test Inputs", () => {
-    const spy = sinon.spy(),
+    const roundStub = sinon.stub().returns([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
       finalizeSHA256 = sha256.__get__("finalizeSHA256"),
-      revert = sha256.__set__("roundSHA256", spy);
+      revert = sha256.__set__("roundSHA256", roundStub);
 
-    finalizeSHA256(abcPacked, 24, 0, newState224.slice());
-    assert.isTrue(spy.calledOnceWithExactly(abcPostProcessed, newState224.slice()));
+    finalizeSHA256(abcPacked, 24, 0, newState224.slice(), "SHA-224");
+    assert.isTrue(roundStub.calledOnceWithExactly(abcPostProcessed, newState224.slice()));
     revert();
   });
 
   it("SHA-256 With NIST Test Inputs", () => {
-    const spy = sinon.spy(),
+    const roundStub = sinon.stub().returns([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
       finalizeSHA256 = sha256.__get__("finalizeSHA256"),
-      revert = sha256.__set__("roundSHA256", spy);
+      revert = sha256.__set__("roundSHA256", roundStub);
 
-    finalizeSHA256(abcPacked, 24, 0, newState256.slice());
-    assert.isTrue(spy.calledOnceWithExactly(abcPostProcessed, newState256.slice()));
+    finalizeSHA256(abcPacked, 24, 0, newState256.slice(), "SHA-256");
+    assert.isTrue(roundStub.calledOnceWithExactly(abcPostProcessed, newState256.slice()));
     revert();
   });
 });
