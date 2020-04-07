@@ -7,25 +7,8 @@ import { runHashTests } from "./common";
 const sha256 = rewire("../../src/sha256"),
   newState224 = [0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939, 0xffc00b31, 0x68581511, 0x64f98fa7, 0xbefa4fa4],
   newState256 = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19],
-  abcPostProcessed = [
-    0x61626380,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000018,
-  ],
-  abcPacked = [0x61626300]
+  abcPostProcessed = [0x61626380, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00000018],
+  abcPacked = [0x61626300];
 
 describe("Test getNewState256", () => {
   const getNewState = sha256.__get__("getNewState256");
@@ -44,27 +27,27 @@ describe("Test roundSHA256", () => {
 
   it("SHA-224 With NIST Test Inputs", () => {
     assert.deepEqual(roundSHA256(abcPostProcessed, newState224.slice()), [
-      0x23097D22,
-      0x3405D822,
-      0x8642A477 | 0,
-      0xBDA255B3 | 0,
-      0x2AADBCE4,
-      0xBDA0B3F7 | 0,
-      0xE36C9DA7 | 0,
-      0xD2DA082D | 0
+      0x23097d22,
+      0x3405d822,
+      0x8642a477 | 0,
+      0xbda255b3 | 0,
+      0x2aadbce4,
+      0xbda0b3f7 | 0,
+      0xe36c9da7 | 0,
+      0xd2da082d | 0,
     ]);
   });
 
   it("SHA-256 With NIST Test Inputs", () => {
     assert.deepEqual(roundSHA256(abcPostProcessed, newState256.slice()), [
-      0xBA7816BF | 0,
-      0x8F01CFEA | 0,
-      0x414140DE,
-      0x5DAE2223,
-      0xB00361A3 | 0,
-      0x96177A9C | 0,
-      0xB410FF61 | 0,
-      0xF20015AD | 0
+      0xba7816bf | 0,
+      0x8f01cfea | 0,
+      0x414140de,
+      0x5dae2223,
+      0xb00361a3 | 0,
+      0x96177a9c | 0,
+      0xb410ff61 | 0,
+      0xf20015ad | 0,
     ]);
   });
 });
@@ -113,7 +96,10 @@ describe("Test jsSHA(SHA-256)", () => {
     }
   }
 
-  [{ variant: "SHA-224", outputBinLen: 224 }, { variant: "SHA-256", outputBinLen: 256 }].forEach((test) => {
+  [
+    { variant: "SHA-224", outputBinLen: 224 },
+    { variant: "SHA-256", outputBinLen: 256 },
+  ].forEach((test) => {
     it(`${test.variant} State Initialization`, () => {
       /*
        * Check a few basic things:
@@ -167,5 +153,5 @@ describe("Test jsSHA(SHA-256)", () => {
   });
 });
 
-runHashTests("SHA-224", sha256.__get__("jsSHA"))
-runHashTests("SHA-256", sha256.__get__("jsSHA"))
+runHashTests("SHA-224", sha256.__get__("jsSHA"));
+runHashTests("SHA-256", sha256.__get__("jsSHA"));

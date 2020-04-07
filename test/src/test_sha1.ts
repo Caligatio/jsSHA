@@ -6,24 +6,7 @@ import { runHashTests } from "./common";
 
 const sha1 = rewire("../../src/sha1"),
   newState = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0],
-  abcPostProcessed = [
-    0x61626380,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000000,
-    0x00000018,
-  ],
+  abcPostProcessed = [0x61626380, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00000018],
   abcPacked = [0x61626300];
 
 describe("Test getNewState", () => {
@@ -133,4 +116,4 @@ describe("Test jsSHA(SHA-1)", () => {
   });
 });
 
-runHashTests("SHA-1", sha1.__get__("jsSHA"))
+runHashTests("SHA-1", sha1.__get__("jsSHA"));
