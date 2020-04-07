@@ -103,7 +103,7 @@ function roundSHA3(block: number[] | null, state: Int_64[][]): Int_64[][] {
 
   for (round = 0; round < 24; round += 1) {
     /* Any SHA-3 variant name will do here */
-    B = getNewState("SHA3-384") as Int_64[][];
+    B = getNewState("SHA3-384");
 
     /* Perform theta step */
     for (x = 0; x < 5; x += 1) {
