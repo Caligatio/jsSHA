@@ -60,7 +60,7 @@ describe("Test finalizeSHA1", () => {
   });
 });
 
-describe("Test jsSHA(1)", () => {
+describe("Test jsSHA(SHA-1)", () => {
   const jsSHA = sha1.__get__("jsSHA");
 
   class jsSHAATest extends jsSHA {
@@ -83,7 +83,7 @@ describe("Test jsSHA(1)", () => {
     }
   }
 
-  it("With NIST Test Inputs", () => {
+  it("State Initialization", () => {
     /*
      * Check a few basic things:
      *   1. All of the variant parameters are correct
