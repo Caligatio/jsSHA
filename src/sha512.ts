@@ -155,11 +155,9 @@ function getNewState512(variant: VariantType): Int_64[] {
  * @returns The resulting H values
  */
 function roundSHA512(block: number[], H: Int_64[]): Int_64[] {
-  let a, b, c, d, e, f, g, h, T1, T2, t, int1, int2, offset;
+  let a, b, c, d, e, f, g, h, T1, T2, t, offset;
 
-  const W: Int_64[] = [],
-    numRounds = 80,
-    binaryStringMult = 2;
+  const W: Int_64[] = [];
 
   a = H[0];
   b = H[1];
@@ -170,12 +168,10 @@ function roundSHA512(block: number[], H: Int_64[]): Int_64[] {
   g = H[6];
   h = H[7];
 
-  for (t = 0; t < numRounds; t += 1) {
+  for (t = 0; t < 80; t += 1) {
     if (t < 16) {
-      offset = t * binaryStringMult;
-      int1 = block.length <= offset ? 0 : block[offset];
-      int2 = block.length <= offset + 1 ? 0 : block[offset + 1];
-      W[t] = new Int_64(int1, int2);
+      offset = t * 2;
+      W[t] = new Int_64(block[offset], block[offset + 1]);
     } else {
       W[t] = safeAdd_64_4(gamma1_64(W[t - 2]), W[t - 7], gamma0_64(W[t - 15]), W[t - 16]);
     }
