@@ -81,7 +81,8 @@
   "mocha": {
     "require": [
       "ts-node/register"
-    ]
+    ],
+    "timeout": 10000
   },
   "nyc": {
     "require": [
