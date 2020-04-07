@@ -53,9 +53,9 @@ describe("Test roundSHA256", () => {
 });
 
 describe("Test finalizeSHA256", () => {
-  const array16Zeros = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  const array8Zeros = [0, 0, 0, 0, 0, 0, 0, 0];
   it("SHA-224 With NIST Test Inputs", () => {
-    const roundStub = sinon.stub().returns(array16Zeros),
+    const roundStub = sinon.stub().returns(array8Zeros),
       finalizeSHA256 = sha256.__get__("finalizeSHA256"),
       revert = sha256.__set__("roundSHA256", roundStub);
 
@@ -65,7 +65,7 @@ describe("Test finalizeSHA256", () => {
   });
 
   it("SHA-256 With NIST Test Inputs", () => {
-    const roundStub = sinon.stub().returns(array16Zeros),
+    const roundStub = sinon.stub().returns(array8Zeros),
       finalizeSHA256 = sha256.__get__("finalizeSHA256"),
       revert = sha256.__set__("roundSHA256", roundStub);
 
