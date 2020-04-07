@@ -53,11 +53,9 @@ function getNewState256(variant: VariantType): number[] {
  * @returns The resulting H values
  */
 function roundSHA256(block: number[], H: number[]): number[] {
-  let a, b, c, d, e, f, g, h, T1, T2, t, int1, offset;
+  let a, b, c, d, e, f, g, h, T1, T2, t;
 
-  const numRounds = 64,
-    binaryStringMult = 1,
-    W: number[] = [];
+  const W: number[] = [];
 
   a = H[0];
   b = H[1];
@@ -68,11 +66,9 @@ function roundSHA256(block: number[], H: number[]): number[] {
   g = H[6];
   h = H[7];
 
-  for (t = 0; t < numRounds; t += 1) {
+  for (t = 0; t < 64; t += 1) {
     if (t < 16) {
-      offset = t * binaryStringMult;
-      int1 = block.length <= offset ? 0 : block[offset];
-      W[t] = int1;
+      W[t] = block[t];
     } else {
       W[t] = safeAdd_32_4(gamma1_32(W[t - 2]), W[t - 7], gamma0_32(W[t - 15]), W[t - 16]);
     }
@@ -189,9 +185,10 @@ export default class jsSHA extends jsSHABase<number[], VariantType> {
     this.stateCloneFunc = function (state): number[] {
       return state.slice();
     };
+
     this.newStateFunc = getNewState256;
     this.finalizeFunc = function (remainder, remainderBinLen, processedBinLen, H): number[] {
-      return finalizeSHA256(remainder, remainderBinLen, processedBinLen, H, this.shaVariant);
+      return finalizeSHA256(remainder, remainderBinLen, processedBinLen, H, variant);
     };
 
     this.intermediateState = getNewState256(variant);
