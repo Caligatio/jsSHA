@@ -16,63 +16,75 @@ export class Int_64 {
 /**
  * The 64-bit implementation of circular rotate left
  *
+ * This does not work for n >= 64 but that is never done
+ *
  * @param x The 64-bit integer argument
  * @param n The number of bits to shift
  * @returns The x shifted circularly by n bits
  */
 export function rotl_64(x: Int_64, n: number): Int_64 {
+  const nMod32 = n % 32;
   if (n > 32) {
-    n = n - 32;
-    return new Int_64((x.lowOrder << n) | (x.highOrder >>> (32 - n)), (x.highOrder << n) | (x.lowOrder >>> (32 - n)));
-  } else if (0 !== n) {
+    return new Int_64(
+      (x.lowOrder << nMod32) | (x.highOrder >>> (32 - nMod32)),
+      (x.highOrder << nMod32) | (x.lowOrder >>> (32 - nMod32))
+    );
+  } else if (0 !== nMod32) {
+    /* n !== 0 && n !== 32 */
     return new Int_64((x.highOrder << n) | (x.lowOrder >>> (32 - n)), (x.lowOrder << n) | (x.highOrder >>> (32 - n)));
-  } else {
+  } else if (0 === n) {
     return x;
+  } else {
+    /* n === 32 which actually never happens in usage */
+    return new Int_64(x.lowOrder, x.highOrder);
   }
 }
 
 /**
  * The 64-bit implementation of circular rotate right
  *
+ * This does not work for n >= 64 but that is never done
+ *
  * @param x The 64-bit integer argument
  * @param n The number of bits to shift
  * @returns The x shifted circularly by n bits
  */
 function rotr_64(x: Int_64, n: number): Int_64 {
-  let retVal: Int_64;
+  const nMod32 = n % 32;
 
-  if (32 >= n) {
-    retVal = new Int_64(
-      (x.highOrder >>> n) | ((x.lowOrder << (32 - n)) & 0xffffffff),
-      (x.lowOrder >>> n) | ((x.highOrder << (32 - n)) & 0xffffffff)
+  if (n > 32) {
+    return new Int_64(
+      (x.lowOrder >>> nMod32) | (x.highOrder << (32 - nMod32)),
+      (x.highOrder >>> nMod32) | (x.lowOrder << (32 - nMod32))
     );
+  } else if (0 !== nMod32) {
+    /* 0 < n < 32 */
+    return new Int_64((x.highOrder >>> n) | (x.lowOrder << (32 - n)), (x.lowOrder >>> n) | (x.highOrder << (32 - n)));
+  } else if (0 === n) {
+    /* Never happens in usage */
+    return x;
   } else {
-    retVal = new Int_64(
-      (x.lowOrder >>> (n - 32)) | ((x.highOrder << (64 - n)) & 0xffffffff),
-      (x.highOrder >>> (n - 32)) | ((x.lowOrder << (64 - n)) & 0xffffffff)
-    );
+    /* n === 32 which actually never happens in usage */
+    return new Int_64(x.lowOrder, x.highOrder);
   }
-
-  return retVal;
 }
 
 /**
  * The 64-bit implementation of shift right
+ *
+ * This does not work for n >= 64 or n == 0.  This is actually only called for n < 32 so we want to make that case the
+ * first/only if for efficiency.
  *
  * @param x The 64-bit integer argument
  * @param n The number of bits to shift
  * @returns The x shifted by n bits
  */
 function shr_64(x: Int_64, n: number): Int_64 {
-  let retVal: Int_64;
-
-  if (32 >= n) {
-    retVal = new Int_64(x.highOrder >>> n, (x.lowOrder >>> n) | ((x.highOrder << (32 - n)) & 0xffffffff));
+  if (n < 32) {
+    return new Int_64(x.highOrder >>> n, (x.lowOrder >>> n) | (x.highOrder << (32 - n)));
   } else {
-    retVal = new Int_64(0, x.highOrder >>> (n - 32));
+    return new Int_64(0, x.highOrder >>> (n - 32));
   }
-
-  return retVal;
 }
 
 /**
