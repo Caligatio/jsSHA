@@ -1,6 +1,10 @@
 module.exports = {
   root: true,
   parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: './tsconfig.json'
+  },
+  ignorePatterns: ["*.txt"],
   plugins: ["@typescript-eslint"],
   overrides: [
     {
@@ -14,6 +18,7 @@ module.exports = {
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
   ],
   rules: {
     "@typescript-eslint/camelcase": "off",
