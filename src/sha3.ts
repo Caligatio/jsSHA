@@ -240,37 +240,39 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
   constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(variant: any, inputFormat: any, options?: any) {
-    let delimiter = 0x06;
+    let delimiter = 0x06, variantBlockSize = 0;
     super(variant, inputFormat, options);
 
     this.isSHAKE = false;
     if ("SHA3-224" === variant) {
-      this.variantBlockSize = 1152;
+      variantBlockSize = 1152;
       this.outputBinLen = 224;
     } else if ("SHA3-256" === variant) {
-      this.variantBlockSize = 1088;
+      variantBlockSize = 1088;
       this.outputBinLen = 256;
     } else if ("SHA3-384" === variant) {
-      this.variantBlockSize = 832;
+      variantBlockSize = 832;
       this.outputBinLen = 384;
     } else if ("SHA3-512" === variant) {
-      this.variantBlockSize = 576;
+      variantBlockSize = 576;
       this.outputBinLen = 512;
     } else if ("SHAKE128" === variant) {
       delimiter = 0x1f;
-      this.variantBlockSize = 1344;
+      variantBlockSize = 1344;
       /* This will be set in getHash */
       this.outputBinLen = -1;
       this.isSHAKE = true;
     } else if ("SHAKE256" === variant) {
       delimiter = 0x1f;
-      this.variantBlockSize = 1088;
+      variantBlockSize = 1088;
       /* This will be set in getHash */
       this.outputBinLen = -1;
       this.isSHAKE = true;
     } else {
       throw new Error(sha_variant_error);
     }
+
+    this.variantBlockSize = variantBlockSize;
 
     this.bigEndianMod = 1;
     this.converterFunc = getStrConverter(this.inputFormat, this.utfType, this.bigEndianMod);
@@ -283,7 +285,7 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
         remainderBinLen,
         processedBinLen,
         state,
-        this.variantBlockSize,
+        variantBlockSize,
         delimiter,
         outputBinLen
       );

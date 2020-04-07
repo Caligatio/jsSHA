@@ -325,7 +325,7 @@ export default class jsSHA extends jsSHABase<Int_64[], VariantType> {
     };
     this.newStateFunc = getNewState512;
     this.finalizeFunc = function (remainder, remainderBinLen, processedBinLen, H): number[] {
-      return finalizeSHA512(remainder, remainderBinLen, processedBinLen, H, this.shaVariant);
+      return finalizeSHA512(remainder, remainderBinLen, processedBinLen, H, variant);
     };
 
     this.intermediateState = getNewState512(variant);
