@@ -2,7 +2,7 @@ import { describe, it } from "mocha";
 import { assert } from "chai";
 import rewire from "rewire";
 import sinon from "sinon";
-import hashData from "../hash_data.js";
+import { runHashTests } from "./common";
 
 const sha1 = rewire("../../src/sha1"),
   newState = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0],
@@ -133,24 +133,4 @@ describe("Test jsSHA(1)", () => {
   });
 });
 
-describe("Test jsSHA(1) Using NIST Tests", () => {
-  const jsSHA = sha1.__get__("jsSHA");
-
-  describe(`Test jsSHA(SHA-1) Using NIST Tests`, () => {
-    hashData["SHA-1"].forEach((test) => {
-      test.outputs.forEach((output) => {
-        const hashObj = new jsSHA("SHA-1", test.input.type, { numRounds: test.input.rounds || 1 });
-        it(test.name, () => {
-          if (test.key) {
-            hashObj.setHMACKey(test.key.value, test.key.type);
-            hashObj.update(test.input.value);
-            assert.equal(hashObj.getHMAC(output.type), output.value);
-          } else {
-            hashObj.update(test.input.value);
-            assert.equal(hashObj.getHash(output.type, { shakeLen: output.shakeLen || 8 }), output.value);
-          }
-        });
-      });
-    });
-  });
-});
+runHashTests("SHA-1", sha1.__get__("jsSHA"))
