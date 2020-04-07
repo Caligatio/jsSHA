@@ -240,7 +240,8 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
   constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(variant: any, inputFormat: any, options?: any) {
-    let delimiter = 0x06, variantBlockSize = 0;
+    let delimiter = 0x06,
+      variantBlockSize = 0;
     super(variant, inputFormat, options);
 
     this.isSHAKE = false;
