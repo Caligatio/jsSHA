@@ -4,7 +4,7 @@ module.exports = function (config) {
 
   config.set({
     frameworks: ["mocha", "chai"],
-    files: ["dist/" + shaVariant + ".umd.js", "test/hash_data.js", "test/dist/test_umd.js"],
+    files: ["dist/" + shaVariant + ".js", "test/hash_data.js", "test/dist/test_umd.js"],
     reporters: ["progress"],
     port: 9876, // karma web server port
     colors: true,
@@ -15,8 +15,8 @@ module.exports = function (config) {
     concurrency: Infinity,
     client: {
       mocha: {
-        timeout: 10000 // 10 seconds - upped from 2 seconds
-      }
-    }
+        timeout: 10000, // 10 seconds - upped from 2 seconds
+      },
+    },
   });
 };

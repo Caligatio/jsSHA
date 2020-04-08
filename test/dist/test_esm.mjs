@@ -1,4 +1,4 @@
-import jsSHA from "../../dist/sha.esm.mjs";
+import jsSHA from "../../dist/sha.mjs";
 import hashData from "../hash_data.js";
 import mocha from "mocha";
 import chai from "chai";

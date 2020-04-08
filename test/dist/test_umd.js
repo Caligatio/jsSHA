@@ -3,7 +3,7 @@
 /* The below if block allows this to work with preloaded globals (karma testing) and in node */
 if (typeof exports === "object" && typeof module !== "undefined") {
   var chai = require("chai");
-  var jsSHA = require("../../dist/sha.umd.js");
+  var jsSHA = require("../../dist/sha.js");
   var hashData = require("../hash_data.js");
 
   var assert = chai.assert;

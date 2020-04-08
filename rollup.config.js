@@ -13,11 +13,11 @@ export default [
       banner: licenseHeaderES3,
       format: "umd",
       sourcemap: true,
-      dir: "dist",
-      entryFileNames: "[name].umd.js",
+      dir: "./",
+      entryFileNames: "dist/[name].js",
     },
     plugins: [
-      typescript({ lib: ["es6"], target: "es3" }),
+      typescript({ lib: ["es6"], declaration: true, declarationDir: "dist/types", target: "es3" }),
       terser({
         sourcemap: true,
         compress: { inline: false },
@@ -32,8 +32,7 @@ export default [
       name: "jsSHA",
       banner: licenseHeaderES3,
       format: "umd",
-      dir: "dist",
-      entryFileNames: "[name].umd.js",
+      file: "dist/sha1.js",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
@@ -50,8 +49,7 @@ export default [
       name: "jsSHA",
       banner: licenseHeaderES3,
       format: "umd",
-      dir: "dist",
-      entryFileNames: "[name].umd.js",
+      file: "dist/sha256.js",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
@@ -68,8 +66,7 @@ export default [
       name: "jsSHA",
       banner: licenseHeaderES3,
       format: "umd",
-      dir: "dist",
-      entryFileNames: "[name].umd.js",
+      file: "dist/sha512.js",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
@@ -86,8 +83,7 @@ export default [
       name: "jsSHA",
       banner: licenseHeaderES3,
       format: "umd",
-      dir: "dist",
-      entryFileNames: "[name].umd.js",
+      file: "dist/sha3.js",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
@@ -105,8 +101,7 @@ export default [
       banner: licenseHeaderES6,
       format: "es",
       sourcemap: true,
-      dir: "dist",
-      entryFileNames: "[name].esm.mjs",
+      file: "dist/sha.mjs",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es6" }),
