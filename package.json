@@ -4,7 +4,7 @@
   "description": "jsSHA implements the complete Secure Hash Standard family (SHA-1, SHA-224/256, SHA-384/512, SHA3-224/256/384/512, and SHAKE128/256) with HMAC",
   "main": "dist/sha.js",
   "module": "dist/sha.mjs",
-  "types": "dist/types/src/sha.d.ts",
+  "types": "dist/sha.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/Caligatio/jsSHA.git"
@@ -67,6 +67,7 @@
     "prettier": "^2.0.2",
     "rewire": "^5.0.0",
     "rollup": "^2.3.0",
+    "rollup-plugin-dts": "^1.3.0",
     "rollup-plugin-terser": "^5.3.0",
     "sinon": "^9.0.1",
     "ts-node": "^8.8.1",

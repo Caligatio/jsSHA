@@ -1,4 +1,5 @@
 import fs from "fs";
+import dts from "rollup-plugin-dts";
 import typescript from "@rollup/plugin-typescript";
 import { terser } from "rollup-plugin-terser";
 
@@ -13,8 +14,8 @@ export default [
       banner: licenseHeaderES3,
       format: "umd",
       sourcemap: true,
-      dir: "./",
-      entryFileNames: "dist/[name].js",
+      dir: "dist",
+      entryFileNames: "[name].js",
     },
     plugins: [
       typescript({ lib: ["es6"], declaration: true, declarationDir: "dist/types", target: "es3" }),
@@ -25,6 +26,11 @@ export default [
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
       }),
     ],
+  },
+  {
+    input: "dist/types/src/sha.d.ts",
+    output: [{ file: "dist/sha.d.ts", format: "umd" }],
+    plugins: [dts()],
   },
   {
     input: "src/sha1.ts",

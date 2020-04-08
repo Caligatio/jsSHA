@@ -80,9 +80,8 @@ typings/
 # nuxt.js build output
 .nuxt
 
-# rollup.js default build output
-# TODO - Comment this out to support bower
-/dist/
+# This will be bundled into /dist/
+/dist/types/
 
 # Uncomment the public line if your project uses Gatsby
 # https://nextjs.org/blog/next-9-1#public-directory-support
