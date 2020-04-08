@@ -1904,6 +1904,7 @@ var SUPPORTED_ALGS = 8 | 4 | 2 | 1;
 			if (0 === ((state_offset * 64) % blockSize))
 			{
 				roundSHA3(null, state);
+				state_offset = 0;
 			}
 		}
 
