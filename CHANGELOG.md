@@ -1,6 +1,16 @@
 jsSHA - ChangeLog
 =========================
 
+2.4.2 (2020-04-08)
+-------------------------
+This marks the last v2.X feature release.  The codebase is transitioning
+to TypeScript and, while the API is intended to be fully backwards-compatible,
+the version will be bumped to v3 as a safety precaution.
+
+- Fixed incorrect SHAKE128 results when output length was greater than
+  1344-bits and SHAKE256 results when output length was greather than
+  1088-bits (1344 and 1088 being internal state size for each variant).
+
 2.4.1 (2020-04-04)
 -------------------------
 - Fixed incorrect HMAC results when using SHA-3 if the key was 1-4 bytes
