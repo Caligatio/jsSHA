@@ -15,9 +15,9 @@ const newState = [
   [new Int_64(0, 0), new Int_64(0, 0), new Int_64(0, 0), new Int_64(0, 0), new Int_64(0, 0)],
 ];
 
-describe("Test getNewState", () => {
-  const getNewState = sha3.__get__("getNewState");
+const getNewState = sha3.__get__("getNewState");
 
+describe("Test getNewState", () => {
   it("For All Variants", () => {
     assert.deepEqual(getNewState("SHA3-224"), newState);
   });
@@ -136,7 +136,7 @@ describe("Test roundSHA3", () => {
   const roundSHA3 = sha3.__get__("roundSHA3");
 
   it("With NIST Test Inputs", () => {
-    assert.deepEqual(roundSHA3(firstBlockData, newState.slice()), firstRoundOut);
+    assert.deepEqual(roundSHA3(firstBlockData.slice(), getNewState()), firstRoundOut);
   });
 });
 
@@ -183,11 +183,87 @@ describe("Test finalizeSHA3", () => {
     const roundStub = sinon.stub().onCall(0).returns(firstRoundOut).onCall(1).returns(secondRoundOut),
       finalizeSHA3 = sha3.__get__("finalizeSHA3"),
       revert = sha3.__set__("roundSHA3", roundStub);
-    assert.deepEqual(
-      finalizeSHA3(firstBlockData.concat(secondBlockData), 1600, -1, newState.slice(), 1152, 0x06, 224),
-      [0x6a817693, 0x723f50ba, 0xebe76cf9, 0x5d09ac65, 0x4bbee3ee, 0xa1c2bbf9, 0xe0117ecb]
-    );
+    assert.deepEqual(finalizeSHA3(firstBlockData.concat(secondBlockData), 1600, -1, getNewState(), 1152, 0x06, 224), [
+      0x6a817693,
+      0x723f50ba,
+      0xebe76cf9,
+      0x5d09ac65,
+      0x4bbee3ee,
+      0xa1c2bbf9,
+      0xe0117ecb,
+    ]);
     revert();
+  });
+
+  it("With outputLen Greater Than Blocksize", () => {
+    const finalizeSHA3 = sha3.__get__("finalizeSHA3");
+    // This is emulating SHAKE128 */
+    assert.deepEqual(finalizeSHA3(firstBlockData.concat(secondBlockData), 1600, -1, getNewState(), 1344, 0x1f, 2048), [
+      0xd2b81a13 | 0,
+      0x6b9494b5,
+      0x3f33819c,
+      0xcee0b69b | 0,
+      0x31b9c375,
+      0x6934fa04,
+      0x577491d3,
+      0x37a05d38,
+      0xf72e23cf | 0,
+      0x1e6d4a16,
+      0x90c848b4 | 0,
+      0x85ad8681 | 0,
+      0xa5853f2d | 0,
+      0x1ada28cf,
+      0x3834feb6,
+      0x46781917,
+      0xd5051c7f | 0,
+      0x8cf37e8c | 0,
+      0xf6414c28 | 0,
+      0x761a22c2,
+      0xc0b12af1 | 0,
+      0x02668240,
+      0x94228050 | 0,
+      0x021887fb,
+      0x5beffd13,
+      0xf57dcb0e | 0,
+      0x55f8a10c,
+      0x324de15b,
+      0xdc6e0fe1 | 0,
+      0x092c89de,
+      0xf5294b42 | 0,
+      0x70c2af97,
+      0x6b5504c9,
+      0x7d7ab4fc,
+      0x398d7740,
+      0x2b642309,
+      0x7905bd3c,
+      0xd50809e6 | 0,
+      0xd0c100a0 | 0,
+      0x93ef988b | 0,
+      0x4564803f,
+      0xb0f887bf | 0,
+      0x949eba09 | 0,
+      0x226126f7,
+      0x4ec27aed,
+      0x426c265e,
+      0xbba12fa8 | 0,
+      0xdbb8b7ef | 0,
+      0x6ae16600,
+      0x3f49e085,
+      0x0948df07,
+      0xa584c0ae | 0,
+      0xc38a7493 | 0,
+      0xd7a6e5dd | 0,
+      0xb6e8e1aa | 0,
+      0x2d2b35e5,
+      0x47bbef71,
+      0xd5eecad4 | 0,
+      0x8033d6e6 | 0,
+      0x3e322d5d,
+      0x461bd86f,
+      0x263ab984,
+      0x745ed477,
+      0xaec6c221 | 0,
+    ]);
   });
 });
 
