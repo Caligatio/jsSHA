@@ -1,7 +1,9 @@
 test/
 coverage/
+dist/types
 *.tgz
 rollup.config.js
 tsconfig.json
 bower.json
 **/.*
+karma.conf.js
