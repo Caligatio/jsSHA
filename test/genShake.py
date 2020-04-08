@@ -21,9 +21,7 @@ def main():
                         hash_name,
                         vector_name,
                         output_len * 8,
-                        binascii.hexlify(
-                            hash_func(vector_value.encode()).digest(output_len)
-                        ).decode(),
+                        binascii.hexlify(hash_func(vector_value.encode()).digest(output_len)).decode(),
                     )
                 )
 
