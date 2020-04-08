@@ -12,7 +12,7 @@ def main():
     }
 
     hash_funcs = {"SHAKE128": sha3.SHAKE128, "SHAKE256": sha3.SHAKE256}
-    output_lens = [31, 63]
+    output_lens = [31, 63, 256]
 
     for hash_name, hash_func in hash_funcs.items():
         for vector_name, vector_value in test_vectors.items():
