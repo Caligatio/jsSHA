@@ -21,7 +21,6 @@ export default [
       typescript({ lib: ["es6"], declaration: true, declarationDir: "dist/types", target: "es3" }),
       terser({
         sourcemap: true,
-        compress: { inline: false },
         output: { comments: /BSD/ },
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
       }),
@@ -43,7 +42,6 @@ export default [
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
-        compress: { inline: false },
         output: { comments: /BSD/ },
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
       }),
@@ -60,7 +58,6 @@ export default [
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
-        compress: { inline: false },
         output: { comments: /BSD/ },
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
       }),
@@ -77,7 +74,6 @@ export default [
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
-        compress: { inline: false },
         output: { comments: /BSD/ },
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
       }),
@@ -94,7 +90,6 @@ export default [
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
-        compress: { inline: false },
         output: { comments: /BSD/ },
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
       }),
@@ -113,7 +108,6 @@ export default [
       typescript({ lib: ["es6"], target: "es6" }),
       terser({
         sourcemap: true,
-        compress: { inline: false },
         output: { comments: /BSD/ },
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
       }),
