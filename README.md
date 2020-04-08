@@ -1,32 +1,43 @@
 # jsSHA
-A pure JavaScript streaming implementation of the complete Secure Hash Standard
-family (SHA-1, SHA-224, SHA3-224, SHA-256, SHA3-256, SHA-384, SHA3-384, SHA-512,
-SHA3-512, SHAKE128, and SHAKE256) as well as HMAC.
+A pure TypeScript/JavaScript streaming implementation of the complete Secure
+Hash Standard family (SHA-1, SHA-224, SHA3-224, SHA-256, SHA3-256, SHA-384,
+SHA3-384, SHA-512, SHA3-512, SHAKE128, and SHAKE256) as well as HMAC.
 
+![npm](https://img.shields.io/npm/v/jssha)
 [![Build Status](https://travis-ci.org/Caligatio/jsSHA.svg?branch=master)](https://travis-ci.org/Caligatio/jsSHA)
+[![Coverage Status](https://coveralls.io/repos/github/Caligatio/jsSHA/badge.svg?branch=master)](https://coveralls.io/github/Caligatio/jsSHA?branch=master)
+![NPM](https://img.shields.io/npm/l/jssha)
 
 ## Usage
 
 ### Installation
 #### Browser
 Include the desired JavaScript file (sha.js, sha1.js, sha256.js, sha512.js, or
-sha3.js) in your header (sha.js used below):
-
+sha3.js) in your header:
+```html
     <script type="text/javascript" src="/path/to/sha.js"></script>
+    <!-- You can also use the ECMAScript module (ESM) by using the following -->
+    <script type="module" src="/path/to/sha.mjs"></script>
+```
 
 #### Node.js
 jsSHA is available through NPM and be installed by simply doing
-
+```bash
     npm install jssha
-
+```
 To use the module, first require it using:
-
-    jsSHA = require("jssha");
+```javascript
+    const jsSHA = require("jssha");
+    // Alternatively, you can load it as a ESM
+    import jsSHA from "jssha";
+    // As yet another alternative, you can load the native ESM module
+    import jsSHA from "jssha/dist/sha.mjs";
+```
 
 
 ### Hashing
-Instantiate a new jsSHA object with the desired hash type, input type, and
-options as parameters.  The hash type can be one of SHA-1, SHA-224, SHA3-224,
+Instantiate a new `jsSHA` object with the desired hash variant, input type, and
+options as parameters.  The hash variant can be one of SHA-1, SHA-224, SHA3-224,
 SHA-256, SHA3-256, SHA-384, SHA3-384, SHA-512, SHA3-512, SHAKE128, or SHAKE256.
 The input type can be one of HEX, TEXT, B64, BYTES, ARRAYBUFFER, or UINT8ARRAY.
 You can then stream in input using the `update` object function, calling it
@@ -34,16 +45,17 @@ multiple times if needed.  Finally, simply call `getHash` with the output type
 as a parameter (B64, HEX, BYTES, ARRAYBUFFER, or UINT8ARRAY).  Example to
 calculate the SHA-512 of "This is a test":
 
-    var shaObj = new jsSHA("SHA-512", "TEXT");
+```JavaScript
+    const shaObj = new jsSHA("SHA-512", "TEXT", {"encoding": "UTF8"});
     shaObj.update("This is a ");
     shaObj.update("test");
-    var hash = shaObj.getHash("HEX");
-
-The constructor takes a hashmap as a optional third argument with possible
-properties of `numRounds` and `encoding`.  `numRounds` controls the number of
-hashing iterations/rounds performed and defaults to a value of 1 if not
-specified. `encoding` specifies the encoding used to encode TEXT-type inputs.
-Valid options are "UTF8", "UTF16BE", and "UTF16LE", it defaults to "UTF8".
+    const hash = shaObj.getHash("HEX");
+```
+The constructor takes a hashmap as a optional third argument with defaults
+`{"encoding" : "UTF8", "numRounds" : 1}`.  `numRounds` controls the number of
+hashing iterations/rounds performed and `encoding` specifies the encoding
+used to encode TEXT-type inputs. Valid options are "UTF8", "UTF16BE", and
+"UTF16LE", it defaults to "UTF8".
 
 `getHash` also takes a hashmap as an optional second argument.  By default the
 hashmap is `{"outputUpper" : false, "b64Pad" : "="}`.  These options are
@@ -55,68 +67,54 @@ of 8 bits.
 ### HMAC
 Instantiate a new jsSHA object the same way as for hashing.  Then set the HMAC
 key to be used by calling `setHMACKey` with the key and its input type (this
-MUST be done before calling update).  You can stream in the input using the
+MUST be done before calling `update`).  You can stream in the input using the
 `update` object function just like hashing.  Finally, get the HMAC by calling
 the `getHMAC` function with the output type as its argument.  Example to
 calculate the SHA-512 HMAC of the string "This is a test" with the key "abc":
 
-    var shaObj = new jsSHA("SHA-512", "TEXT");
+```JavaScript
+    const shaObj = new jsSHA("SHA-512", "TEXT");
     shaObj.setHMACKey("abc", "TEXT");
     shaObj.update("This is a ");
     shaObj.update("test");
-    var hmac = shaObj.getHMAC("HEX");
-
+    const hmac = shaObj.getHMAC("HEX");
+```
 `setHMACKey` takes the same input types as the constructor and `getHMAC` takes the
 same inputs as `getHash` as described above.
 
 Note: You cannot calculate both the hash and HMAC using the same object.
 
 ## Files
-**src/sha\_dev.js**
+**dist/sha.js**
 
-A commented implementation of the entire SHA family of hashes. Not to be used
-in production.
+The minified [UMD](https://github.com/umdjs/umd) version of the library with
+support for all hash variants.  Its accompanying source map can be found in sha.js.map
+and its TypeScript declarations in sha.d.ts.
 
-**src/sha.js**
+**dist/sha.mjs**
 
-A Google Closure Compiler optimized version of the entire library.
+The minified ESM version of the library with support for all hash variants. Its
+accompanying source map can be found in sha.mjs.map and its TypeScript
+declarations in sha.d.ts.
 
-**src/sha1.js**
+**dist/sha1.js**
 
-A Google Closure Compiler optimized version the library with non SHA-1
-functionality removed.
+The minified UMD version of the library with support for only the SHA-1 hash variant.
 
-**src/sha256.js**
+**dist/sha256.js**
 
-A Google Closure Compiler optimized version the library with non SHA-224/SHA-256
-functionality removed.
+The minified UMD version of the library with support for only the SHA-224 and
+SHA-256 hash variants.
 
-**src/sha3.js**
+**dist/sha512.js**
 
-A Google Closure Compiler optimized version the library with non SHA-3
-functionality removed.
+The minified UMD version of the library with support for only the SHA-384 and
+SHA-512 hash variants.
 
-**src/sha512.js**
+**dist/sha3.js**
 
-A Google Closure Compiler optimized version the library with non SHA-384/SHA-512
-functionality removed.
-
-## Compiling
-This library makes use of the [Google Closure Compiler](https://developers.google.com/closure/compiler)
-to both boost performance and reduce filesizes.  To compile sha\_dev.js into a customized output file,
-use a command like the following:
-
-    java -jar compiler.jar --define="SUPPORTED_ALGS=<FLAG>" \
-        --externs /path/to/build/externs.js --warning_level VERBOSE \
-        --compilation_level ADVANCED_OPTIMIZATIONS \
-        --js /path/to/sha_dev.js --js_output_file /path/to/sha.js
-
-where FLAG is a bitwise OR of the following values:
-
-* 8 for SHA3
-* 4 for SHA-384/SHA-512
-* 2 for SHA-224/256
-* 1 for SHA-1
+The minified UMD version of the library with support for only the SHA3-224,
+SHA3-256, SHA3-384, SHA3-512, SHAKE128, and SHAKE256 hash variants.
 
 ## Contact Info
 The project's website is located at [https://caligatio.github.com/jsSHA/](https://caligatio.github.com/jsSHA/)
