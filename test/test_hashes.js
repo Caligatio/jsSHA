@@ -955,7 +955,8 @@ var hashTests = [
 					{"type": "HEX", "value": "5881092dd818bf5cf8a3ddb793fbcba74097d5c526a6d35f97b83351940f2c", "shakeLen": 248},
 					{"type": "B64", "value": "WIEJLdgYv1z4o923k/vLp0CX1cUmptNfl7gzUZQPLA==", "shakeLen": 248},
 					{"type": "HEX", "value": "5881092dd818bf5cf8a3ddb793fbcba74097d5c526a6d35f97b83351940f2cc844c50af32acd3f2cdd066568706f509bc1bdde58295dae3f891a9a0fca5783", "shakeLen": 504},
-					{"type": "B64", "value": "WIEJLdgYv1z4o923k/vLp0CX1cUmptNfl7gzUZQPLMhExQrzKs0/LN0GZWhwb1Cbwb3eWCldrj+JGpoPyleD", "shakeLen": 504}
+					{"type": "B64", "value": "WIEJLdgYv1z4o923k/vLp0CX1cUmptNfl7gzUZQPLMhExQrzKs0/LN0GZWhwb1Cbwb3eWCldrj+JGpoPyleD", "shakeLen": 504},
+					{"type": "HEX", "value": "5881092dd818bf5cf8a3ddb793fbcba74097d5c526a6d35f97b83351940f2cc844c50af32acd3f2cdd066568706f509bc1bdde58295dae3f891a9a0fca5783789a41f8611214ce612394df286a62d1a2252aa94db9c538956c717dc2bed4f232a0294c857c730aa16067ac1062f1201fb0d377cfb9cde4c63599b27f3462bba4a0ed296c801f9ff7f57302bb3076ee145f97a32ae68e76ab66c48d51675bd49acc29082f5647584e6aa01b3f5af057805f973ff8ecb8b226ac32ada6f01c1fcd4818cb006aa5b4cdb3611eb1e533c8964cacfdf31012cd3fb744d02225b988b475375faad996eb1b9176ecb0f8b2871723d6dbb804e23357e50732f5cfc904b1", shakeLen: 2048}
 				]
 			},
 			{
@@ -969,7 +970,8 @@ var hashTests = [
 					{"type": "HEX", "value": "7b6df6ff181173b6d7898d7ff63fb07b7c237daf471a5ae5602adbccef9ccf", "shakeLen": 248},
 					{"type": "B64", "value": "e232/xgRc7bXiY1/9j+we3wjfa9HGlrlYCrbzO+czw==", "shakeLen": 248},
 					{"type": "HEX", "value": "7b6df6ff181173b6d7898d7ff63fb07b7c237daf471a5ae5602adbccef9ccf4b37e06b4a3543164ffbe0d0557c02f9b25ad434005526d88ca04a6094b93ee5", "shakeLen": 504},
-					{"type": "B64", "value": "e232/xgRc7bXiY1/9j+we3wjfa9HGlrlYCrbzO+cz0s34GtKNUMWT/vg0FV8AvmyWtQ0AFUm2IygSmCUuT7l", "shakeLen": 504}
+					{"type": "B64", "value": "e232/xgRc7bXiY1/9j+we3wjfa9HGlrlYCrbzO+cz0s34GtKNUMWT/vg0FV8AvmyWtQ0AFUm2IygSmCUuT7l", "shakeLen": 504},
+                    {"type": "HEX", "value": "7b6df6ff181173b6d7898d7ff63fb07b7c237daf471a5ae5602adbccef9ccf4b37e06b4a3543164ffbe0d0557c02f9b25ad434005526d88ca04a6094b93ee57a55d5ea66e744bd391f8f52baf4e031d9e60e5ca32a0ed162bb89fc908097984548796652952dd4737d2a234a401f4857f3d1866efa736fd6a8f7c0b5d02ab06e5f821b2cc8cb8b4606fb15b9527cce5c3ec02c65cd1cdb5c81bd67686ebdd3b5b3fcffb123ca8ca63df53537042f64637ab595f06e865ebaa322b253bfa533a056b46c7a63e21e569ff3cb26a976ccb749104adfce5f8db6751bbdbf0d898c22dad8e85523376744b889a7e68fab7e68699cd63bcc3d40e6b8cbb39e8e8a0931", shakeLen: 2048}
 				]
 			},
 			{
@@ -983,7 +985,8 @@ var hashTests = [
 					{"type": "HEX", "value": "9d222c79c4ff9d092cf6ca86143aa411e369973808ef97093255826c5572ef", "shakeLen": 248},
 					{"type": "B64", "value": "nSIsecT/nQks9sqGFDqkEeNplzgI75cJMlWCbFVy7w==", "shakeLen": 248},
 					{"type": "HEX", "value": "9d222c79c4ff9d092cf6ca86143aa411e369973808ef97093255826c5572ef58424c4b5c28475ffdcf981663867fec6321c1262e387bccf8ca676884c4a9d0", "shakeLen": 504},
-					{"type": "B64", "value": "nSIsecT/nQks9sqGFDqkEeNplzgI75cJMlWCbFVy71hCTEtcKEdf/c+YFmOGf+xjIcEmLjh7zPjKZ2iExKnQ", "shakeLen": 504}
+					{"type": "B64", "value": "nSIsecT/nQks9sqGFDqkEeNplzgI75cJMlWCbFVy71hCTEtcKEdf/c+YFmOGf+xjIcEmLjh7zPjKZ2iExKnQ", "shakeLen": 504},
+                    {"type": "HEX", "value": "9d222c79c4ff9d092cf6ca86143aa411e369973808ef97093255826c5572ef58424c4b5c28475ffdcf981663867fec6321c1262e387bccf8ca676884c4a9d0c13bfa6869763d5ae4bbc9b3ccd09d1ca5ea7446538d69b3fb98c72b59a2b4817db5eadd9011f90fa71091931f8134f4f00b562e2fe105937270361c1909862ad45046e3932f5dd311ec72fec5f8fb8f60b45a3bee3f85bbf7fcedc6a555677648e0654b381941a86bd3e512657b0d57a7991fc4543f89d8290492222ce4a33e17602b3b99c009f7655f87535cdaa3716f58c47b8a157ad195f02809f27500b9254979311c6bb415968cd10431169a27d5a8d61e13a6b8b77af1f8b6dd2eefdea0", shakeLen: 2048}
 				]
 			},
 			{
@@ -1062,7 +1065,8 @@ var hashTests = [
 					{"type": "HEX", "value": "483366601360a8771c6863080cc4114d8db44530f8f1e1ee4f94ea37e78b57", "shakeLen": 248},
 					{"type": "B64", "value": "SDNmYBNgqHccaGMIDMQRTY20RTD48eHuT5TqN+eLVw==", "shakeLen": 248},
 					{"type": "HEX", "value": "483366601360a8771c6863080cc4114d8db44530f8f1e1ee4f94ea37e78b5739d5a15bef186a5386c75744c0527e1faa9f8726e462a12a4feb06bd8801e751", "shakeLen": 504},
-					{"type": "B64", "value": "SDNmYBNgqHccaGMIDMQRTY20RTD48eHuT5TqN+eLVznVoVvvGGpThsdXRMBSfh+qn4cm5GKhKk/rBr2IAedR", "shakeLen": 504}
+					{"type": "B64", "value": "SDNmYBNgqHccaGMIDMQRTY20RTD48eHuT5TqN+eLVznVoVvvGGpThsdXRMBSfh+qn4cm5GKhKk/rBr2IAedR", "shakeLen": 504},
+                    {"type": "HEX", "value": "483366601360a8771c6863080cc4114d8db44530f8f1e1ee4f94ea37e78b5739d5a15bef186a5386c75744c0527e1faa9f8726e462a12a4feb06bd8801e751e41385141204f329979fd3047a13c5657724ada64d2470157b3cdc288620944d78dbcddbd912993f0913f164fb2ce95131a2d09a3e6d51cbfc622720d7a75c6334e8a2d7ec71a7cc29cf0ea610eeff1a588290a53000faa79932becec0bd3cd0b33a7e5d397fed1ada9442b99903f4dcfd8559ed3950faf40fe6f3b5d710ed3b677513771af6bfe11934817e8762d9896ba579d88d84ba7aa3cdc7055f6796f195bd9ae788f2f5bb96100d6bbaff7fbc6eea24d4449a2477d172a5507dcc931412", shakeLen: 2048}
 				]
 			},
 			{
@@ -1076,7 +1080,8 @@ var hashTests = [
 					{"type": "HEX", "value": "98be04516c04cc73593fef3ed0352ea9f6443942d6950e29a372a681c3deaf", "shakeLen": 248},
 					{"type": "B64", "value": "mL4EUWwEzHNZP+8+0DUuqfZEOULWlQ4po3KmgcPerw==", "shakeLen": 248},
 					{"type": "HEX", "value": "98be04516c04cc73593fef3ed0352ea9f6443942d6950e29a372a681c3deaf4535423709b02843948684e029010badcc0acd8303fc85fdad3eabf4f78cae16", "shakeLen": 504},
-					{"type": "B64", "value": "mL4EUWwEzHNZP+8+0DUuqfZEOULWlQ4po3KmgcPer0U1QjcJsChDlIaE4CkBC63MCs2DA/yF/a0+q/T3jK4W", "shakeLen": 504}
+					{"type": "B64", "value": "mL4EUWwEzHNZP+8+0DUuqfZEOULWlQ4po3KmgcPer0U1QjcJsChDlIaE4CkBC63MCs2DA/yF/a0+q/T3jK4W", "shakeLen": 504},
+                    {"type": "HEX", "value": "98be04516c04cc73593fef3ed0352ea9f6443942d6950e29a372a681c3deaf4535423709b02843948684e029010badcc0acd8303fc85fdad3eabf4f78cae165635f57afd28810fc22abf63df55c5ead450fdfb64209010e982102aa0b5f0a4b4753b53eb4b5319c06986f5aac5cc247256d06b05a273d7ef8d31864777d488d541451ed82a38926582deb65d40ddb959b79dbe933635f9f3e2ae57f7c6aefc4d5bd7f230070fc2e9e2357d4eb39cee4bd064c4a33f35d5f652774fe941300cce4e800b127d54ba3548986db411d08dee19a295c1e9219e8c76a292bae5cfecf54785b37044bac9deef0f129c666b99719164d5f62ccef52b2ae53e4e8e971646", shakeLen: 2048}
 				]
 			},
 			{
@@ -1090,7 +1095,8 @@ var hashTests = [
 					{"type": "HEX", "value": "3578a7a4ca9137569cdf76ed617d31bb994fca9c1bbf8b184013de8234dfd1", "shakeLen": 248},
 					{"type": "B64", "value": "NXinpMqRN1ac33btYX0xu5lPypwbv4sYQBPegjTf0Q==", "shakeLen": 248},
 					{"type": "HEX", "value": "3578a7a4ca9137569cdf76ed617d31bb994fca9c1bbf8b184013de8234dfd13a3fd124d4df76c0a539ee7dd2f6e1ec346124c815d9410e145eb561bcd97b18", "shakeLen": 504},
-					{"type": "B64", "value": "NXinpMqRN1ac33btYX0xu5lPypwbv4sYQBPegjTf0To/0STU33bApTnufdL24ew0YSTIFdlBDhRetWG82XsY", "shakeLen": 504}
+					{"type": "B64", "value": "NXinpMqRN1ac33btYX0xu5lPypwbv4sYQBPegjTf0To/0STU33bApTnufdL24ew0YSTIFdlBDhRetWG82XsY", "shakeLen": 504},
+                    {"type": "HEX", "value": "3578a7a4ca9137569cdf76ed617d31bb994fca9c1bbf8b184013de8234dfd13a3fd124d4df76c0a539ee7dd2f6e1ec346124c815d9410e145eb561bcd97b18ab6ce8d5553e0eab3d1f7dfb8f9deefe16847e2192f6f61fb82fb90dde60b19063c56a4c55cdd7b672b75bf515adbfe204903c8c0036de54a2999a920de90f66d7ff6ec8e4c93d24ae346fdcb3a5a5bd5739ec15a6eddb5ce5b02da53039fac63e19555faa2eddc693b1f0c2a6fcbe7c0a0a091d0ee700d7322e4b0ff09590de166422f9ead5da4c993d605fe4d9c634843aa178b17672c6568c8a2e62abebea2c21c302bd366ad698959e1f6e434af155568b2734d8379fcd3ffe6489baffa6d7", shakeLen: 2048}
 				]
 			},
 			{
