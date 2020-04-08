@@ -8,7 +8,7 @@ to TypeScript and, while the API is intended to be fully backwards-compatible,
 the version will be bumped to v3 as a safety precaution.
 
 - Fixed incorrect SHAKE128 results when output length was greater than
-  1344-bits and SHAKE256 results when output length was greather than
+  1344-bits and SHAKE256 results when output length was greater than
   1088-bits (1344 and 1088 being internal state size for each variant).
 
 2.4.1 (2020-04-04)
