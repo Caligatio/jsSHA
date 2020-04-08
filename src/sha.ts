@@ -24,6 +24,14 @@ type VariantType =
   | "SHAKE256";
 
 export default class jsSHA {
+  /**
+   * @param variant The desired SHA variant (SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-256,
+   *   SHA3-384, SHA3-512, SHAKE128, or SHAKE256) as a string.
+   * @param inputFormat The input format to be used in future `update` calls (TEXT, HEX, B64, BYTES, ARRAYBUFFER,
+   *   or UINT8ARRAY) as a string.
+   * @param options Optional extra options in the form of { encoding?: "UTF8" | "UTF16BE" | "UTF16LE";
+   *   numRounds?: number }.  `encoding` is for only TEXT input (defaults to UTF8) and `numRounds` defaults to 1.
+   */
   private readonly shaObj: jsSHA1 | jsSHA256 | jsSHA512 | jsSHA3;
   constructor(variant: VariantType, inputFormat: "TEXT", options?: InputOptionsEncodingType);
   constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
@@ -50,24 +58,22 @@ export default class jsSHA {
   }
 
   /**
-   * Takes strString and hashes as many blocks as possible.  Stores the
-   * rest for either a future update or getHash call.
+   * Takes `input` and hashes as many blocks as possible. Stores the rest for either a future update or getHash call.
    *
-   * @param srcString The string to be hashed
+   * @param input The input to be hashed
    */
-  update(srcString: string | ArrayBuffer | Uint8Array): void {
-    this.shaObj.update(srcString);
+  update(input: string | ArrayBuffer | Uint8Array): void {
+    this.shaObj.update(input);
   }
 
   /**
-   * Returns the desired SHA hash of the string specified at instantiation
-   * using the specified parameters
+   * Returns the desired SHA hash of the input fed in via `update` calls.
    *
-   * @param format The desired output formatting (B64, HEX,
-   *   BYTES, ARRAYBUFFER, or UINT8ARRAY)
-   * @param options Hash list of output formatting options
-   * @returns The string representation of the hash
-   *   in the format specified.
+   * @param format The desired output formatting (B64, HEX, BYTES, ARRAYBUFFER, or UINT8ARRAY) as a string.
+   * @param options Options in the form of { outputUpper?: boolean; shakeLen?: number; b64Pad?: string }.  `shakeLen`
+   *   is required for SHAKE128 and SHAKE256 variants.  `outputUpper` is only for HEX output (defaults to false) and
+   *   b64pad is only for B64 output (defaults to "=").
+   * @returns The hash in the format specified.
    */
   getHash(format: "HEX", options?: { outputUpper?: boolean; shakeLen?: number }): string;
   getHash(format: "B64", options?: { b64Pad?: string; shakeLen?: number }): string;
@@ -80,14 +86,12 @@ export default class jsSHA {
   }
 
   /**
-   * Sets the HMAC key for an eventual getHMAC call.  Must be called
-   * immediately after jsSHA object instantiation
+   * Sets the HMAC key for an eventual `getHMAC` call.  Must be called immediately after jsSHA object instantiation.
    *
    * @param key The key used to calculate the HMAC
-   * @param inputFormat The format of key, HEX, TEXT, B64, BYTES,
-   *   ARRAYBUFFER, or UINT8ARRAY
-   * @param options Associative array
-   *   of input format options
+   * @param inputFormat The format of key (HEX, TEXT, B64, BYTES, ARRAYBUFFER, or UINT8ARRAY) as a string.
+   * @param options Options in the form of { encoding?: "UTF8" | "UTF16BE" | "UTF16LE }.  `encoding` is only for TEXT
+   *   and defaults to UTF8.
    */
   setHMACKey(key: string, inputFormat: "TEXT", options?: { encoding?: EncodingType }): void;
   setHMACKey(key: string, inputFormat: "B64" | "HEX" | "BYTES"): void;
@@ -99,15 +103,13 @@ export default class jsSHA {
   }
 
   /**
-   * Returns the the HMAC in the specified format using the key given by
-   * a previous setHMACKey call.
+   * Returns the the HMAC in the specified format using the key given by a previous `setHMACKey` call.
    *
-   * @param format The desired output formatting
-   *   (B64, HEX, BYTES, ARRAYBUFFER, or UINT8ARRAY)
-   * @param options associative array of output
-   *   formatting options
-   * @returns The string representation of the hash in the
-   *   format specified.
+   * @param format The desired output formatting (B64, HEX, BYTES, ARRAYBUFFER, or UINT8ARRAY) as a string.
+   * @param options Options in the form of { outputUpper?: boolean; shakeLen?: number; b64Pad?: string }.  `shakeLen`
+   *   is required for SHAKE128 and SHAKE256 variants.  `outputUpper` is only for HEX output (defaults to false) and
+   *   b64pad is only for B64 output (defaults to "=").
+   * @returns The HMAC in the format specified.
    */
   getHMAC(format: "HEX", options?: { outputUpper?: boolean; shakeLen?: number }): string;
   getHMAC(format: "B64", options?: { b64Pad?: string; shakeLen?: number }): string;
