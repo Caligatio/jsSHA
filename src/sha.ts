@@ -24,7 +24,7 @@ type VariantType =
   | "SHAKE256";
 
 export default class jsSHA {
-  protected readonly shaObj: jsSHA1 | jsSHA256 | jsSHA512 | jsSHA3;
+  private readonly shaObj: jsSHA1 | jsSHA256 | jsSHA512 | jsSHA3;
   constructor(variant: VariantType, inputFormat: "TEXT", options?: InputOptionsEncodingType);
   constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
