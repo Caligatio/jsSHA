@@ -26,7 +26,7 @@ Include the desired JavaScript file (sha.js, sha1.js, sha256.js, sha512.js, or s
 
 jsSHA is available through NPM and be installed by simply doing
 
-```shell
+```console
 npm install jssha
 ```
 
