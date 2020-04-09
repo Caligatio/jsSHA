@@ -34,10 +34,10 @@ To use the module, first require it using:
 
 ```javascript
 const jsSHA = require("jssha");
+// The limited variant files are also exported (sha1, sha256, sha512, and sha3)
+const jsSHA1 = require("jssha/sha1");
 // Alternatively, you can load it as a ESM
 import jsSHA from "jssha";
-// As yet another alternative, you can load the native ESM module
-import jsSHA from "jssha/dist/sha.mjs";
 ```
 
 ### Hashing

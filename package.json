@@ -2,7 +2,17 @@
   "name": "jssha",
   "version": "3.0.0",
   "description": "jsSHA implements the complete Secure Hash Standard family (SHA-1, SHA-224/256, SHA-384/512, SHA3-224/256/384/512, and SHAKE128/256) with HMAC",
-  "main": "dist/sha.js",
+  "main": "./dist/sha.js",
+  "exports": {
+    ".": {
+      "import": "./dist/sha.mjs",
+      "require": "./dist/sha.js"
+    },
+    "./sha1": "./dist/sha1.js",
+    "./sha256": "./dist/sha256.js",
+    "./sha512": "./dist/sha512.js",
+    "./sha3": "./dist/sha3.js"
+  },
   "module": "dist/sha.mjs",
   "types": "dist/sha.d.ts",
   "repository": {
