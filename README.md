@@ -32,9 +32,12 @@ To use the module, first require it using:
 
 ```javascript
 const jsSHA = require("jssha");
-// The limited variant files are also exported (sha1, sha256, sha512, and sha3) but do not have TypeScript declarations
+/* The limited variant files are also exported (sha1, sha256, sha512, and sha3) using conditional subpath exports in
+ * Node.js v13+ or using --experimental-modules in v12 */
 const jsSHA1 = require("jssha/sha1");
-// Alternatively, you can load it as a ESM
+// For Node.js versions that don't support subpath exports, you can do the following instead:
+const jsSHA1 = require("jssha/dist/sha1");
+// Alternatively, you can load it as an ESM (Node.js v13+ or using --experimental-modules in v12)
 import jsSHA from "jssha";
 ```
 
@@ -92,13 +95,14 @@ Note: You cannot calculate both the hash and HMAC using the same object.
   variants. Its accompanying source map can be found in dist/sha.mjs.map and its TypeScript declarations in
   dist/sha.d.ts.
 - **dist/sha1.js** - The minified ES3-compatible UMD version of the library with support for only the SHA-1 hash
-  variant.
+  variant. Its accompanying TypeScript declarations can be found in dist/sha1.d.ts.
 - **dist/sha256.js** - The minified ES3-compatible UMD version of the library with support for only the SHA-224 and
-  SHA-256 hash variants.
+  SHA-256 hash variants. Its accompanying TypeScript declarations can be found in dist/sha256.d.ts.
 - **dist/sha512.js** - The minified ES3-compatible UMD version of the library with support for only the SHA-384 and
-  SHA-512 hash variants.
+  SHA-512 hash variants. Its accompanying TypeScript declarations can be found in dist/sha513.d.ts.
 - **dist/sha3.js** - The minified ES3-compatible UMD version of the library with support for only the SHA3-224,
-  SHA3-256, SHA3-384, SHA3-512, SHAKE128, and SHAKE256 hash variants.
+  SHA3-256, SHA3-384, SHA3-512, SHAKE128, and SHAKE256 hash variants. Its accompanying TypeScript declarations can be
+  found in dist/sha3.d.ts.
 
 ## Contact Info
 

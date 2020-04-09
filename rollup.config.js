@@ -48,6 +48,11 @@ export default [
     ],
   },
   {
+    input: "dist/types/src/sha1.d.ts",
+    output: [{ file: "dist/sha1.d.ts", format: "umd" }],
+    plugins: [dts()],
+  },
+  {
     input: "src/sha256.ts",
     output: {
       name: "jsSHA",
@@ -62,6 +67,11 @@ export default [
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
       }),
     ],
+  },
+  {
+    input: "dist/types/src/sha256.d.ts",
+    output: [{ file: "dist/sha256.d.ts", format: "umd" }],
+    plugins: [dts()],
   },
   {
     input: "src/sha512.ts",
@@ -80,6 +90,11 @@ export default [
     ],
   },
   {
+    input: "dist/types/src/sha512.d.ts",
+    output: [{ file: "dist/sha512.d.ts", format: "umd" }],
+    plugins: [dts()],
+  },
+  {
     input: "src/sha3.ts",
     output: {
       name: "jsSHA",
@@ -94,6 +109,11 @@ export default [
         mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
       }),
     ],
+  },
+  {
+    input: "dist/types/src/sha3.d.ts",
+    output: [{ file: "dist/sha3.d.ts", format: "umd" }],
+    plugins: [dts()],
   },
   {
     input: "src/sha.ts",
