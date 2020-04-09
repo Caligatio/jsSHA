@@ -13,7 +13,7 @@ function testVariant(variant) {
   let success = true;
 
   try {
-    describe(`Test jsSHA(${variant}) Using NIST Tests`, () => {
+    describe(`Test UMD jsSHA(${variant}) Using NIST Tests`, () => {
       hashData[variant].forEach((test) => {
         test.outputs.forEach((output) => {
           const hashObj = new jsSHA(variant, test.input.type, { numRounds: test.input.rounds || 1 });

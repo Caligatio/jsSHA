@@ -4,7 +4,7 @@ module.exports = {
   parserOptions: {
     project: "./tsconfig.json",
   },
-  ignorePatterns: ["*.txt", "/dist"],
+  ignorePatterns: ["*.txt", "/dist", "/test/dist"],
   plugins: ["@typescript-eslint"],
   overrides: [
     {

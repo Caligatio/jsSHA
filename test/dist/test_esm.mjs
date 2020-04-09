@@ -7,7 +7,7 @@ function testVariant(variant) {
   let success = true;
 
   try {
-    mocha.describe(`Test jsSHA(${variant}) Using NIST Tests`, () => {
+    mocha.describe(`Test ESM jsSHA(${variant}) Using NIST Tests`, () => {
       hashData[variant].forEach((test) => {
         test.outputs.forEach((output) => {
           const hashObj = new jsSHA(variant, test.input.type, { numRounds: test.input.rounds || 1 });
