@@ -1,19 +1,20 @@
 # jsSHA - ChangeLog
 
-## 3.0.0 - Stay-At-Home Order Edition (XXXX-XX-XX)
+## 3.0.0 - Stay-At-Home Order Edition (2020-04-09)
 
-- Transitioned codebase to [TypeScript] while still maintaining v2 backwards compatible output files.
+- Transitioned codebase to [TypeScript] while still maintaining v2 backwards compatible output files (thanks for the
+  solid start oberondelafay!).
 - v2 backwards compatible files now use the [Universal Module Definition (UMD)][umd] format which should support all
   well-known loaders.
-- Added a oft-requested ECMAScript 2015 (ES6) ECMAScript Module (ESM) version of the library (sha.mjs).
+- Added a oft-requested ECMAScript 2015 (ES6) ECMAScript Module (ESM) version of the library (dist/sha.mjs).
 - Reworked package exports to allow Node.js and other tools to smartly choose between ES6 ESM module and ES3 UMD
   versions of the library.
-- TypeScript declarations are now included with the library for the default entry points (sha.js and sha.mjs).
+- TypeScript declarations are now included with the library for the default entry points (dist/sha.js and dist/sha.mjs).
 - Source maps are now included with the library for the default entry points.
 - Limited hash variant files (sha1.js, sha256.js, sha512.js, and sha3.js) are now accessed via exports rather than file
   path (e.g. using `require("jssha/sha1")` rather than the previous `require("jssha/src/sha1.js"`).
-- Changed build system from [Google Closure Compiler][gcc] to [Rollup] with [terser] as the minifier/uglifer. This
-  resulted in slightly larger output files but infinitely better maintainability.
+- Changed build system from [Google Closure Compiler][gcc] to [Rollup] with [terser] as the minifier/uglifer (thanks
+  blikblum!). This resulted in slightly larger output files but infinitely better maintainability.
 - Optimized 64-bit functions by removing unneeded logical/arithmetic/bit operations.
 - Completely overhauled testing due to transition to TypeScript. This resulted in the ability to get true 100% unit test
   coverage and identification of a few lurking/obscure bugs (see v2.4.2 and v2.4.1).
