@@ -10,23 +10,21 @@ import { packedValue, getStrConverter } from "./converters";
 import { ch_32, parity_32, maj_32, rotl_32, safeAdd_32_2, safeAdd_32_5 } from "./primitives_32";
 
 /**
- * Gets the state values for the specified SHA variant
+ * Gets the state values for the specified SHA variant.
  *
  * @param _variant: Unused
- * @returns The initial state values
+ * @returns The initial state values.
  */
 function getNewState(_variant: "SHA-1"): number[] {
   return [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0];
 }
 
 /**
- * Performs a round of SHA-1 hashing over a 512-byte block
+ * Performs a round of SHA-1 hashing over a 512-byte block.  This clobbers `H`.
  *
- * @param block The binary array representation of the
- *   block to hash
- * @param H The intermediate H values from a previous
- *   round
- * @returns The resulting H values
+ * @param block The binary array representation of the block to hash.
+ * @param H The intermediate H values from a previous round.
+ * @returns The resulting H values.
  */
 function roundSHA1(block: number[], H: number[]): number[] {
   let a, b, c, d, e, T, t;
@@ -72,17 +70,13 @@ function roundSHA1(block: number[], H: number[]): number[] {
 }
 
 /**
- * Finalizes the SHA-1 hash
+ * Finalizes the SHA-1 hash.  This clobbers `remainder` and `H`.
  *
- * @param remainder Any leftover unprocessed packed ints
- *   that still need to be processed
- * @param remainderBinLen The number of bits in remainder
- * @param processedBinLen The number of bits already
- *   processed
- * @param H The intermediate H values from a previous
- *   round
- * @returns The array of integers representing the SHA-1
- *   hash of message
+ * @param remainder Any leftover unprocessed packed ints that still need to be processed.
+ * @param remainderBinLen The number of bits in `remainder`.
+ * @param processedBinLen The number of bits already processed.
+ * @param H The intermediate H values from a previous round.
+ * @returns The array of integers representing the SHA-1 hash of message.
  */
 function finalizeSHA1(remainder: number[], remainderBinLen: number, processedBinLen: number, H: number[]): number[] {
   let i;
@@ -98,13 +92,14 @@ function finalizeSHA1(remainder: number[], remainderBinLen: number, processedBin
   }
   /* Append '1' at the end of the binary string */
   remainder[remainderBinLen >>> 5] |= 0x80 << (24 - (remainderBinLen % 32));
+
   /* Append length of binary string in the position such that the new
    * length is a multiple of 512.  Logic does not work for even multiples
    * of 512 but there can never be even multiples of 512. JavaScript
    * numbers are limited to 2^53 so it's "safe" to treat the totalLen as
    * a 64-bit integer. */
-
   remainder[offset] = totalLen & 0xffffffff;
+
   /* Bitwise operators treat the operand as a 32-bit number so need to
    * use hacky division and round to get access to upper 32-ish bits */
   remainder[offset - 1] = (totalLen / TWO_PWR_32) | 0;

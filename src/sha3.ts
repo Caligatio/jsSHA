@@ -46,10 +46,10 @@ const r_sha3 = [
 ];
 
 /**
- * Gets the state values for the specified SHA-3 variant
+ * Gets the state values for the specified SHA-3 variant.
  *
- * @param variant The SHA-3 family variant
- * @returns The initial state values
+ * @param _variant Unused for this family.
+ * @returns The initial state values.
  */
 function getNewState(_variant: VariantType): Int_64[][] {
   let i;
@@ -63,10 +63,10 @@ function getNewState(_variant: VariantType): Int_64[][] {
 }
 
 /**
- * Returns a clone of the given SHA3 state
+ * Returns a clone of the given SHA3 state.
  *
- * @param state The state to be cloned
- * @returns The cloned state
+ * @param state The state to be cloned.
+ * @returns The cloned state.
  */
 function cloneSHA3State(state: Int_64[][]): Int_64[][] {
   let i;
@@ -79,13 +79,11 @@ function cloneSHA3State(state: Int_64[][]): Int_64[][] {
 }
 
 /**
- * Performs a round of SHA-3 hashing over a block
+ * Performs a round of SHA-3 hashing over a block. This clobbers `state`.
  *
- * @param block The binary array representation of the
- *   block to hash
- * @param state The binary array representation of the
- *   block to hash
- * @returns The resulting state value
+ * @param block The binary array representation of the block to hash.
+ * @param state Hash state from a previous round.
+ * @returns The resulting state value.
  */
 function roundSHA3(block: number[] | null, state: Int_64[][]): Int_64[][] {
   let round, x, y, B;
@@ -146,19 +144,16 @@ function roundSHA3(block: number[] | null, state: Int_64[][]): Int_64[][] {
 }
 
 /**
- * Finalizes the SHA-3 hash
+ * Finalizes the SHA-3 hash. This clobbers `remainder` and `state`.
  *
- * @param remainder Any leftover unprocessed packed ints
- *   that still need to be processed
- * @param remainderBinLen The number of bits in remainder
- * @param processedBinLen The number of bits already
- *   processed
- * @param state The state from a previous round
+ * @param remainder Any leftover unprocessed packed ints that still need to be processed.
+ * @param remainderBinLen The number of bits in `remainder`.
+ * @param _processedBinLen Unused for this family.
+ * @param state The state from a previous round.
  * @param blockSize The block size/rate of the variant in bits
  * @param delimiter The delimiter value for the variant
  * @param outputLen The output length for the variant in bits
- * @returns The array of integers representing the SHA-3
- *   hash of message
+ * @returns The array of integers representing the SHA-3 hash of message.
  */
 function finalizeSHA3(
   remainder: number[],

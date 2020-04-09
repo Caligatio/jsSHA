@@ -109,10 +109,10 @@ const K_sha512 = [
 ];
 
 /**
- * Gets the state values for the specified SHA variant
+ * Gets the state values for the specified SHA variant.
  *
- * @param variant: The SHA-512 family variant
- * @returns The initial state values
+ * @param variant: The SHA-512 family variant.
+ * @returns The initial state values.
  */
 function getNewState512(variant: VariantType): Int_64[] {
   let retVal;
@@ -145,14 +145,12 @@ function getNewState512(variant: VariantType): Int_64[] {
 }
 
 /**
- * Performs a round of SHA-512 hashing over a block
+ * Performs a round of SHA-512 hashing over a block. This clobbers `H`.
  *
- * @param block The binary array representation of the
- *   block to hash
- * @param H The intermediate H values from a previous
- *   round
- * @param variant The desired SHA-512 variant
- * @returns The resulting H values
+ * @param block The binary array representation of the block to hash.
+ * @param H The intermediate H values from a previous round.
+ * @param variant The desired SHA-512 variant.
+ * @returns The resulting H values.
  */
 function roundSHA512(block: number[], H: Int_64[]): Int_64[] {
   let a, b, c, d, e, f, g, h, T1, T2, t, offset;
@@ -200,18 +198,14 @@ function roundSHA512(block: number[], H: Int_64[]): Int_64[] {
 }
 
 /**
- * Finalizes the SHA-512 hash
+ * Finalizes the SHA-512 hash. This clobbers `remainder` and `H`.
  *
- * @param remainder Any leftover unprocessed packed ints
- *   that still need to be processed
- * @param remainderBinLen The number of bits in remainder
- * @param processedBinLen The number of bits already
- *   processed
- * @param H The intermediate H values from a previous
- *   round
- * @param variant The desired SHA-512 variant
- * @returns The array of integers representing the SHA-512
- *   hash of message
+ * @param remainder Any leftover unprocessed packed ints that still need to be processed.
+ * @param remainderBinLen The number of bits in `remainder`.
+ * @param processedBinLen The number of bits already processed.
+ * @param H The intermediate H values from a previous round.
+ * @param variant The desired SHA-512 variant.
+ * @returns The array of integers representing the SHA-512 hash of message.
  */
 function finalizeSHA512(
   remainder: number[],

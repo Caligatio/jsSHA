@@ -25,10 +25,10 @@ import {
 type VariantType = "SHA-224" | "SHA-256";
 
 /**
- * Gets the state values for the specified SHA variant
+ * Gets the state values for the specified SHA variant.
  *
- * @param variant: The SHA-256 family variant
- * @returns The initial state values
+ * @param variant: The SHA-256 family variant.
+ * @returns The initial state values.
  */
 function getNewState256(variant: VariantType): number[] {
   let retVal;
@@ -43,14 +43,12 @@ function getNewState256(variant: VariantType): number[] {
 }
 
 /**
- * Performs a round of SHA-256 hashing over a block
+ * Performs a round of SHA-256 hashing over a block. This clobbers `H`.
  *
- * @param block The binary array representation of the
- *   block to hash
- * @param H The intermediate H values from a previous
- *   round
- * @param variant The desired SHA-256 variant
- * @returns The resulting H values
+ * @param block The binary array representation of the block to hash.
+ * @param H The intermediate H values from a previous round.
+ * @param variant The desired SHA-256 variant.
+ * @returns The resulting H values.
  */
 function roundSHA256(block: number[], H: number[]): number[] {
   let a, b, c, d, e, f, g, h, T1, T2, t;
@@ -97,18 +95,14 @@ function roundSHA256(block: number[], H: number[]): number[] {
 }
 
 /**
- * Finalizes the SHA-256 hash
+ * Finalizes the SHA-256 hash. This clobbers `remainder` and `H`.
  *
- * @param remainder Any leftover unprocessed packed ints
- *   that still need to be processed
- * @param remainderBinLen The number of bits in remainder
- * @param processedBinLen The number of bits already
- *   processed
- * @param H The intermediate H values from a previous
- *   round
- * @param variant The desired SHA-256 variant
- * @returns The array of integers representing the SHA-2
- *   hash of message
+ * @param remainder Any leftover unprocessed packed ints that still need to be processed.
+ * @param remainderBinLen The number of bits in `remainder`.
+ * @param processedBinLen The number of bits already processed.
+ * @param H The intermediate H values from a previous round.
+ * @param variant The desired SHA-256 variant.
+ * @returns The array of integers representing the SHA-2 hash of message.
  */
 function finalizeSHA256(
   remainder: number[],

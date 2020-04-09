@@ -83,12 +83,11 @@ export const H_full = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527
 
 export const sha_variant_error = "Chosen SHA variant is not supported";
 /**
- * Validate hash list containing output formatting options, ensuring
- * presence of every option or adding the default value
+ * Validate hash list containing output formatting options, ensuring presence of every option or adding the default
+ * value.
  *
- * @param options Hash list of output formatting options
- * @returns Validated
- *   hash list containing output formatting options
+ * @param options Hashmap of output formatting options from user.
+ * @returns Validated hashmap containing output formatting options.
  */
 export function getOutputOpts(options?: {
   outputUpper?: boolean;
@@ -123,6 +122,11 @@ export function getOutputOpts(options?: {
 }
 
 export abstract class jsSHABase<StateT, VariantT> {
+  /**
+   * @param variant The desired SHA variant.
+   * @param inputFormat The input format to be used in future `update` calls.
+   * @param options Hashmap of extra input options.
+   */
   /* Needed inputs */
   protected readonly shaVariant: VariantT;
   protected readonly inputFormat: FormatNoTextType | "TEXT";
@@ -187,10 +191,9 @@ export abstract class jsSHABase<StateT, VariantT> {
   }
 
   /**
-   * Takes strString and hashes as many blocks as possible.  Stores the
-   * rest for either a future update or getHash call.
+   * Hashes as many blocks as possible.  Stores the rest for either a future update or getHash call.
    *
-   * @param srcString The string to be hashed
+   * @param srcString The string to be hashed.
    */
   update(srcString: string | ArrayBuffer | Uint8Array): void {
     let i,
@@ -214,14 +217,11 @@ export abstract class jsSHABase<StateT, VariantT> {
   }
 
   /**
-   * Returns the desired SHA hash of the string specified at instantiation
-   * using the specified parameters
+   * Returns the desired SHA hash of the input fed in via `update` calls.
    *
-   * @param format The desired output formatting (B64, HEX,
-   *   BYTES, ARRAYBUFFER, or UINT8ARRAY)
-   * @param options Hash list of output formatting options
-   * @returns The string representation of the hash
-   *   in the format specified.
+   * @param format The desired output formatting
+   * @param options Hashmap of output formatting options
+   * @returns The hash in the format specified.
    */
   getHash(format: "HEX", options?: { outputUpper?: boolean; shakeLen?: number }): string;
   getHash(format: "B64", options?: { b64Pad?: string; shakeLen?: number }): string;
@@ -274,14 +274,11 @@ export abstract class jsSHABase<StateT, VariantT> {
   }
 
   /**
-   * Sets the HMAC key for an eventual getHMAC call.  Must be called
-   * immediately after jsSHA object instantiation
+   * Sets the HMAC key for an eventual `getHMAC` call.  Must be called immediately after jsSHA object instantiation.
    *
    * @param key The key used to calculate the HMAC
-   * @param inputFormat The format of key, HEX, TEXT, B64, BYTES,
-   *   ARRAYBUFFER, or UINT8ARRAY
-   * @param options Associative array
-   *   of input format options
+   * @param inputFormat The format of key.
+   * @param options Hashmap of extra input options.
    */
   setHMACKey(key: string, inputFormat: "TEXT", options?: { encoding?: EncodingType }): void;
   setHMACKey(key: string, inputFormat: "B64" | "HEX" | "BYTES"): void;
@@ -336,15 +333,11 @@ export abstract class jsSHABase<StateT, VariantT> {
   }
 
   /**
-   * Returns the the HMAC in the specified format using the key given by
-   * a previous setHMACKey call.
+   * Returns the the HMAC in the specified format using the key given by a previous `setHMACKey` call.
    *
-   * @param format The desired output formatting
-   *   (B64, HEX, BYTES, ARRAYBUFFER, or UINT8ARRAY)
-   * @param options associative array of output
-   *   formatting options
-   * @returns The string representation of the hash in the
-   *   format specified.
+   * @param format The desired output formatting.
+   * @param options Hashmap of extra outputs options. `shakeLen` must be specified for SHAKE variants.
+   * @returns The HMAC in the format specified.
    */
   getHMAC(format: "HEX", options?: { outputUpper?: boolean; shakeLen?: number }): string;
   getHMAC(format: "B64", options?: { b64Pad?: string; shakeLen?: number }): string;

@@ -9,25 +9,18 @@ export interface packedValue {
 const b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 /**
- * Convert a string to an array of big-endian words
+ * Convert a string to an array of words.
  *
- * There is a known bug with an odd number of existing bytes and using a
- * UTF-16 encoding.  However, this function is used such that the existing
- * bytes are always a result of a previous UTF-16 str2packed call and
- * therefore there should never be an odd number of existing bytes
+ * There is a known bug with an odd number of existing bytes and using a UTF-16 encoding.  However, this function is
+ * used such that the existing bytes are always a result of a previous UTF-16 str2packed call and therefore there 
+ * should never be an odd number of existing bytes.
 
- * @param str String to be converted to binary representation
- * @param utfType The Unicode type, UTF8 or UTF16BE, UTF16LE, to
- *   use to encode the source string
- * @param existingPacked A packed int array of bytes to
- *   append the results to
- * @param existingPackedLen The number of bits in the existingPacked
- *   array
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @returns Hash list where
- *   "value" contains the output number array and "binLen" is the binary
- *   length of "value"
+ * @param str Unicode string to be converted to binary representation.
+ * @param utfType The Unicode type to use to encode the source string.
+ * @param existingPacked A packed int array of bytes to append the results to.
+ * @param existingPackedLen The number of bits in `existingPacked`.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian.
+ * @returns Hashmap of the packed values.
  */
 function str2packed(
   str: string,
@@ -112,18 +105,13 @@ function str2packed(
 }
 
 /**
- * Convert a hex string to an array of big-endian words
+ * Convert a hex string to an array of words.
  *
- * @param str String to be converted to binary representation
- * @param existingPacked A packed int array of bytes to
- *   append the results to
- * @param existingPackedLen The number of bits in the existingPacked
- *   array
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @returns Hash list where
- *   "value" contains the output number array and "binLen" is the binary
- *   length of "value"
+ * @param str Hexadecimal string to be converted to binary representation.
+ * @param existingPacked A packed int array of bytes to append the results to.
+ * @param existingPackedLen The number of bits in `existingPacked` array.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian.
+ * @returns Hashmap of the packed values.
  */
 function hex2packed(
   str: string,
@@ -160,18 +148,13 @@ function hex2packed(
 }
 
 /**
- * Convert a string of raw bytes to an array of big-endian words
+ * Convert a string of raw bytes to an array of words.
  *
- * @param str String of raw bytes to be converted to binary representation
- * @param existingPacked A packed int array of bytes to
- *   append the results to
- * @param existingPackedLen The number of bits in the existingPacked
- *   array
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @returns Hash list where
- *   "value" contains the output number array and "binLen" is the binary
- *   length of "value"
+ * @param str String of raw bytes to be converted to binary representation.
+ * @param existingPacked A packed int array of bytes to append the results to.
+ * @param existingPackedLen The number of bits in `existingPacked` array.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian.
+ * @returns Hashmap of the packed values.
  */
 function bytes2packed(
   str: string,
@@ -201,18 +184,13 @@ function bytes2packed(
 }
 
 /**
- * Convert a base-64 string to an array of big-endian words
+ * Convert a base-64 string to an array of words.
  *
- * @param str String to be converted to binary representation
- * @param existingPacked A packed int array of bytes to
- *   append the results to
- * @param existingPackedLen The number of bits in the existingPacked
- *   array
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @returns Hash list where
- *   "value" contains the output number array and "binLen" is the binary
- *   length of "value"
+ * @param str Base64-encoded string to be converted to binary representation.
+ * @param existingPacked A packed int array of bytes to append the results to.
+ * @param existingPackedLen The number of bits in `existingPacked` array.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian.
+ * @returns Hashmap of the packed values.
  */
 function b642packed(
   str: string,
@@ -269,19 +247,13 @@ function b642packed(
 }
 
 /**
- * Convert an Uint8Array to an array of big-endian words
+ * Convert an Uint8Array to an array of words.
  *
- * @param arr Uint8Array to be converted to binary
- *   representation
- * @param existingPacked A packed int array of bytes to
- *   append the results to
- * @param existingPackedLen The number of bits in the existingPacked
- *   array
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @returns Hash list where
- *   "value" contains the output number array and "binLen" is the binary
- *   length of "value"
+ * @param arr Uint8Array to be converted to binary representation.
+ * @param existingPacked A packed int array of bytes to append the results to.
+ * @param existingPackedLen The number of bits in `existingPacked` array.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian.
+ * @returns Hashmap of the packed values.
  */
 function uint8array2packed(
   arr: Uint8Array,
@@ -309,19 +281,13 @@ function uint8array2packed(
 }
 
 /**
- * Convert an ArrayBuffer to an array of big-endian words
+ * Convert an ArrayBuffer to an array of words
  *
- * @param arr ArrayBuffer to be converted to binary
- *   representation
- * @param existingPacked A packed int array of bytes to
- *   append the results to
- * @param existingPackedLen The number of bits in the existingPacked
- *   array
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @returns Hash list where
- *   "value" contains the output number array and "binLen" is the binary
- *   length of "value"
+ * @param arr ArrayBuffer to be converted to binary representation.
+ * @param existingPacked A packed int array of bytes to append the results to.
+ * @param existingPackedLen The number of bits in `existingPacked` array.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian.
+ * @returns Hashmap of the packed values.
  */
 function arraybuffer2packed(
   arr: ArrayBuffer,
@@ -333,16 +299,12 @@ function arraybuffer2packed(
 }
 
 /**
- * Function that takes an input format and UTF encoding and returns the
- * appropriate function used to convert the input.
+ * Function that takes an input format and UTF encoding and returns the appropriate function used to convert the input.
  *
- * @param format The format of the string to be converted
- * @param utfType The string encoding to use (UTF8, UTF16BE,
- *	UTF16LE)
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @returns Function that will convert an input
- *   string to a packed int array
+ * @param format The format of the input to be converted
+ * @param utfType The string encoding to use for TEXT inputs.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian
+ * @returns Function that will convert an input to a packed int array.
  */
 export function getStrConverter(
   format: "HEX" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY" | "TEXT",
@@ -367,56 +329,40 @@ export function getStrConverter(
   switch (format) {
     case "HEX":
       /**
-       * @param str String of raw bytes to be converted to binary representation
-       * @param existingBin A packed int array of bytes to
-       *   append the results to
-       * @param existingBinLen The number of bits in the existingBin
-       *   array
-       * @returns Hash list where
-       *   "value" contains the output number array and "binLen" is the binary
-       *   length of "value"
+       * @param str String of hexadecimal bytes to be converted to binary representation.
+       * @param existingPacked A packed int array of bytes to append the results to.
+       * @param existingPackedLen The number of bits in `existingPacked` array.
+       * @returns Hashmap of the packed values.
        */
       return function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
         return hex2packed(str, existingBin, existingBinLen, bigEndianMod);
       };
     case "TEXT":
       /**
-       * @param str String of raw bytes to be converted to binary representation
-       * @param existingBin A packed int array of bytes to
-       *   append the results to
-       * @param existingBinLen The number of bits in the existingBin
-       *   array
-       * @returns Hash list where
-       *   "value" contains the output number array and "binLen" is the binary
-       *   length of "value"
+       * @param str Unicode string to be converted to binary representation.
+       * @param existingPacked A packed int array of bytes to append the results to.
+       * @param existingPackedLen The number of bits in `existingPacked` array.
+       * @returns Hashmap of the packed values.
        */
       return function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
         return str2packed(str, utfType, existingBin, existingBinLen, bigEndianMod);
       };
     case "B64":
       /**
-       * @param str String of raw bytes to be converted to binary representation
-       * @param existingBin A packed int array of bytes to
-       *   append the results to
-       * @param existingBinLen The number of bits in the existingBin
-       *   array
-       * @returns Hash list where
-       *   "value" contains the output number array and "binLen" is the binary
-       *   length of "value"
+       * @param str Base64-encoded string to be converted to binary representation.
+       * @param existingPacked A packed int array of bytes to append the results to.
+       * @param existingPackedLen The number of bits in `existingPacked` array.
+       * @returns Hashmap of the packed values.
        */
       return function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
         return b642packed(str, existingBin, existingBinLen, bigEndianMod);
       };
     case "BYTES":
       /**
-       * @param str String of raw bytes to be converted to binary representation
-       * @param existingBin A packed int array of bytes to
-       *   append the results to
-       * @param existingBinLen The number of bits in the existingBin
-       *   array
-       * @returns Hash list where
-       *   "value" contains the output number array and "binLen" is the binary
-       *   length of "value"
+       * @param str String of raw bytes to be converted to binary representation.
+       * @param existingPacked A packed int array of bytes to append the results to.
+       * @param existingPackedLen The number of bits in `existingPacked` array.
+       * @returns Hashmap of the packed values.
        */
       return function (str: string, existingBin?: number[], existingBinLen?: number): packedValue {
         return bytes2packed(str, existingBin, existingBinLen, bigEndianMod);
@@ -428,15 +374,10 @@ export function getStrConverter(
         throw new Error("ARRAYBUFFER not supported by this environment");
       }
       /**
-       * @param arr ArrayBuffer to be converted to binary
-       *   representation
-       * @param existingBin A packed int array of bytes to
-       *   append the results to
-       * @param existingBinLen The number of bits in the existingBin
-       *   array
-       * @returns Hash list where
-       *   "value" contains the output number array and "binLen" is the binary
-       *   length of "value"
+       * @param arr ArrayBuffer to be converted to binary representation.
+       * @param existingPacked A packed int array of bytes to append the results to.
+       * @param existingPackedLen The number of bits in `existingPacked` array.
+       * @returns Hashmap of the packed values.
        */
       return function (arr: ArrayBuffer, existingBin?: number[], existingBinLen?: number): packedValue {
         return arraybuffer2packed(arr, existingBin, existingBinLen, bigEndianMod);
@@ -448,15 +389,10 @@ export function getStrConverter(
         throw new Error("UINT8ARRAY not supported by this environment");
       }
       /**
-       * @param arr Uint8Array to be converted to binary
-       *   representation
-       * @param existingBin A packed int array of bytes to
-       *   append the results to
-       * @param existingBinLen The number of bits in the existingBin
-       *   array
-       * @returns Hash list where
-       *   "value" contains the output number array and "binLen" is the binary
-       *   length of "value"
+       * @param arr Uint8Array to be converted to binary representation.
+       * @param existingPacked A packed int array of bytes to append the results to.
+       * @param existingPackedLen The number of bits in `existingPacked` array.
+       * @returns Hashmap of the packed values.
        */
       return function (arr: Uint8Array, existingBin?: number[], existingBinLen?: number): packedValue {
         return uint8array2packed(arr, existingBin, existingBinLen, bigEndianMod);
@@ -467,20 +403,16 @@ export function getStrConverter(
 }
 
 /**
- * Convert an array of big-endian words to a hex string.
+ * Convert an array of words to a hexadecimal string.
  *
  * toString() won't work here because it removes preceding zeros (e.g. 0x00000001.toString === "1" rather than
  * "00000001" and 0.toString(16) === "0" rather than "00").
  *
- * @param packed Array of integers to be converted to
- *   hexidecimal representation
- * @param outputLength Length of output in bits
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @param formatOpts Hash list
- *   containing validated output formatting options
- * @returns Hexidecimal representation of the parameter in string
- *   form
+ * @param packed Array of integers to be converted.
+ * @param outputLength Length of output in bits.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian.
+ * @param formatOpts Hashmap containing validated output formatting options.
+ * @returns Hexadecimal representation of `packed`.
  */
 export function packed2hex(
   packed: number[],
@@ -506,17 +438,13 @@ export function packed2hex(
 }
 
 /**
- * Convert an array of big-endian words to a base-64 string
+ * Convert an array of words to a base-64 string.
  *
- * @param packed Array of integers to be converted to
- *   base-64 representation
- * @param outputLength Length of output in bits
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @param formatOpts Hash list
- *   containing validated output formatting options
- * @returns Base-64 encoded representation of the parameter in
- *   string form
+ * @param packed Array of integers to be converted.
+ * @param outputLength Length of output in bits.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian.
+ * @param formatOpts Hashmap containing validated output formatting options.
+ * @returns Base64-encoded representation of `packed`.
  */
 export function packed2b64(
   packed: number[],
@@ -553,15 +481,13 @@ export function packed2b64(
 }
 
 /**
- * Convert an array of big-endian words to raw bytes string
+ * Convert an array of words to raw bytes string.
  *
- * @param packed Array of integers to be converted to
- *   a raw bytes string representation
- * @param outputLength Length of output in bits
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @returns Raw bytes representation of the parameter in string
- *   form
+ * @param packed Array of integers to be converted.
+ * @param outputLength Length of output in bits.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian.
+ * @param formatOpts Hashmap containing validated output formatting options.
+ * @returns Raw bytes representation of `packed`.
  */
 export function packed2bytes(packed: number[], outputLength: number, bigEndianMod: -1 | 1): string {
   let str = "",
@@ -580,15 +506,13 @@ export function packed2bytes(packed: number[], outputLength: number, bigEndianMo
 }
 
 /**
- * Convert an array of big-endian words to an ArrayBuffer
+ * Convert an array of words to an ArrayBuffer.
  *
- * @param packed Array of integers to be converted to
- *   an ArrayBuffer
- * @param outputLength Length of output in bits
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @returns Raw bytes representation of the parameter in an
- *   ArrayBuffer
+ * @param packed Array of integers to be converted.
+ * @param outputLength Length of output in bits.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian.
+ * @param formatOpts Hashmap containing validated output formatting options.
+ * @returns An ArrayBuffer containing bytes from `packed.
  */
 export function packed2arraybuffer(packed: number[], outputLength: number, bigEndianMod: -1 | 1): ArrayBuffer {
   let i;
@@ -605,15 +529,13 @@ export function packed2arraybuffer(packed: number[], outputLength: number, bigEn
 }
 
 /**
- * Convert an array of big-endian words to an Uint8Array
+ * Convert an array of words to an Uint8Array.
  *
- * @param packed Array of integers to be converted to
- *   an Uint8Array
- * @param outputLength Length of output in bits
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @returns Raw bytes representation of the parameter in an
- *   Uint8Array
+ * @param packed Array of integers to be converted.
+ * @param outputLength Length of output in bits.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian.
+ * @param formatOpts Hashmap containing validated output formatting options.
+ * @returns An Uint8Array containing bytes from `packed.
  */
 export function packed2uint8array(packed: number[], outputLength: number, bigEndianMod: -1 | 1): Uint8Array {
   let i;
@@ -632,12 +554,10 @@ export function packed2uint8array(packed: number[], outputLength: number, bigEnd
  * Function that takes an output format and associated parameters and returns a function that converts packed integers
  * to that format.
  *
- * @param format The desired output formatting (B64, HEX,
- *   BYTES, ARRAYBUFFER, or UINT8ARRAY)
- * @param outputBinLen Output length, in bits.
- * @param bigEndianMod Modifier for whether hash function is
- *   big or small endian
- * @param options Hash list of output formatting options
+ * @param format The desired output formatting.
+ * @param outputBinLen Output length in bits.
+ * @param bigEndianMod Modifier for whether hash function is big or small endian.
+ * @param options Hashmap of output formatting options
  * @returns Function that will convert a packed integer array to desired format.
  */
 export function getOutputConverter(
