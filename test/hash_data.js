@@ -8,10 +8,6 @@
 })(this, function () {
   "use strict";
 
-  String.prototype.repeat = function (times) {
-    return new Array(times + 1).join(this);
-  };
-
   /* This is used often so make a global copy that everything can reference */
   const millionaAscii = "a".repeat(1000000);
 
