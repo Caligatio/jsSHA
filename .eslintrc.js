@@ -2,9 +2,9 @@ module.exports = {
   root: true,
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: './tsconfig.json'
+    project: "./tsconfig.json",
   },
-  ignorePatterns: ["*.txt"],
+  ignorePatterns: ["*.txt", "/dist"],
   plugins: ["@typescript-eslint"],
   overrides: [
     {
