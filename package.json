@@ -101,5 +101,8 @@
       "html"
     ],
     "all": true
+  },
+  "prettier": {
+    "printWidth": 120
   }
 }
