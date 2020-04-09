@@ -8,4 +8,4 @@ node_js:
   - "node"
 script:
   - npm test && npm run coverage
-  - npm run build && npm run test_dist
+  - npm run test_dist
