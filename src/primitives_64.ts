@@ -1,12 +1,22 @@
 /**
- * Int_64 is a object for 2 32-bit numbers emulating a 64-bit number
+ * Note 1: All the functions in this file guarantee only that the bottom 32-bits of the returned Int_64 are correct.
+ * JavaScript is flakey when it comes to bit operations and a '1' in the highest order bit of a 32-bit number causes
+ * it to be interpreted as a negative number per two's complement.
  *
- * @param msint_32 The most significant 32-bits of a 64-bit number
- * @param lsint_32 The least significant 32-bits of a 64-bit number
+ * Note 2: Per the ECMAScript spec, all JavaScript operations mask the shift amount by 0x1F.  This results in weird
+ * cases like 1 << 32 == 1 and 1 << 33 === 1 << 1 === 2
+ */
+
+/**
+ * Int_64 is a object for 2 32-bit numbers emulating a 64-bit number.
  */
 export class Int_64 {
-  highOrder: number;
-  lowOrder: number;
+  /**
+   * @param msint_32 The most significant 32-bits of a 64-bit number.
+   * @param lsint_32 The least significant 32-bits of a 64-bit number.
+   */
+  readonly highOrder: number;
+  readonly lowOrder: number;
   constructor(msint_32: number, lsint_32: number) {
     this.highOrder = msint_32;
     this.lowOrder = lsint_32;
@@ -14,13 +24,13 @@ export class Int_64 {
 }
 
 /**
- * The 64-bit implementation of circular rotate left
+ * The 64-bit implementation of circular rotate left.
  *
- * This does not work for n >= 64 or n == 32 but those are never done
+ * This does not work for n >= 64 or n == 32 but those are never done.
  *
- * @param x The 64-bit integer argument
- * @param n The number of bits to shift
- * @returns The x shifted circularly by n bits
+ * @param x The 64-bit integer argument.
+ * @param n The number of bits to shift.
+ * @returns `x` shifted left circularly by `n` bits.
  */
 export function rotl_64(x: Int_64, n: number): Int_64 {
   let tmp;
@@ -36,13 +46,13 @@ export function rotl_64(x: Int_64, n: number): Int_64 {
 }
 
 /**
- * The 64-bit implementation of circular rotate right
+ * The 64-bit implementation of circular rotate right.
  *
- * This does not work for n >= 64, n == 32, or n == 0 but those are never done
+ * This does not work for n >= 64, n == 32, or n == 0 but those are never done.
  *
- * @param x The 64-bit integer argument
- * @param n The number of bits to shift
- * @returns The x shifted circularly by n bits
+ * @param x The 64-bit integer argument.
+ * @param n The number of bits to shift.
+ * @returns `x` shifted right circularly by `n` bits.
  */
 function rotr_64(x: Int_64, n: number): Int_64 {
   let tmp;
@@ -56,25 +66,25 @@ function rotr_64(x: Int_64, n: number): Int_64 {
 }
 
 /**
- * The 64-bit implementation of shift right
+ * The 64-bit implementation of shift right.
  *
- * This does not work for n >= 32 but is only called for n < 32
+ * This does not work for n >= 32 but is only called for n < 32.
  *
- * @param x The 64-bit integer argument
- * @param n The number of bits to shift
- * @returns The x shifted by n bits
+ * @param x The 64-bit integer argument.
+ * @param n The number of bits to shift.
+ * @returns `x` shifted right by `n` bits
  */
 function shr_64(x: Int_64, n: number): Int_64 {
   return new Int_64(x.highOrder >>> n, (x.lowOrder >>> n) | (x.highOrder << (32 - n)));
 }
 
 /**
- * The 64-bit implementation of the NIST specified Ch function
+ * The 64-bit implementation of the NIST specified Ch function.
  *
- * @param x The first 64-bit integer argument
- * @param y The second 64-bit integer argument
- * @param z The third 64-bit integer argument
- * @returns The NIST specified output of the function
+ * @param x The first 64-bit integer argument.
+ * @param y The second 64-bit integer argument.
+ * @param z The third 64-bit integer argument.
+ * @returns The NIST specified output of the function.
  */
 export function ch_64(x: Int_64, y: Int_64, z: Int_64): Int_64 {
   return new Int_64(
@@ -84,12 +94,12 @@ export function ch_64(x: Int_64, y: Int_64, z: Int_64): Int_64 {
 }
 
 /**
- * The 64-bit implementation of the NIST specified Maj function
+ * The 64-bit implementation of the NIST specified Maj function.
  *
- * @param x The first 64-bit integer argument
- * @param y The second 64-bit integer argument
- * @param z The third 64-bit integer argument
- * @returns The NIST specified output of the function
+ * @param x The first 64-bit integer argument.
+ * @param y The second 64-bit integer argument.
+ * @param z The third 64-bit integer argument.
+ * @returns The NIST specified output of the function.
  */
 export function maj_64(x: Int_64, y: Int_64, z: Int_64): Int_64 {
   return new Int_64(
@@ -99,10 +109,10 @@ export function maj_64(x: Int_64, y: Int_64, z: Int_64): Int_64 {
 }
 
 /**
- * The 64-bit implementation of the NIST specified Sigma0 function
+ * The 64-bit implementation of the NIST specified Sigma0 function.
  *
- * @param x The 64-bit integer argument
- * @returns The NIST specified output of the function
+ * @param x The 64-bit integer argument.
+ * @returns The NIST specified output of the function.
  */
 export function sigma0_64(x: Int_64): Int_64 {
   const rotr28 = rotr_64(x, 28),
@@ -116,12 +126,11 @@ export function sigma0_64(x: Int_64): Int_64 {
 }
 
 /**
- * Add two 64-bit integers, wrapping at 2^64. This uses 16-bit operations
- * internally to work around bugs in some JS interpreters.
+ * Add two 64-bit integers.
  *
- * @param x The first 64-bit integer argument to be added
- * @param y The second 64-bit integer argument to be added
- * @returns The sum of x + y
+ * @param x The first 64-bit integer argument to be added.
+ * @param y The second 64-bit integer argument to be added.
+ * @returns The sum of `x` + `y`.
  */
 export function safeAdd_64_2(x: Int_64, y: Int_64): Int_64 {
   let lsw, msw;
@@ -138,14 +147,13 @@ export function safeAdd_64_2(x: Int_64, y: Int_64): Int_64 {
 }
 
 /**
- * Add four 64-bit integers, wrapping at 2^64. This uses 16-bit operations
- * internally to work around bugs in some JS interpreters.
+ * Add four 64-bit integers.
  *
- * @param a The first 64-bit integer argument to be added
- * @param b The second 64-bit integer argument to be added
- * @param c The third 64-bit integer argument to be added
- * @param d The fouth 64-bit integer argument to be added
- * @returns The sum of a + b + c + d
+ * @param a The first 64-bit integer argument to be added.
+ * @param b The second 64-bit integer argument to be added.
+ * @param c The third 64-bit integer argument to be added.
+ * @param d The fouth 64-bit integer argument to be added.
+ * @returns The sum of `a` + `b` + `c` + `d`.
  */
 export function safeAdd_64_4(a: Int_64, b: Int_64, c: Int_64, d: Int_64): Int_64 {
   let lsw, msw;
@@ -163,15 +171,14 @@ export function safeAdd_64_4(a: Int_64, b: Int_64, c: Int_64, d: Int_64): Int_64
 }
 
 /**
- * Add five 64-bit integers, wrapping at 2^64. This uses 16-bit operations
- * internally to work around bugs in some JS interpreters.
+ * Add five 64-bit integers.
  *
- * @param a The first 64-bit integer argument to be added
- * @param b The second 64-bit integer argument to be added
- * @param c The third 64-bit integer argument to be added
- * @param d The fouth 64-bit integer argument to be added
- * @param e The fouth 64-bit integer argument to be added
- * @returns The sum of a + b + c + d + e
+ * @param a The first 64-bit integer argument to be added.
+ * @param b The second 64-bit integer argument to be added.
+ * @param c The third 64-bit integer argument to be added.
+ * @param d The fouth 64-bit integer argument to be added.
+ * @param e The fifth 64-bit integer argument to be added.
+ * @returns The sum of `a` + `b` + `c` + `d` + `e`.
  */
 export function safeAdd_64_5(a: Int_64, b: Int_64, c: Int_64, d: Int_64, e: Int_64): Int_64 {
   let lsw, msw;
@@ -213,9 +220,9 @@ export function safeAdd_64_5(a: Int_64, b: Int_64, c: Int_64, d: Int_64, e: Int_
 /**
  * XORs two given arguments.
  *
- * @param a First argument to be XORed
- * @param b Second argument to be XORed
- * @returns The XOR of the arguments
+ * @param a The first argument to be XORed.
+ * @param b The second argument to be XORed.
+ * @returns The The XOR `a` and `b`
  */
 export function xor_64_2(a: Int_64, b: Int_64): Int_64 {
   return new Int_64(a.highOrder ^ b.highOrder, a.lowOrder ^ b.lowOrder);
@@ -224,12 +231,12 @@ export function xor_64_2(a: Int_64, b: Int_64): Int_64 {
 /**
  * XORs five given arguments.
  *
- * @param a First argument to be XORed
- * @param b Second argument to be XORed
- * @param c Third argument to be XORed
- * @param d Fourth argument to be XORed
- * @param e Fifth argument to be XORed
- * @returns The XOR of the arguments
+ * @param a The first argument to be XORed.
+ * @param b The second argument to be XORed.
+ * @param c The third argument to be XORed.
+ * @param d The fourth argument to be XORed.
+ * @param e The fifth argument to be XORed.
+ * @returns The XOR of `a`, `b`, `c`, `d`, and `e`.
  */
 export function xor_64_5(a: Int_64, b: Int_64, c: Int_64, d: Int_64, e: Int_64): Int_64 {
   return new Int_64(
@@ -239,10 +246,10 @@ export function xor_64_5(a: Int_64, b: Int_64, c: Int_64, d: Int_64, e: Int_64):
 }
 
 /**
- * The 64-bit implementation of the NIST specified Gamma1 function
+ * The 64-bit implementation of the NIST specified Gamma1 function.
  *
- * @param x The 64-bit integer argument
- * @returns The NIST specified output of the function
+ * @param x The 64-bit integer argument.
+ * @returns The NIST specified output of the function.
  */
 export function gamma1_64(x: Int_64): Int_64 {
   const rotr19 = rotr_64(x, 19),
@@ -256,10 +263,10 @@ export function gamma1_64(x: Int_64): Int_64 {
 }
 
 /**
- * The 64-bit implementation of the NIST specified Gamma0 function
+ * The 64-bit implementation of the NIST specified Gamma0 function.
  *
- * @param x The 64-bit integer argument
- * @returns The NIST specified output of the function
+ * @param x The 64-bit integer argument.
+ * @returns The NIST specified output of the function.
  */
 export function gamma0_64(x: Int_64): Int_64 {
   const rotr1 = rotr_64(x, 1),
@@ -273,10 +280,10 @@ export function gamma0_64(x: Int_64): Int_64 {
 }
 
 /**
- * The 64-bit implementation of the NIST specified Sigma1 function
+ * The 64-bit implementation of the NIST specified Sigma1 function.
  *
- * @param x The 64-bit integer argument
- * @returns The NIST specified output of the function
+ * @param x The 64-bit integer argument.
+ * @returns The NIST specified output of the function.
  */
 export function sigma1_64(x: Int_64): Int_64 {
   const rotr14 = rotr_64(x, 14),
