@@ -34,7 +34,7 @@ To use the module, first require it using:
 
 ```javascript
 const jsSHA = require("jssha");
-// The limited variant files are also exported (sha1, sha256, sha512, and sha3)
+// The limited variant files are also exported (sha1, sha256, sha512, and sha3) but do not have TypeScript declarations
 const jsSHA1 = require("jssha/sha1");
 // Alternatively, you can load it as a ESM
 import jsSHA from "jssha";
@@ -86,33 +86,21 @@ Note: You cannot calculate both the hash and HMAC using the same object.
 
 ## Files
 
-**dist/sha.js**
-
-The minified [UMD](https://github.com/umdjs/umd) version of the library with support for all hash variants. Its
-accompanying source map can be found in sha.js.map and its TypeScript declarations in sha.d.ts.
-
-**dist/sha.mjs**
-
-The minified ESM version of the library with support for all hash variants. Its accompanying source map can be found in
-sha.mjs.map and its TypeScript declarations in sha.d.ts.
-
-**dist/sha1.js**
-
-The minified UMD version of the library with support for only the SHA-1 hash variant.
-
-**dist/sha256.js**
-
-The minified UMD version of the library with support for only the SHA-224 and SHA-256 hash variants.
-
-**dist/sha512.js**
-
-The minified UMD version of the library with support for only the SHA-384 and SHA-512 hash variants.
-
-**dist/sha3.js**
-
-The minified UMD version of the library with support for only the SHA3-224, SHA3-256, SHA3-384, SHA3-512, SHAKE128, and
-SHAKE256 hash variants.
+- **dist/sha.js** - The minified ES3-compatible [UMD] version of the library with support for all hash variants. Its
+  accompanying source map can be found in sha.js.map and its TypeScript declarations in sha.d.ts.
+- **dist/sha.mjs** - The minified ES6-compatible ESM version of the library with support for all hash variants. Its
+  accompanying source map can be found in sha.mjs.map and its TypeScript declarations in sha.d.ts.
+- **dist/sha1.js** - The minified ES3-compatible UMD version of the library with support for only the SHA-1 hash
+  variant.
+- **dist/sha256.js** - The minified ES3-compatible UMD version of the library with support for only the SHA-224 and
+  SHA-256 hash variants.
+- **dist/sha512.js** - The minified ES3-compatible UMD version of the library with support for only the SHA-384 and
+  SHA-512 hash variants.
+- **dist/sha3.js** - The minified ES3-compatible UMD version of the library with support for only the SHA3-224,
+  SHA3-256, SHA3-384, SHA3-512, SHAKE128, and SHAKE256 hash variants.
 
 ## Contact Info
 
-The project's website is located at [https://caligatio.github.com/jsSHA/](https://caligatio.github.com/jsSHA/)
+The project's website is located at https://caligatio.github.com/jsSHA/
+
+[umd]: https://github.com/umdjs/umd
