@@ -1,114 +1,112 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>jsSHA (http://caligatio.github.com/jsSHA/) - File Test</title>
-		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-        <script type="text/javascript" src="../../dist/sha.js"></script>
-        <script type="text/javascript" >
-            // How many bytes to read per chunk
-            var chunkSize = Math.pow(10, 5)
+  <head>
+    <title>jsSHA (http://caligatio.github.com/jsSHA/) - File Test</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <script type="text/javascript" src="../../dist/sha.js"></script>
+    <script type="text/javascript">
+      // How many bytes to read per chunk
+      var chunkSize = Math.pow(10, 5);
 
-            // Handle various I/O problems
-            function errorHandler(evt) {
-                switch(evt.target.error.code) {
-                    case evt.target.error.NOT_FOUND_ERR:
-                        alert('File Not Found!')
-                        break
-                    case evt.target.error.NOT_READABLE_ERR:
-                        alert('File is not readable')
-                        break
-                    case evt.target.error.ABORT_ERR:
-                        break // noop
-                    default:
-                        alert('An error occurred reading this file.')
-                }
+      // Handle various I/O problems
+      function errorHandler(evt) {
+        switch (evt.target.error.code) {
+          case evt.target.error.NOT_FOUND_ERR:
+            alert("File Not Found!");
+            break;
+          case evt.target.error.NOT_READABLE_ERR:
+            alert("File is not readable");
+            break;
+          case evt.target.error.ABORT_ERR:
+            break; // noop
+          default:
+            alert("An error occurred reading this file.");
+        }
+      }
+
+      // Recurse through async chunk reads
+      function readFile(hasher1, hasher224, hasher256, hasher384, hasher512, file, start, stop) {
+        var progress = document.querySelector("#progress");
+        // Only read to the end of the file
+        stop = stop <= file.size ? stop : file.size;
+
+        // Prepare to read chunk
+        var reader = new FileReader();
+        reader.onerror = errorHandler;
+
+        // If we use onloadend, we need to check the readyState.
+        reader.onloadend = function (evt) {
+          if (evt.target.readyState == FileReader.DONE) {
+            hasher1.update(evt.target.result);
+            hasher224.update(evt.target.result);
+            hasher256.update(evt.target.result);
+            hasher384.update(evt.target.result);
+            hasher512.update(evt.target.result);
+
+            var percent = Math.round((stop / file.size) * 100);
+            progress.innerHTML = "Progress: " + percent + "%";
+
+            // Recurse or finish
+            if (stop == file.size) {
+              progress.innerHTML = "";
+              result1 = hasher1.getHash("HEX");
+              result224 = hasher224.getHash("HEX");
+              result256 = hasher256.getHash("HEX");
+              result384 = hasher384.getHash("HEX");
+              result512 = hasher512.getHash("HEX");
+
+              progress.innerHTML += "<p>SHA-1: " + result1 + "</p>";
+              progress.innerHTML += "<p>SHA-224: " + result224 + "</p>";
+              progress.innerHTML += "<p>SHA-256: " + result256 + "</p>";
+              progress.innerHTML += "<p>SHA-384: " + result384 + "</p>";
+              progress.innerHTML += "<p>SHA-512: " + result512 + "</p>";
+            } else {
+              readFile(hasher1, hasher224, hasher256, hasher384, hasher512, file, start + chunkSize, stop + chunkSize);
             }
+          }
+        };
 
-            // Recurse through async chunk reads
-            function readFile(hasher1, hasher224, hasher256, hasher384, hasher512, file, start, stop) {
-                var progress = document.querySelector('#progress')
-                // Only read to the end of the file
-                stop = (stop <= file.size) ? stop : file.size
+        // Begin read
+        var blob = file.slice(start, stop);
+        reader.readAsArrayBuffer(blob);
+      }
 
-                // Prepare to read chunk
-                var reader = new FileReader()
-                reader.onerror = errorHandler
+      function handleFileSelect(input) {
+        var progress = document.querySelector("#progress");
+        // Reset progress indicator on new file selection.
+        progress.innerHTML = "Progress: 0%";
 
-                // If we use onloadend, we need to check the readyState.
-                reader.onloadend = function(evt) {
-                    if (evt.target.readyState == FileReader.DONE) {
-                        hasher1.update(evt.target.result)
-                        hasher224.update(evt.target.result)
-                        hasher256.update(evt.target.result)
-                        hasher384.update(evt.target.result)
-                        hasher512.update(evt.target.result)
+        // Get file object from the form
+        var file = input.files[0];
 
-                        var percent = Math.round((stop / file.size) * 100)
-                        progress.innerHTML = 'Progress: ' + percent + '%'
+        var hasher1 = new jsSHA("SHA-1", "ARRAYBUFFER");
+        var hasher224 = new jsSHA("SHA-224", "ARRAYBUFFER");
+        var hasher256 = new jsSHA("SHA-256", "ARRAYBUFFER");
+        var hasher384 = new jsSHA("SHA-384", "ARRAYBUFFER");
+        var hasher512 = new jsSHA("SHA-512", "ARRAYBUFFER");
 
-                        // Recurse or finish
-                        if (stop == file.size) {
-                            progress.innerHTML = "";
-                            result1 = hasher1.getHash('HEX')
-                            result224 = hasher224.getHash('HEX')
-                            result256 = hasher256.getHash('HEX')
-                            result384 = hasher384.getHash('HEX')
-                            result512 = hasher512.getHash('HEX')
+        // Read file in chunks
+        readFile(hasher1, hasher224, hasher256, hasher384, hasher512, file, 0, chunkSize);
+      }
+    </script>
+    <style type="text/css">
+      .correct {
+        color: #00ff00;
+        background-color: #ffffff;
+      }
 
-                            progress.innerHTML += '<p>SHA-1: ' + result1 + '</p>';
-                            progress.innerHTML += '<p>SHA-224: ' + result224 + '</p>';
-                            progress.innerHTML += '<p>SHA-256: ' + result256 + '</p>';
-                            progress.innerHTML += '<p>SHA-384: ' + result384 + '</p>';
-                            progress.innerHTML += '<p>SHA-512: ' + result512 + '</p>';
-                        } else {
-                            readFile(hasher1, hasher224, hasher256, hasher384, hasher512, file, start + chunkSize, stop + chunkSize)
-                        }
-                    }
-                }
-
-                // Begin read
-                var blob = file.slice(start, stop)
-                reader.readAsArrayBuffer(blob)
-            }
-
-            function handleFileSelect(input) {
-                var progress = document.querySelector('#progress')
-                // Reset progress indicator on new file selection.
-                progress.innerHTML = 'Progress: 0%';
-
-                // Get file object from the form
-                var file = input.files[0];
-
-                var hasher1 = new jsSHA('SHA-1', 'ARRAYBUFFER')
-                var hasher224 = new jsSHA('SHA-224', 'ARRAYBUFFER')
-                var hasher256 = new jsSHA('SHA-256', 'ARRAYBUFFER')
-                var hasher384 = new jsSHA('SHA-384', 'ARRAYBUFFER')
-                var hasher512 = new jsSHA('SHA-512', 'ARRAYBUFFER')
-
-                // Read file in chunks
-                readFile(hasher1, hasher224, hasher256, hasher384, hasher512, file, 0, chunkSize)
-            }
-        </script>
-        <style type="text/css">
-            .correct
-            {
-                color: #00FF00;
-                background-color: #FFFFFF;
-            }
-
-            .incorrect
-            {
-                color: #FF0000;
-                background-color: #FFFFFF;
-            }
-        </style>
-    </head>
-    <body>
-        Drop this project's LICENSE file to test, or any other file to find its hashes:
-        <p>
-            <input type="file" id="files" name="file" onchange="handleFileSelect(this)" />
-        </p>
-        NOTE: This may not work in Internet Explorer
-        <div id="progress"></div>
-    </body>
+      .incorrect {
+        color: #ff0000;
+        background-color: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    Drop this project's LICENSE file to test, or any other file to find its hashes:
+    <p>
+      <input type="file" id="files" name="file" onchange="handleFileSelect(this)" />
+    </p>
+    NOTE: This may not work in Internet Explorer
+    <div id="progress"></div>
+  </body>
 </html>
