@@ -60,8 +60,8 @@ encode TEXT-type inputs. Valid `encoding` values are "UTF8", "UTF16BE", and "UTF
 `getHash` also takes a hashmap as an optional second argument with defaults `{"outputUpper" : false, "b64Pad" : "="}`.
 `outputUpper` is only used for "HEX" outputs and `b64Pad` only for "B64" outputs.
 
-\***\*_Important_\*\***: SHAKE128 and SHAKE256 require `shakeLen` to be included in the hashmap where `shakeLen` is the
-desired output length of the SHAKE algorithm in a multiple of 8 bits.
+**_Important_**: SHAKE128 and SHAKE256 require `shakeLen` to be included in the hashmap where `shakeLen` is the desired
+output length of the SHAKE algorithm in a multiple of 8 bits.
 
 ### HMAC
 
@@ -85,7 +85,7 @@ Note: You cannot calculate both the hash and HMAC using the same object.
 
 ## Files
 
-- **dist/sha.js** - The minified ECMAScript 3 (ES3) compatible [Universal Module Definition (UMD)](UMD) version of the
+- **dist/sha.js** - The minified ECMAScript 3 (ES3) compatible [Universal Module Definition (UMD)][umd] version of the
   library with support for all hash variants. Its accompanying source map can be found in dist/sha.js.map and its
   TypeScript declarations in dist/sha.d.ts.
 - **dist/sha.mjs** - The minified ECMAScript 2015 (ES6) compatible ESM version of the library with support for all hash

@@ -3,7 +3,7 @@
 ## 3.0.0 - Stay-At-Home Order Edition (XXXX-XX-XX)
 
 - Transitioned codebase to [TypeScript] while still maintaining v2 backwards compatible output files.
-- v2 backwards compatible files now use the [Universal Module Definition (UMD)](UMD) format which should support all
+- v2 backwards compatible files now use the [Universal Module Definition (UMD)][umd] format which should support all
   well-known loaders.
 - Added a oft-requested ECMAScript 2015 (ES6) ECMAScript Module (ESM) version of the library (sha.mjs).
 - Reworked package exports to allow Node.js and other tools to smartly choose between ES6 ESM module and ES3 UMD
@@ -12,7 +12,7 @@
 - Source maps are now included with the library for the default entry points.
 - Limited hash variant files (sha1.js, sha256.js, sha512.js, and sha3.js) are now accessed via exports rather than file
   path (e.g. using `require("jssha/sha1")` rather than the previous `require("jssha/src/sha1.js"`).
-- Changed build system from [Google Closure Compiler](GCC) to [Rollup] with [terser] as the minifier/uglifer. This
+- Changed build system from [Google Closure Compiler][gcc] to [Rollup] with [terser] as the minifier/uglifer. This
   resulted in slightly larger output files but infinitely better maintainability.
 - Optimized 64-bit functions by removing unneeded logical/arithmetic/bit operations.
 - Completely overhauled testing due to transition to TypeScript. This resulted in the ability to get true 100% unit test
@@ -54,7 +54,7 @@ be fully backwards-compatible, the version will be bumped to v3 as a safety prec
 - Sped up SHA-3 implementation by adding little-endian capability to conversion functions
 - Further sped up SHA-3 implementation by decomposing xor_64 function (thanks frostschutz!)
 - Fixed incorrect results when using ArrayBuffers (thanks conref!)
-- Added externs/sha.js for [Google Closure Compiler](GCC) users (thanks IvanRF!)
+- Added externs/sha.js for [Google Closure Compiler][gcc] users (thanks IvanRF!)
 
 ## 2.2.0 (2016-07-10)
 
@@ -100,7 +100,7 @@ and it will be too difficult to support the older API style with new features.
 
 ## 1.5.1 (2013-12-15)
 
-- Changed [Google Closure Compiler](GCC) options to produce "strict" compatible code
+- Changed [Google Closure Compiler][gcc] options to produce "strict" compatible code
 
 ## 1.5 (2013-12-15)
 
@@ -131,7 +131,7 @@ and it will be too difficult to support the older API style with new features.
     have default values of false and "=", respectively
   - jsSHA constructor takes an optional parameter, charSize (8 or 16) that specifies the character width of the input
     (TEXT and ASCII input only)
-- Modified comments to be [Google Closure Compiler](GCC) compliant
+- Modified comments to be [Google Closure Compiler][gcc] compliant
 - Added a SUPPORTED_ALGS flag that, when used with the Google Closure Compiler, will remove unused functions/function
   portions
   - Removed all src/\*\_nice.js files as the SUPPORTED_ALGS flag renders them obsolete
