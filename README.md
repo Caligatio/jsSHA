@@ -18,8 +18,6 @@ Include the desired JavaScript file (sha.js, sha1.js, sha256.js, sha512.js, or s
 
 ```html
 <script type="text/javascript" src="/path/to/sha.js"></script>
-<!-- You can also use the ECMAScript module (ESM) by using the following -->
-<script type="module" src="/path/to/sha.mjs"></script>
 ```
 
 #### Node.js
@@ -57,16 +55,17 @@ const hash = shaObj.getHash("HEX");
 
 The constructor takes a hashmap as a optional third argument with defaults `{"encoding" : "UTF8", "numRounds" : 1}`.
 `numRounds` controls the number of hashing iterations/rounds performed and `encoding` specifies the encoding used to
-encode TEXT-type inputs. Valid options are "UTF8", "UTF16BE", and "UTF16LE", it defaults to "UTF8".
+encode TEXT-type inputs. Valid `encoding` values are "UTF8", "UTF16BE", and "UTF16LE".
 
-`getHash` also takes a hashmap as an optional second argument. By default the hashmap is
-`{"outputUpper" : false, "b64Pad" : "="}`. These options are intelligently interpreted based upon the chosen output
-format. **Important**: SHAKE128 and SHAKE256 require `shakeLen` to be included in the hashmap where `shakeLen` is the
+`getHash` also takes a hashmap as an optional second argument with defaults `{"outputUpper" : false, "b64Pad" : "="}`.
+`outputUpper` is only used for "HEX" outputs and `b64Pad` only for "B64" outputs.
+
+\***\*_Important_\*\***: SHAKE128 and SHAKE256 require `shakeLen` to be included in the hashmap where `shakeLen` is the
 desired output length of the SHAKE algorithm in a multiple of 8 bits.
 
 ### HMAC
 
-Instantiate a new jsSHA object the same way as for hashing. Then set the HMAC key to be used by calling `setHMACKey`
+Instantiate a new `jsSHA` object the same way as for hashing. Then set the HMAC key to be used by calling `setHMACKey`
 with the key and its input type (this MUST be done before calling `update`). You can stream in the input using the
 `update` object function just like hashing. Finally, get the HMAC by calling the `getHMAC` function with the output type
 as its argument. Example to calculate the SHA-512 HMAC of the string "This is a test" with the key "abc":
@@ -86,10 +85,12 @@ Note: You cannot calculate both the hash and HMAC using the same object.
 
 ## Files
 
-- **dist/sha.js** - The minified ES3-compatible [UMD] version of the library with support for all hash variants. Its
-  accompanying source map can be found in sha.js.map and its TypeScript declarations in sha.d.ts.
-- **dist/sha.mjs** - The minified ES6-compatible ESM version of the library with support for all hash variants. Its
-  accompanying source map can be found in sha.mjs.map and its TypeScript declarations in sha.d.ts.
+- **dist/sha.js** - The minified ECMAScript 3 (ES3) compatible [Universal Module Definition (UMD)](UMD) version of the
+  library with support for all hash variants. Its accompanying source map can be found in dist/sha.js.map and its
+  TypeScript declarations in dist/sha.d.ts.
+- **dist/sha.mjs** - The minified ECMAScript 2015 (ES6) compatible ESM version of the library with support for all hash
+  variants. Its accompanying source map can be found in dist/sha.mjs.map and its TypeScript declarations in
+  dist/sha.d.ts.
 - **dist/sha1.js** - The minified ES3-compatible UMD version of the library with support for only the SHA-1 hash
   variant.
 - **dist/sha256.js** - The minified ES3-compatible UMD version of the library with support for only the SHA-224 and
