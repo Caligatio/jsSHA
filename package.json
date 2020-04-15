@@ -1,6 +1,6 @@
 {
   "name": "jssha",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "jsSHA implements the complete Secure Hash Standard (SHA) family (SHA-1, SHA-224/256/384/512, SHA3-224/256/384/512, SHAKE128/256, cSHAKE128/256, and KMAC128/256) with HMAC",
   "main": "./dist/sha.js",
   "exports": {
@@ -33,8 +33,6 @@
     "SHAKE-256",
     "SHAKE128",
     "SHAKE256",
-    "cSHAKE-128",
-    "cSHAKE-256",
     "cSHAKE128",
     "cSHAKE256",
     "KMAC128",
@@ -50,8 +48,12 @@
     "SHA3",
     "SHAKE",
     "cSHAKE",
+    "cSHAKE-128",
+    "cSHAKE-256",
     "HMAC",
     "KMAC",
+    "KMAC-128",
+    "KMAC-256",
     "hash",
     "cryptography"
   ],

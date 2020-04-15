@@ -1,5 +1,15 @@
 # jsSHA - ChangeLog
 
+## 3.1.0 - Still-At-Home Edition (2020-04-15)
+
+- Added support for cSHAKE128/256 and KMAC128/256 (thanks paulg446 for the
+  ticket and mrecachinas for the test vector help!).
+- Added TypeScript declarations for all variant files (thanks wKovacs64!).
+- Deprecated `setHMACKey` and `getHMAC` in order to unify MAC API. See the
+  [jsSHA Wiki] for more information.
+
+[jssha wiki]: https://github.com/Caligatio/jsSHA/wiki
+
 ## 3.0.0 - Stay-At-Home Order Edition (2020-04-09)
 
 - Transitioned codebase to [TypeScript] while still maintaining v2 backwards
