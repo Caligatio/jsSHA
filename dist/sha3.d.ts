@@ -31,6 +31,12 @@ interface packedValue {
     value: number[];
     binLen: number;
 }
+interface SHAKEOptionsNoEncodingType {
+    numRounds?: number;
+}
+interface SHAKEOptionsEncodingType extends SHAKEOptionsNoEncodingType {
+    encoding?: EncodingType;
+}
 interface CSHAKEOptionsNoEncodingType {
     customization?: GenericInputType;
     funcName?: GenericInputType;
@@ -177,8 +183,8 @@ declare class Int_64 {
     constructor(msint_32: number, lsint_32: number);
 }
 
-declare type VariantNoCSHAKEType = "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
-declare type VariantType = VariantNoCSHAKEType | "CSHAKE128" | "CSHAKE256" | "KMAC128" | "KMAC256";
+declare type FixedLengthVariantType = "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
+declare type VariantType = FixedLengthVariantType | "SHAKE128" | "SHAKE256" | "CSHAKE128" | "CSHAKE256" | "KMAC128" | "KMAC256";
 declare class jsSHA extends jsSHABase<Int_64[][], VariantType> {
     intermediateState: Int_64[][];
     variantBlockSize: number;
@@ -194,8 +200,10 @@ declare class jsSHA extends jsSHABase<Int_64[][], VariantType> {
     getMAC: ((options: {
         outputLen: number;
     }) => number[]) | null;
-    constructor(variant: VariantNoCSHAKEType, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
-    constructor(variant: VariantNoCSHAKEType, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
+    constructor(variant: FixedLengthVariantType, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
+    constructor(variant: FixedLengthVariantType, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
+    constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: "TEXT", options?: SHAKEOptionsEncodingType);
+    constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: FormatNoTextType, options?: SHAKEOptionsNoEncodingType);
     constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: "TEXT", options?: CSHAKEOptionsEncodingType);
     constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: FormatNoTextType, options?: CSHAKEOptionsNoEncodingType);
     constructor(variant: "KMAC128" | "KMAC256", inputFormat: "TEXT", options: KMACOptionsEncodingType);

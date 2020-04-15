@@ -26,6 +26,12 @@ declare type FixedLengthOptionsEncodingType = {
     numRounds?: number;
     encoding?: EncodingType;
 };
+interface SHAKEOptionsNoEncodingType {
+    numRounds?: number;
+}
+interface SHAKEOptionsEncodingType extends SHAKEOptionsNoEncodingType {
+    encoding?: EncodingType;
+}
 interface CSHAKEOptionsNoEncodingType {
     customization?: GenericInputType;
     funcName?: GenericInputType;
@@ -41,7 +47,7 @@ interface KMACOptionsEncodingType extends KMACOptionsNoEncodingType {
     encoding?: EncodingType;
 }
 
-declare type FixedLengthVariantType = "SHA-1" | "SHA-224" | "SHA-256" | "SHA-384" | "SHA-512" | "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
+declare type FixedLengthVariantType = "SHA-1" | "SHA-224" | "SHA-256" | "SHA-384" | "SHA-512" | "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512";
 declare class jsSHA {
     private readonly shaObj;
     /**
@@ -63,6 +69,8 @@ declare class jsSHA {
      */
     constructor(variant: FixedLengthVariantType, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
     constructor(variant: FixedLengthVariantType, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
+    constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: "TEXT", options?: SHAKEOptionsEncodingType);
+    constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: FormatNoTextType, options?: SHAKEOptionsNoEncodingType);
     constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: "TEXT", options?: CSHAKEOptionsEncodingType);
     constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: FormatNoTextType, options?: CSHAKEOptionsNoEncodingType);
     constructor(variant: "KMAC128" | "KMAC256", inputFormat: "TEXT", options: KMACOptionsEncodingType);
