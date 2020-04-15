@@ -1,4 +1,4 @@
-/**
+/*
  * Note 1: All the functions in this file guarantee only that the bottom 32-bits of the return value are correct.
  * JavaScript is flakey when it comes to bit operations and a '1' in the highest order bit of a 32-bit number causes
  * it to be interpreted as a negative number per two's complement.

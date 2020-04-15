@@ -143,14 +143,6 @@ declare abstract class jsSHABase<StateT, VariantT> {
 }
 
 /**
- * Note 1: All the functions in this file guarantee only that the bottom 32-bits of the returned Int_64 are correct.
- * JavaScript is flakey when it comes to bit operations and a '1' in the highest order bit of a 32-bit number causes
- * it to be interpreted as a negative number per two's complement.
- *
- * Note 2: Per the ECMAScript spec, all JavaScript operations mask the shift amount by 0x1F.  This results in weird
- * cases like 1 << 32 == 1 and 1 << 33 === 1 << 1 === 2
- */
-/**
  * Int_64 is a object for 2 32-bit numbers emulating a 64-bit number.
  */
 declare class Int_64 {
