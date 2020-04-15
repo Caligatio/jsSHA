@@ -218,7 +218,7 @@ declare class jsSHA extends jsSHABase<Int_64[][], VariantType> {
      * Returns the the KMAC in the specified format.
      *
      * @param format The desired output formatting.
-     * @param options Hashmap of extra outputs options. `shakeLen` must be specified.
+     * @param options Hashmap of extra outputs options. `outputLen` must be specified.
      * @returns The KMAC in the format specified.
      */
     protected _getKMAC(options: {

@@ -269,7 +269,7 @@ describe("Test jsSHABase", () => {
     assert.equal(stubbedJsSHA.getter("processedLen"), 64);
   });
 
-  it("Test getHash Without Needed shakeLen ", () => {
+  it("Test getHash Without Needed outputLen ", () => {
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
 
     stubbedJsSHA.setter("isVariableLen", true);
@@ -319,7 +319,7 @@ describe("Test jsSHABase", () => {
   it("Test getHash for SHAKE", () => {
     /*
      * Check a few basic things:
-     *   1. The output of getHash should equal the first shakeLen bits of the output of finalizeFunc
+     *   1. The output of getHash should equal the first outputLen bits of the output of finalizeFunc
      *   2. finalize should be called once with the correct inputs
      */
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
@@ -334,7 +334,7 @@ describe("Test jsSHABase", () => {
     stubbedJsSHA.setter("processedLen", 64);
 
     // Check #1
-    assert.equal(stubbedJsSHA.getHash("HEX", { shakeLen: 32 }), dummyVals[0].toString(16));
+    assert.equal(stubbedJsSHA.getHash("HEX", { outputLen: 32 }), dummyVals[0].toString(16));
 
     // Check #2
     assert.isTrue(stubbedFinalize.calledOnceWith([dummyVals[5]], 32, 64, [dummyVals[2], dummyVals[3]], 32));
@@ -362,7 +362,7 @@ describe("Test jsSHABase", () => {
      * Check a few basic things:
      *   1. The output of getHash should equal the output of last finalizeFunc call
      *   2. finalizeFunc should be called numRound times
-     *   3. The last numRound-1 calls of finalizeFunc should have the last 32-shakeLen bits 0ed out
+     *   3. The last numRound-1 calls of finalizeFunc should have the last 32-outputLen bits 0ed out
      */
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX", { numRounds: 3 });
     stubbedJsSHA.setter("isVariableLen", true);
@@ -370,7 +370,7 @@ describe("Test jsSHABase", () => {
     stubbedFinalize.returns([dummyVals[0], dummyVals[1]]).onCall(2).returns([dummyVals[2], dummyVals[3]]);
 
     // Check #1
-    assert.equal(stubbedJsSHA.getHash("HEX", { shakeLen: 24 }), dummyVals[2].toString(16).substr(0, 6));
+    assert.equal(stubbedJsSHA.getHash("HEX", { outputLen: 24 }), dummyVals[2].toString(16).substr(0, 6));
 
     // Check #2
     assert.equal(stubbedFinalize.callCount, 3);

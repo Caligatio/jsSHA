@@ -586,7 +586,7 @@ describe("Test getOutputConverter", () => {
       { inputValue: "ARRAYBUFFER", funcName: "packed2arraybuffer", needsOptions: false },
       { inputValue: "UINT8ARRAY", funcName: "packed2uint8array", needsOptions: false },
     ],
-    options = { outputUpper: false, b64Pad: "", shakeLen: -1 };
+    options = { outputUpper: false, b64Pad: "", outputLen: -1 };
 
   funcNameToInputValueMappings.forEach((mapping) => {
     it(`${mapping.funcName} Mapping`, () => {
