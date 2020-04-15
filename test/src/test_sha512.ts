@@ -3,6 +3,11 @@ import { assert } from "chai";
 import rewire from "rewire";
 import sinon from "sinon";
 import { runHashTests } from "./common";
+import {
+  FixedLengthOptionsEncodingType,
+  FixedLengthOptionsNoEncodingType,
+  FormatNoTextType,
+} from "../../src/custom_types";
 import { Int_64 } from "../../src/primitives_64";
 
 const sha512 = rewire("../../src/sha512"),
@@ -118,34 +123,33 @@ describe("Test finalizeSHA512", () => {
     new Int_64(0, 0),
   ];
   it("SHA-384 With NIST Test Inputs", () => {
-    const roundStub = sinon.stub().returns(array8Zeros),
-      finalizeSHA512 = sha512.__get__("finalizeSHA512"),
-      revert = sha512.__set__("roundSHA512", roundStub);
-
-    finalizeSHA512(abcPacked, 24, 0, newState384.slice(), "SHA-384");
-    assert.isTrue(roundStub.calledOnceWithExactly(abcPostProcessed, newState384.slice()));
-    revert();
+    const roundStub = sinon.stub().returns(array8Zeros);
+    sha512.__with__({ roundSHA512: roundStub })(() => {
+      sha512.__get__("finalizeSHA512")(abcPacked, 24, 0, newState384.slice(), "SHA-384");
+      assert.isTrue(roundStub.calledOnceWithExactly(abcPostProcessed, newState384.slice()));
+    });
   });
 
   it("SHA-512 With NIST Test Inputs", () => {
-    const roundStub = sinon.stub().returns(array8Zeros),
-      finalizeSHA512 = sha512.__get__("finalizeSHA512"),
-      revert = sha512.__set__("roundSHA512", roundStub);
-
-    finalizeSHA512(abcPacked, 24, 0, newState512.slice());
-    assert.isTrue(roundStub.calledOnceWithExactly(abcPostProcessed, newState512.slice()));
-    revert();
+    const roundStub = sinon.stub().returns(array8Zeros);
+    sha512.__with__({ roundSHA512: roundStub })(() => {
+      sha512.__get__("finalizeSHA512")(abcPacked, 24, 0, newState512.slice());
+      assert.isTrue(roundStub.calledOnceWithExactly(abcPostProcessed, newState512.slice()));
+    });
   });
 });
 
 describe("Test jsSHA(SHA-512)", () => {
   const jsSHA = sha512.__get__("jsSHA");
   class jsSHAATest extends jsSHA {
+    constructor(variant: "SHA-384" | "SHA-512", inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
     constructor(
       variant: "SHA-384" | "SHA-512",
-      inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-      options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
-    ) {
+      inputFormat: FormatNoTextType,
+      options?: FixedLengthOptionsNoEncodingType
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    constructor(variant: any, inputFormat: any, options?: any) {
       super(variant, inputFormat, options);
     }
 
@@ -174,41 +178,40 @@ describe("Test jsSHA(SHA-512)", () => {
       sinon.reset();
       const roundFuncSpy = sinon.spy(),
         finalizeFuncSpy = sinon.spy(),
-        newStateFuncSpy = sinon.spy(),
-        roundRevert = sha512.__set__("roundSHA512", roundFuncSpy),
-        finalizeRevert = sha512.__set__("finalizeSHA512", finalizeFuncSpy),
-        newStateRevert = sha512.__set__("getNewState512", newStateFuncSpy),
+        newStateFuncSpy = sinon.spy();
+      sha512.__with__({
+        roundSHA512: roundFuncSpy,
+        finalizeSHA512: finalizeFuncSpy,
+        getNewState512: newStateFuncSpy,
+      })(() => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
-        hash = new jsSHAATest(test.variant, "HEX");
+        const hash = new jsSHAATest(test.variant, "HEX");
 
-      // Check #1
-      assert.equal(hash.getter("bigEndianMod"), -1);
-      assert.equal(hash.getter("variantBlockSize"), 1024);
-      assert.equal(hash.getter("outputBinLen"), test.outputBinLen);
-      assert.isFalse(hash.getter("isSHAKE"));
+        // Check #1
+        assert.equal(hash.getter("bigEndianMod"), -1);
+        assert.equal(hash.getter("variantBlockSize"), 1024);
+        assert.equal(hash.getter("outputBinLen"), test.outputBinLen);
+        assert.isFalse(hash.getter("isVariableLen"));
 
-      // Check #2
-      const state = [0xdeadbeef];
-      const clonedState = hash.getter("stateCloneFunc")(state);
-      assert.notEqual(state, clonedState);
-      assert.deepEqual(state, clonedState);
+        // Check #2
+        const state = [0xdeadbeef];
+        const clonedState = hash.getter("stateCloneFunc")(state);
+        assert.notEqual(state, clonedState);
+        assert.deepEqual(state, clonedState);
 
-      // Check #3
-      hash.getter("roundFunc")([0xdeadbeef], [new Int_64(0xfacefeed, 0)]);
-      assert.isTrue(roundFuncSpy.lastCall.calledWithExactly([0xdeadbeef], [new Int_64(0xfacefeed, 0)]));
+        // Check #3
+        hash.getter("roundFunc")([0xdeadbeef], [new Int_64(0xfacefeed, 0)]);
+        assert.isTrue(roundFuncSpy.lastCall.calledWithExactly([0xdeadbeef], [new Int_64(0xfacefeed, 0)]));
 
-      hash.getter("newStateFunc")(test.variant);
-      assert.isTrue(newStateFuncSpy.lastCall.calledWithExactly(test.variant));
+        hash.getter("newStateFunc")(test.variant);
+        assert.isTrue(newStateFuncSpy.lastCall.calledWithExactly(test.variant));
 
-      hash.getter("finalizeFunc")([0xdeadbeef], 32, 0, [new Int_64(0xfacefeed, 0)]);
-      assert.isTrue(
-        finalizeFuncSpy.lastCall.calledWithExactly([0xdeadbeef], 32, 0, [new Int_64(0xfacefeed, 0)], test.variant)
-      );
-
-      roundRevert();
-      finalizeRevert();
-      newStateRevert();
+        hash.getter("finalizeFunc")([0xdeadbeef], 32, 0, [new Int_64(0xfacefeed, 0)]);
+        assert.isTrue(
+          finalizeFuncSpy.lastCall.calledWithExactly([0xdeadbeef], 32, 0, [new Int_64(0xfacefeed, 0)], test.variant)
+        );
+      });
     });
   });
 
@@ -216,6 +219,18 @@ describe("Test jsSHA(SHA-512)", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore - Deliberate bad variant value to test exceptions
     assert.throws(() => new jsSHA("SHA-TEST", "HEX"), "Chosen SHA variant is not supported");
+  });
+
+  it("With hmacKey Set at Instantiation", () => {
+    const hash = new jsSHAATest("SHA-512", "HEX", { hmacKey: { value: "TEST", format: "TEXT" } });
+    assert.isTrue(hash.getter("macKeySet"));
+  });
+
+  it("With hmacKey Set at Instantiation but then also setHMACKey", () => {
+    const hash = new jsSHAATest("SHA-512", "HEX", { hmacKey: { value: "TEST", format: "TEXT" } });
+    assert.throws(() => {
+      hash.setHMACKey("TEST", "TEXT");
+    }, "MAC key already set");
   });
 });
 

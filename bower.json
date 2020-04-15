@@ -1,7 +1,7 @@
 {
   "name": "jssha",
-  "description": "jsSHA implements the complete Secure Hash Standard family (SHA-1, SHA-224/256, SHA-384/512, SHA3-224/256/384/512, SHAKE128/256) with HMAC",
-  "main": "dist/sha.umd.js",
+  "description": "jsSHA implements the complete SHA family (SHA-1, SHA-224/256/384/512, SHA3-224/256/384/512, SHAKE128/256 & cSHAKE128/256) with HMAC and KMAC",
+  "main": "./dist/sha.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Caligatio/jsSHA.git"
@@ -21,6 +21,12 @@
     "SHAKE-256",
     "SHAKE128",
     "SHAKE256",
+    "cSHAKE-128",
+    "cSHAKE-256",
+    "cSHAKE128",
+    "cSHAKE256",
+    "KMAC128",
+    "KMAC256",
     "SHA1",
     "SHA224",
     "SHA256",
@@ -31,8 +37,11 @@
     "SHA-3",
     "SHA3",
     "SHAKE",
+    "cSHAKE",
     "HMAC",
-    "hash"
+    "KMAC",
+    "hash",
+    "cryptography"
   ],
   "license": "BSD-3-Clause",
   "authors": ["Brian Turek <brian.turek@gmail.com>"],

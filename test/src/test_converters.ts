@@ -2,7 +2,7 @@ import { describe, it } from "mocha";
 import rewire from "rewire";
 import sinon from "sinon";
 import { assert } from "chai";
-import { packedValue } from "../../src/converters";
+import { packedValue } from "../../src/custom_types";
 
 const converters = rewire("../../src/converters");
 
@@ -510,7 +510,7 @@ describe("Test packed2uint8array", () => {
 });
 
 describe("Test getStrConverter", () => {
-  let spy, revert, strConverter;
+  let revert, strConverter;
 
   // getStrConverter is actually exported but mixing rewire and sinon imports causes a node.js core dump
   const getStrConverter = converters.__get__("getStrConverter"),
@@ -524,7 +524,7 @@ describe("Test getStrConverter", () => {
 
   funcNameToInputValueMappings.forEach((mapping) => {
     it(`${mapping.funcName} Mapping`, () => {
-      spy = sinon.spy();
+      const spy = sinon.spy();
       revert = converters.__set__(mapping.funcName, spy);
       strConverter = getStrConverter(mapping.inputValue, "UTF8", -1);
       strConverter("00", [], 0);
@@ -535,12 +535,12 @@ describe("Test getStrConverter", () => {
 
   // Needed to be handled separately due to utf type being passed into eventual function
   it("str2packed Mapping", () => {
-    spy = sinon.spy();
-    revert = converters.__set__("str2packed", spy);
-    strConverter = getStrConverter("TEXT", "UTF8", -1);
-    strConverter("00", [], 0);
-    assert.isTrue(spy.calledWithExactly("00", "UTF8", [], 0, -1));
-    revert();
+    const spy = sinon.spy();
+    converters.__with__({ str2packed: spy })(() => {
+      strConverter = getStrConverter("TEXT", "UTF8", -1);
+      strConverter("00", [], 0);
+      assert.isTrue(spy.calledWithExactly("00", "UTF8", [], 0, -1));
+    });
   });
 
   it("Invalid UTF Exception", () => {
@@ -558,19 +558,19 @@ describe("Test getStrConverter", () => {
   });
 
   it("arraybuffer2packed Unsupported", () => {
-    revert = converters.__set__("ArrayBuffer", sinon.stub().throws());
-    assert.throws(() => {
-      getStrConverter("ARRAYBUFFER", "UTF8", -1);
-    }, "ARRAYBUFFER not supported by this environment");
-    revert();
+    converters.__with__({ ArrayBuffer: sinon.stub().throws() })(() => {
+      assert.throws(() => {
+        getStrConverter("ARRAYBUFFER", "UTF8", -1);
+      }, "ARRAYBUFFER not supported by this environment");
+    });
   });
 
   it("uint8array2packed Unsupported", () => {
-    revert = converters.__set__("Uint8Array", sinon.stub().throws());
-    assert.throws(() => {
-      getStrConverter("UINT8ARRAY", "UTF8", -1);
-    }, "UINT8ARRAY not supported by this environment");
-    revert();
+    converters.__with__({ Uint8Array: sinon.stub().throws() })(() => {
+      assert.throws(() => {
+        getStrConverter("UINT8ARRAY", "UTF8", -1);
+      }, "UINT8ARRAY not supported by this environment");
+    });
   });
 });
 
@@ -610,22 +610,18 @@ describe("Test getOutputConverter", () => {
   });
 
   it("arraybuffer2packed Unsupported", () => {
-    revert = converters.__set__("ArrayBuffer", () => {
-      throw new Error();
+    converters.__with__({ ArrayBuffer: sinon.stub().throws() })(() => {
+      assert.throws(() => {
+        getOutputConverter("ARRAYBUFFER", 0, -1, options);
+      }, "ARRAYBUFFER not supported by this environment");
     });
-    assert.throws(() => {
-      getOutputConverter("ARRAYBUFFER", 0, -1, options);
-    }, "ARRAYBUFFER not supported by this environment");
-    revert();
   });
 
   it("uint8array2packed Unsupported", () => {
-    revert = converters.__set__("Uint8Array", () => {
-      throw new Error();
+    converters.__with__({ Uint8Array: sinon.stub().throws() })(() => {
+      assert.throws(() => {
+        getOutputConverter("UINT8ARRAY", 0, -1, options);
+      }, "UINT8ARRAY not supported by this environment");
     });
-    assert.throws(() => {
-      getOutputConverter("UINT8ARRAY", 0, -1, options);
-    }, "UINT8ARRAY not supported by this environment");
-    revert();
   });
 });

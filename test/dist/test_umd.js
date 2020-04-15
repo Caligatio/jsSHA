@@ -16,16 +16,24 @@ function testVariant(variant) {
     describe(`Test UMD jsSHA(${variant}) Using NIST Tests`, () => {
       hashData[variant].forEach((test) => {
         test.outputs.forEach((output) => {
-          const hashObj = new jsSHA(variant, test.input.type, { numRounds: test.input.rounds || 1 });
+          // This constructor needs to be outside of the "it" otherwise the variant support exception will fail the test
+          if (test.hmacKey) {
+            const hashObj = new jsSHA(variant, test.input.format);
+            it(test.name + " - Old Style", () => {
+              hashObj.setHMACKey(test.hmacKey.value, test.hmacKey.format);
+              hashObj.update(test.input.value);
+              assert.equal(hashObj.getHMAC(output.format), output.value);
+            });
+          }
+          const hashObj = new jsSHA(variant, test.input.format, {
+            numRounds: test.input.rounds || 1,
+            customization: test.customization,
+            kmacKey: test.kmacKey,
+            hmacKey: test.hmacKey,
+          });
           it(test.name, () => {
-            if (test.key) {
-              hashObj.setHMACKey(test.key.value, test.key.type);
-              hashObj.update(test.input.value);
-              assert.equal(hashObj.getHMAC(output.type), output.value);
-            } else {
-              hashObj.update(test.input.value);
-              assert.equal(hashObj.getHash(output.type, { shakeLen: output.shakeLen || 8 }), output.value);
-            }
+            hashObj.update(test.input.value);
+            assert.equal(hashObj.getHash(output.format, { outputLen: output.outputLen || 8 }), output.value);
           });
         });
       });
@@ -44,7 +52,18 @@ function testVariant(variant) {
   ["SHA-1"],
   ["SHA-224", "SHA-256"],
   ["SHA-384", "SHA-512"],
-  ["SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SHAKE128", "SHAKE256"],
+  [
+    "SHA3-224",
+    "SHA3-256",
+    "SHA3-384",
+    "SHA3-512",
+    "SHAKE128",
+    "SHAKE256",
+    "CSHAKE128",
+    "CSHAKE256",
+    "KMAC128",
+    "KMAC256",
+  ],
 ].forEach((shaFamily) => {
   let successes = 0;
   shaFamily.forEach((shaVariant) => {

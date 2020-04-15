@@ -1,32 +1,103 @@
 import { describe, it } from "mocha";
 import sinon from "sinon";
 import { assert } from "chai";
+import { getOutputOpts, parseInputOption, packedLEConcat, jsSHABase } from "../../src/common";
 import {
-  InputOptionsEncodingType,
-  InputOptionsNoEncodingType,
+  FixedLengthOptionsEncodingType,
+  FixedLengthOptionsNoEncodingType,
   FormatNoTextType,
-  getOutputOpts,
-  jsSHABase,
-} from "../../src/common";
-import { packedValue } from "../../src/converters";
+  packedValue,
+} from "../../src/custom_types";
+
+describe("Test packedLEConcat", () => {
+  it("For 2 0-byte Values", () => {
+    assert.deepEqual(packedLEConcat({ value: [], binLen: 0 }, { value: [], binLen: 0 }), { value: [], binLen: 0 });
+  });
+
+  it("For 2 3-byte Values", () => {
+    assert.deepEqual(packedLEConcat({ value: [0x00112233], binLen: 24 }, { value: [0x00aabbcc], binLen: 24 }), {
+      value: [0xcc112233 | 0, 0x0000aabb],
+      binLen: 48,
+    });
+  });
+
+  it("For 2 4-byte Values", () => {
+    assert.deepEqual(packedLEConcat({ value: [0x11223344], binLen: 32 }, { value: [0xaabbccdd], binLen: 32 }), {
+      value: [0x11223344, 0xaabbccdd],
+      binLen: 64,
+    });
+  });
+
+  it("For 1 1-byte and 1 3-byte Value", () => {
+    assert.deepEqual(packedLEConcat({ value: [0x00000011], binLen: 8 }, { value: [0x00aabbcc], binLen: 24 }), {
+      value: [0xaabbcc11 | 0],
+      binLen: 32,
+    });
+  });
+});
+
+describe("Test parseInputOption", () => {
+  it("For Fully Specified Value", () => {
+    assert.deepEqual(parseInputOption("kmacKey", { value: "00112233", format: "HEX" }, 1), {
+      value: [0x33221100],
+      binLen: 32,
+    });
+  });
+
+  it("For Empty but Optional Value", () => {
+    assert.deepEqual(parseInputOption("kmacKey", undefined, 1, { value: [], binLen: 0 }), { value: [], binLen: 0 });
+  });
+
+  it("For Empty but Required Value", () => {
+    assert.throws(() => {
+      parseInputOption("kmacKey", undefined, 1);
+    }, "kmacKey must include a value and format");
+  });
+
+  it("For Value Missing value Key", () => {
+    assert.throws(() => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore - Deliberately bad value for test
+      parseInputOption("kmacKey", { format: "HEX" }, 1);
+    }, "kmacKey must include a value and format");
+  });
+
+  it("For Value Missing binLen Key", () => {
+    assert.throws(() => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore - Deliberately bad value for test
+      parseInputOption("kmacKey", { value: "TEST" }, 1);
+    }, "kmacKey must include a value and format");
+  });
+});
 
 describe("Test getOutputOpts", () => {
   it("Empty Input", () => {
-    assert.deepEqual(getOutputOpts(), { outputUpper: false, b64Pad: "=", shakeLen: -1 });
+    assert.deepEqual(getOutputOpts(), { outputUpper: false, b64Pad: "=", outputLen: -1 });
   });
 
   it("b64Pad Specified", () => {
-    assert.deepEqual(getOutputOpts({ b64Pad: "#" }), { outputUpper: false, b64Pad: "#", shakeLen: -1 });
+    assert.deepEqual(getOutputOpts({ b64Pad: "#" }), { outputUpper: false, b64Pad: "#", outputLen: -1 });
+  });
+
+  it("outputLen Specified", () => {
+    assert.deepEqual(getOutputOpts({ outputLen: 16, shakeLen: 8 }), { outputUpper: false, b64Pad: "=", outputLen: 16 });
   });
 
   it("shakeLen Specified", () => {
-    assert.deepEqual(getOutputOpts({ shakeLen: 8 }), { outputUpper: false, b64Pad: "=", shakeLen: 8 });
+    assert.deepEqual(getOutputOpts({ shakeLen: 8 }), { outputUpper: false, b64Pad: "=", outputLen: 8 });
   });
 
   it("Invalid shakeLen", () => {
     assert.throws(() => {
       getOutputOpts({ shakeLen: 1 });
-    }, "shakeLen must be a multiple of 8");
+    }, "Output length must be a multiple of 8");
+  });
+
+  it("Invalid outputLen", () => {
+    assert.throws(() => {
+      getOutputOpts({ outputLen: 1 });
+    }, "Output length must be a multiple of 8");
   });
 
   it("Invalid b64Pad", () => {
@@ -72,7 +143,8 @@ describe("Test jsSHABase", () => {
     variantBlockSize: number;
     bigEndianMod: -1 | 1;
     outputBinLen: number;
-    isSHAKE: boolean;
+    isVariableLen: boolean;
+    HMACSupported: boolean;
 
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
@@ -80,9 +152,10 @@ describe("Test jsSHABase", () => {
     finalizeFunc: (remainder: number[], remainderBinLen: number, processedBinLen: number, H: number[]) => number[];
     stateCloneFunc: (state: number[]) => number[];
     newStateFunc: (variant: "SHA-TEST") => number[];
+    getMAC: () => number[];
 
-    constructor(variant: "SHA-TEST", inputFormat: "TEXT", options?: InputOptionsEncodingType);
-    constructor(variant: "SHA-TEST", inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
+    constructor(variant: "SHA-TEST", inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
+    constructor(variant: "SHA-TEST", inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(variant: any, inputFormat: any, options?: any) {
       super(variant, inputFormat, options);
@@ -93,11 +166,14 @@ describe("Test jsSHABase", () => {
       this.stateCloneFunc = stubbedStateClone;
       this.newStateFunc = (stubbedNewState as unknown) as (variant: "SHA-TEST") => number[];
       this.finalizeFunc = stubbedFinalize;
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      this.getMAC = this._getHMAC;
 
       this.intermediateState = [0, 0];
       this.variantBlockSize = 64;
       this.outputBinLen = 64;
-      this.isSHAKE = false;
+      this.isVariableLen = false;
+      this.HMACSupported = true;
     }
 
     /*
@@ -131,7 +207,7 @@ describe("Test jsSHABase", () => {
     assert.equal(stubbedJsSHA.getter("remainderLen"), 0);
     assert.equal(stubbedJsSHA.getter("processedLen"), 0);
     assert.isFalse(stubbedJsSHA.getter("updateCalled"));
-    assert.isFalse(stubbedJsSHA.getter("hmacKeySet"));
+    assert.isFalse(stubbedJsSHA.getter("macKeySet"));
     assert.deepEqual(stubbedJsSHA.getter("remainder"), []);
     assert.deepEqual(stubbedJsSHA.getter("keyWithIPad"), []);
     assert.deepEqual(stubbedJsSHA.getter("keyWithOPad"), []);
@@ -196,26 +272,10 @@ describe("Test jsSHABase", () => {
   it("Test getHash Without Needed shakeLen ", () => {
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
 
-    stubbedJsSHA.setter("isSHAKE", true);
+    stubbedJsSHA.setter("isVariableLen", true);
     assert.throws(() => {
       stubbedJsSHA.getHash("HEX", {});
-    }, "shakeLen must be specified in options");
-  });
-
-  it("Test getHash After setHMACKey Called", () => {
-    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
-    sinon.reset();
-
-    // Bare minimum stubs for function not to throw exceptions
-    stubbedStrConverter.returns({ value: [dummyVals[0]], binLen: 32 });
-    stubbedNewState.returns({ value: [dummyVals[0], dummyVals[1]], binLen: 32 });
-    stubbedFinalize.returns([dummyVals[2], dummyVals[3]]);
-
-    stubbedJsSHA.setHMACKey("ABCD", "HEX");
-
-    assert.throws(() => {
-      stubbedJsSHA.getHash("HEX");
-    }, "Cannot call getHash after setting HMAC key");
+    }, "Output length must be specified in options");
   });
 
   it("Test getHash", () => {
@@ -263,7 +323,7 @@ describe("Test jsSHABase", () => {
      *   2. finalize should be called once with the correct inputs
      */
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
-    stubbedJsSHA.setter("isSHAKE", true);
+    stubbedJsSHA.setter("isVariableLen", true);
     sinon.reset();
     stubbedFinalize.returns([dummyVals[0], dummyVals[1]]);
     stubbedStateClone.returns([dummyVals[2], dummyVals[3]]);
@@ -305,7 +365,7 @@ describe("Test jsSHABase", () => {
      *   3. The last numRound-1 calls of finalizeFunc should have the last 32-shakeLen bits 0ed out
      */
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX", { numRounds: 3 });
-    stubbedJsSHA.setter("isSHAKE", true);
+    stubbedJsSHA.setter("isVariableLen", true);
     sinon.reset();
     stubbedFinalize.returns([dummyVals[0], dummyVals[1]]).onCall(2).returns([dummyVals[2], dummyVals[3]]);
 
@@ -326,18 +386,18 @@ describe("Test jsSHABase", () => {
      *   1. keyWithIPad is set correctly
      *   2. keyWithOPad is set correctly
      *   3. The round function was called and its return value stored as intermediateState
-     *   4. hmacKeySet was set
+     *   4. macKeySet was set
      *   5. processedLen was updated
      */
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
     sinon.reset();
     stubbedRound.returns([dummyVals[0], dummyVals[1]]);
-    stubbedJsSHA.setHMACKey("ABCDEFGH", "TEXT");
+    stubbedJsSHA.setHMACKey("ABCD", "TEXT");
 
     // Check #1
     assert.deepEqual(
       stubbedJsSHA.getter("keyWithIPad"),
-      [0x41424344, 0x45464748].map((val) => {
+      [0x41424344, 0].map((val) => {
         return val ^ 0x36363636;
       })
     );
@@ -345,7 +405,7 @@ describe("Test jsSHABase", () => {
     // Check #2
     assert.deepEqual(
       stubbedJsSHA.getter("keyWithOPad"),
-      [0x41424344, 0x45464748].map((val) => {
+      [0x41424344, 0].map((val) => {
         return val ^ 0x5c5c5c5c;
       })
     );
@@ -353,7 +413,7 @@ describe("Test jsSHABase", () => {
     // Check #3
     assert.isTrue(
       stubbedRound.calledOnceWithExactly(
-        [0x41424344, 0x45464748].map((val) => {
+        [0x41424344, 0].map((val) => {
           return val ^ 0x36363636;
         }),
         [0, 0]
@@ -362,7 +422,7 @@ describe("Test jsSHABase", () => {
     assert.deepEqual(stubbedJsSHA.getter("intermediateState"), [dummyVals[0], dummyVals[1]]);
 
     // Check #4
-    assert.isTrue(stubbedJsSHA.getter("hmacKeySet"));
+    assert.isTrue(stubbedJsSHA.getter("macKeySet"));
 
     // Check #5
     assert.equal(stubbedJsSHA.getter("processedLen"), stubbedJsSHA.getter("variantBlockSize"));
@@ -428,12 +488,21 @@ describe("Test jsSHABase", () => {
 
   it("Test setHMACKey Error on Double Call", () => {
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
-    stubbedJsSHA.setter("hmacKeySet", true);
+    stubbedJsSHA.setter("macKeySet", true);
     sinon.reset();
 
     assert.throws(() => {
       stubbedJsSHA.setHMACKey("ABCD", "TEXT");
-    }, "HMAC key already set");
+    }, "MAC key already set");
+  });
+
+  it("Test setHMACKey Error on numRounds > 1", () => {
+    const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX", { numRounds: 2 });
+    sinon.reset();
+
+    assert.throws(() => {
+      stubbedJsSHA.setHMACKey("ABCD", "TEXT");
+    }, "Cannot set numRounds with MAC");
   });
 
   it("Test setHMACKey Error on After update", () => {
@@ -443,20 +512,20 @@ describe("Test jsSHABase", () => {
 
     assert.throws(() => {
       stubbedJsSHA.setHMACKey("ABCD", "TEXT");
-    }, "Cannot set HMAC key after calling update");
+    }, "Cannot set MAC key after calling update");
   });
 
-  it("Test setHMACKey Error on SHAKE Variant", () => {
+  it("Test setHMACKey Error on Unsupported Variant", () => {
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
-    stubbedJsSHA.setter("isSHAKE", true);
+    stubbedJsSHA.setter("HMACSupported", false);
     sinon.reset();
 
     assert.throws(() => {
       stubbedJsSHA.setHMACKey("ABCD", "TEXT");
-    }, "SHAKE is not supported for HMAC");
+    }, "Variant does not support HMAC");
   });
 
-  it("Test getHMAC", () => {
+  it("Test HMAC Return", () => {
     /*
      * Check a few basic things:
      *   1. It returns the formatted output of the last finalizeFunc call
@@ -464,14 +533,16 @@ describe("Test jsSHABase", () => {
      *   3. roundFunc was called with keyWithOPad
      *   4. finalizeFunc was called with the output of the previous finalizeFunc's output and the roundFunc's state
      *   5. remainder, intermediateState, and remainderLen remain untouched
+     *   6. A call to getHash actually returns the HMAC
      */
+    sinon.reset();
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX"),
       intermediateState = [dummyVals[6], dummyVals[7]],
       remainder = [dummyVals[0]],
       keyWithOPad = [dummyVals[10], dummyVals[11]],
       newState = [dummyVals[8], dummyVals[9]],
-      clonedState = [dummyVals[6], dummyVals[7]];
-    sinon.reset();
+      clonedState = [dummyVals[6], dummyVals[7]],
+      getMACStub = sinon.stub().returns([[dummyVals[2]], dummyVals[3]]);
 
     stubbedFinalize
       .onCall(0)
@@ -482,7 +553,7 @@ describe("Test jsSHABase", () => {
     stubbedStateClone.returns(clonedState);
     stubbedNewState.returns(newState);
 
-    stubbedJsSHA.setter("hmacKeySet", true);
+    stubbedJsSHA.setter("macKeySet", true);
     stubbedJsSHA.setter("processedLen", 64);
     stubbedJsSHA.setter("keyWithOPad", keyWithOPad);
     stubbedJsSHA.setter("remainder", remainder);
@@ -521,14 +592,19 @@ describe("Test jsSHABase", () => {
     assert.equal(stubbedJsSHA.getter("remainder"), remainder);
     assert.equal(stubbedJsSHA.getter("remainderLen"), 32);
     assert.equal(stubbedJsSHA.getter("intermediateState"), intermediateState);
+
+    // Check #6
+    stubbedJsSHA.setter("getMAC", getMACStub);
+    stubbedJsSHA.getHash("HEX");
+    assert.equal(getMACStub.callCount, 1);
   });
 
-  it("Test getHMAC Error on Not Setting HMAC Key", () => {
+  it("Test getHMAC Error on Not Setting MAC Key", () => {
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX");
     sinon.reset();
 
     assert.throws(() => {
       stubbedJsSHA.getHMAC("HEX");
-    }, "Cannot call getHMAC without first setting HMAC key");
+    }, "Cannot call getHMAC without first setting MAC key");
   });
 });

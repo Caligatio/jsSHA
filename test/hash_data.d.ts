@@ -3,27 +3,34 @@
 export as namespace hashData;
 
 interface testTextInput {
-  type: "TEXT";
+  format: "TEXT";
   value: string;
   encoding?: "UTF8";
   rounds?: number;
 }
 
 interface testHexKey {
-  type: "HEX";
+  format: "HEX";
+  value: string;
+}
+
+interface testTextCustomization {
+  format: "TEXT";
   value: string;
 }
 
 interface testHexOutut {
-  type: "HEX";
+  format: "HEX";
   value: string;
-  shakeLen?: number;
+  outputLen?: number;
 }
 
 interface test {
   name: string;
   input: testTextInput;
-  key?: testHexKey;
+  hmacKey?: testHexKey;
+  kmacKey?: testHexKey;
+  customization?: testTextCustomization;
   outputs: testHexOutut[];
 }
 
@@ -39,6 +46,10 @@ declare const hash_data: {
   "SHA3-512": test[];
   SHAKE128: test[];
   SHAKE256: test[];
+  CSHAKE128: test[];
+  CSHAKE256: test[];
+  KMAC128: test[];
+  KMAC256: test[];
 };
 
 export = hash_data;

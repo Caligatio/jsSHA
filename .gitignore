@@ -1,3 +1,5 @@
+# The below file is manually built as a rollup.js workaround.  See rollup.config.js for more info
+dist/custom_types.js
 
 # Created by https://www.gitignore.io/api/vim,node,visualstudiocode,python
 # Edit at https://www.gitignore.io/?templates=vim,node,visualstudiocode,python

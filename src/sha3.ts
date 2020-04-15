@@ -1,14 +1,22 @@
+import { jsSHABase, packedLEConcat, sha_variant_error, mac_rounds_error, TWO_PWR_32, parseInputOption } from "./common";
 import {
-  InputOptionsEncodingType,
-  InputOptionsNoEncodingType,
+  packedValue,
+  CSHAKEOptionsNoEncodingType,
+  CSHAKEOptionsEncodingType,
+  KMACOptionsNoEncodingType,
+  KMACOptionsEncodingType,
+  FixedLengthOptionsEncodingType,
+  FixedLengthOptionsNoEncodingType,
   FormatNoTextType,
-  jsSHABase,
-  sha_variant_error,
-} from "./common";
-import { packedValue, getStrConverter } from "./converters";
+  ResolvedCSHAKEOptionsNoEncodingType,
+  ResolvedKMACOptionsNoEncodingType,
+} from "./custom_types";
+import { getStrConverter } from "./converters";
 import { Int_64, rotl_64, xor_64_2, xor_64_5 } from "./primitives_64";
 
-type VariantType = "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
+type VariantNoCSHAKEType = "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
+
+type VariantType = VariantNoCSHAKEType | "CSHAKE128" | "CSHAKE256" | "KMAC128" | "KMAC256";
 
 const rc_sha3 = [
   new Int_64(0x00000000, 0x00000001),
@@ -212,12 +220,139 @@ function finalizeSHA3(
   return retVal;
 }
 
+/**
+ * Performs NIST left_encode function returned with no extra garbage bits. `x` is limited to <= 9007199254740991.
+ *
+ * @param x 32-bit number to to encode.
+ * @returns The NIST specified output of the function.
+ */
+function left_encode(x: number): packedValue {
+  let byteOffset,
+    byte,
+    numEncodedBytes = 0;
+  /* JavaScript numbers max out at 0x1FFFFFFFFFFFFF (7 bytes) so this will return a maximum of 7 + 1 = 8 bytes */
+  const retVal = [0, 0],
+    x_64 = [x & 0xffffffff, (x / TWO_PWR_32) & 0x1fffff];
+
+  for (byteOffset = 6; byteOffset >= 0; byteOffset--) {
+    /* This will surprisingly work for large shifts because JavaScript masks the shift amount by 0x1F */
+    byte = (x_64[byteOffset >> 2] >>> (8 * byteOffset)) & 0xff;
+
+    /* Starting from the most significant byte of a 64-bit number, start recording the first non-0 byte and then
+       every byte thereafter */
+    if (byte !== 0 || numEncodedBytes !== 0) {
+      retVal[(numEncodedBytes + 1) >> 2] |= byte << ((numEncodedBytes + 1) * 8);
+      numEncodedBytes += 1;
+    }
+  }
+  numEncodedBytes = numEncodedBytes !== 0 ? numEncodedBytes : 1;
+  retVal[0] |= numEncodedBytes;
+
+  return { value: numEncodedBytes + 1 > 4 ? retVal : [retVal[0]], binLen: 8 + numEncodedBytes * 8 };
+}
+
+/**
+ * Performs NIST right_encode function returned with no extra garbage bits. `x` is limited to <= 9007199254740991.
+ *
+ * @param x 32-bit number to to encode.
+ * @returns The NIST specified output of the function.
+ */
+function right_encode(x: number): packedValue {
+  let byteOffset,
+    byte,
+    numEncodedBytes = 0;
+  /* JavaScript numbers max out at 0x1FFFFFFFFFFFFF (7 bytes) so this will return a maximum of 7 + 1 = 8 bytes */
+  const retVal = [0, 0],
+    x_64 = [x & 0xffffffff, (x / TWO_PWR_32) & 0x1fffff];
+
+  for (byteOffset = 6; byteOffset >= 0; byteOffset--) {
+    /* This will surprisingly work for large shifts because JavaScript masks the shift amount by 0x1F */
+    byte = (x_64[byteOffset >> 2] >>> (8 * byteOffset)) & 0xff;
+
+    /* Starting from the most significant byte of a 64-bit number, start recording the first non-0 byte and then
+       every byte thereafter */
+    if (byte !== 0 || numEncodedBytes !== 0) {
+      retVal[numEncodedBytes >> 2] |= byte << (numEncodedBytes * 8);
+      numEncodedBytes += 1;
+    }
+  }
+  numEncodedBytes = numEncodedBytes !== 0 ? numEncodedBytes : 1;
+  retVal[numEncodedBytes >> 2] |= numEncodedBytes << (numEncodedBytes * 8);
+
+  return { value: numEncodedBytes + 1 > 4 ? retVal : [retVal[0]], binLen: 8 + numEncodedBytes * 8 };
+}
+
+/**
+ * Performs NIST encode_string function.
+ *
+ * @param input Packed array of integers.
+ * @param inputBinLen Binary length of `input`.
+ * @returns NIST encode_string output.
+ */
+function encode_string(input: packedValue): packedValue {
+  return packedLEConcat(left_encode(input["binLen"]), input);
+}
+
+/**
+ * Performs NIST byte_pad function.
+ *
+ * @param packed Packed array of integers.
+ * @param packedBinLen Length of `packed` in bits.
+ * @param outputByteLen Desired length of the output in bytes, assumed to be a multiple of 4.
+ * @returns NIST byte_pad output.
+ */
+function byte_pad(packed: packedValue, outputByteLen: number): number[] {
+  let encodedLen = left_encode(outputByteLen),
+    i;
+
+  encodedLen = packedLEConcat(encodedLen, packed);
+  const outputIntLen = outputByteLen >>> 2,
+    intsToAppend = (outputIntLen - (encodedLen["value"].length % outputIntLen)) % outputIntLen;
+
+  for (i = 0; i < intsToAppend; i++) {
+    encodedLen["value"].push(0);
+  }
+
+  return encodedLen["value"];
+}
+
+/**
+ * Parses/validate constructor options for a CSHAKE variant
+ *
+ * @param options Option given to constructor
+ */
+function resolveCSHAKEOptions(options: CSHAKEOptionsNoEncodingType): ResolvedCSHAKEOptionsNoEncodingType {
+  const resolvedOptions = options || {};
+
+  return {
+    funcName: parseInputOption("funcName", resolvedOptions["funcName"], 1, { value: [], binLen: 0 }),
+    customization: parseInputOption("Customization", resolvedOptions["customization"], 1, { value: [], binLen: 0 }),
+  };
+}
+
+/**
+ * Parses/validate constructor options for a KMAC variant
+ *
+ * @param options Option given to constructor
+ */
+function resolveKMACOptions(options: KMACOptionsNoEncodingType): ResolvedKMACOptionsNoEncodingType {
+  const resolvedOptions = options || {};
+
+  return {
+    kmacKey: parseInputOption("kmacKey", resolvedOptions["kmacKey"], 1),
+    /* This is little-endian packed "KMAC" */
+    funcName: { value: [0x43414d4b], binLen: 32 },
+    customization: parseInputOption("Customization", resolvedOptions["customization"], 1, { value: [], binLen: 0 }),
+  };
+}
+
 export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
   intermediateState: Int_64[][];
   variantBlockSize: number;
   bigEndianMod: -1 | 1;
   outputBinLen: number;
-  isSHAKE: boolean;
+  isVariableLen: boolean;
+  HMACSupported: boolean;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
@@ -231,51 +366,131 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
   ) => number[];
   stateCloneFunc: (state: Int_64[][]) => Int_64[][];
   newStateFunc: (variant: VariantType) => Int_64[][];
+  getMAC: ((options: { outputLen: number }) => number[]) | null;
 
-  constructor(variant: VariantType, inputFormat: "TEXT", options?: InputOptionsEncodingType);
-  constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: InputOptionsNoEncodingType);
+  constructor(variant: VariantNoCSHAKEType, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
+  constructor(variant: VariantNoCSHAKEType, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
+  constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: "TEXT", options?: CSHAKEOptionsEncodingType);
+  constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: FormatNoTextType, options?: CSHAKEOptionsNoEncodingType);
+  constructor(variant: "KMAC128" | "KMAC256", inputFormat: "TEXT", options: KMACOptionsEncodingType);
+  constructor(variant: "KMAC128" | "KMAC256", inputFormat: FormatNoTextType, options: KMACOptionsNoEncodingType);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(variant: any, inputFormat: any, options?: any) {
     let delimiter = 0x06,
       variantBlockSize = 0;
     super(variant, inputFormat, options);
+    const resolvedOptions = options || {};
 
-    this.isSHAKE = false;
-    if ("SHA3-224" === variant) {
-      variantBlockSize = 1152;
-      this.outputBinLen = 224;
-    } else if ("SHA3-256" === variant) {
-      variantBlockSize = 1088;
-      this.outputBinLen = 256;
-    } else if ("SHA3-384" === variant) {
-      variantBlockSize = 832;
-      this.outputBinLen = 384;
-    } else if ("SHA3-512" === variant) {
-      variantBlockSize = 576;
-      this.outputBinLen = 512;
-    } else if ("SHAKE128" === variant) {
-      delimiter = 0x1f;
-      variantBlockSize = 1344;
-      /* This will be set in getHash */
-      this.outputBinLen = -1;
-      this.isSHAKE = true;
-    } else if ("SHAKE256" === variant) {
-      delimiter = 0x1f;
-      variantBlockSize = 1088;
-      /* This will be set in getHash */
-      this.outputBinLen = -1;
-      this.isSHAKE = true;
-    } else {
-      throw new Error(sha_variant_error);
+    /* In other variants, this was done after variable initialization but need to do it earlier here becaue we want to
+       avoid KMAC initialization */
+    if (this.numRounds !== 1) {
+      if (resolvedOptions["kmacKey"] || resolvedOptions["hmacKey"]) {
+        throw new Error(mac_rounds_error);
+      } else if (this.shaVariant === "CSHAKE128" || this.shaVariant === "CSHAKE256") {
+        throw new Error("Cannot set numRounds for CSHAKE variants");
+      }
     }
-
-    this.variantBlockSize = variantBlockSize;
 
     this.bigEndianMod = 1;
     this.converterFunc = getStrConverter(this.inputFormat, this.utfType, this.bigEndianMod);
     this.roundFunc = roundSHA3;
     this.stateCloneFunc = cloneSHA3State;
     this.newStateFunc = getNewState;
+    this.intermediateState = getNewState(variant);
+
+    this.isVariableLen = false;
+    switch (variant) {
+      case "SHA3-224":
+        this.variantBlockSize = variantBlockSize = 1152;
+        this.outputBinLen = 224;
+        this.HMACSupported = true;
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        this.getMAC = this._getHMAC;
+        break;
+      case "SHA3-256":
+        this.variantBlockSize = variantBlockSize = 1088;
+        this.outputBinLen = 256;
+        this.HMACSupported = true;
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        this.getMAC = this._getHMAC;
+        break;
+      case "SHA3-384":
+        this.variantBlockSize = variantBlockSize = 832;
+        this.outputBinLen = 384;
+        this.HMACSupported = true;
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        this.getMAC = this._getHMAC;
+        break;
+      case "SHA3-512":
+        this.variantBlockSize = variantBlockSize = 576;
+        this.outputBinLen = 512;
+        this.HMACSupported = true;
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        this.getMAC = this._getHMAC;
+        break;
+      case "SHAKE128":
+        delimiter = 0x1f;
+        this.variantBlockSize = variantBlockSize = 1344;
+        /* This will be set in getHash */
+        this.outputBinLen = -1;
+        this.isVariableLen = true;
+        this.HMACSupported = false;
+        this.getMAC = null;
+        break;
+      case "SHAKE256":
+        delimiter = 0x1f;
+        this.variantBlockSize = variantBlockSize = 1088;
+        /* This will be set in getHash */
+        this.outputBinLen = -1;
+        this.isVariableLen = true;
+        this.HMACSupported = false;
+        this.getMAC = null;
+        break;
+      case "KMAC128":
+        delimiter = 0x4;
+        this.variantBlockSize = variantBlockSize = 1344;
+        this._initializeKMAC(options);
+        /* This will be set in getHash */
+        this.outputBinLen = -1;
+        this.isVariableLen = true;
+        this.HMACSupported = false;
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        this.getMAC = this._getKMAC;
+        break;
+      case "KMAC256":
+        delimiter = 0x4;
+        this.variantBlockSize = variantBlockSize = 1088;
+        this._initializeKMAC(options);
+        /* This will be set in getHash */
+        this.outputBinLen = -1;
+        this.isVariableLen = true;
+        this.HMACSupported = false;
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        this.getMAC = this._getKMAC;
+        break;
+      case "CSHAKE128":
+        this.variantBlockSize = variantBlockSize = 1344;
+        delimiter = this._initializeCSHAKE(options);
+        /* This will be set in getHash */
+        this.outputBinLen = -1;
+        this.isVariableLen = true;
+        this.HMACSupported = false;
+        this.getMAC = null;
+        break;
+      case "CSHAKE256":
+        this.variantBlockSize = variantBlockSize = 1088;
+        delimiter = this._initializeCSHAKE(options);
+        /* This will be set in getHash */
+        this.outputBinLen = -1;
+        this.isVariableLen = true;
+        this.HMACSupported = false;
+        this.getMAC = null;
+        break;
+      default:
+        throw new Error(sha_variant_error);
+    }
+
+    /* This needs to be down here as CSHAKE can change its delimiter */
     this.finalizeFunc = function (remainder, remainderBinLen, processedBinLen, state, outputBinLen): number[] {
       return finalizeSHA3(
         remainder,
@@ -287,6 +502,87 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
         outputBinLen
       );
     };
-    this.intermediateState = getNewState(variant);
+
+    if (resolvedOptions["hmacKey"]) {
+      this._setHMACKey(parseInputOption("hmacKey", resolvedOptions["hmacKey"], this.bigEndianMod));
+    }
+  }
+
+  /**
+   * Initialize CSHAKE variants.
+   *
+   * @param options Options containing CSHAKE params.
+   * @param funcNameOverride Overrides any "funcName" present in `options` (used with KMAC)
+   * @returns The delimiter to be used
+   */
+  protected _initializeCSHAKE(options?: CSHAKEOptionsNoEncodingType, funcNameOverride?: packedValue): number {
+    const resolvedOptions = resolveCSHAKEOptions(options || {});
+    if (funcNameOverride) {
+      resolvedOptions["funcName"] = funcNameOverride;
+    }
+    const packedParams = packedLEConcat(
+      encode_string(resolvedOptions["funcName"]),
+      encode_string(resolvedOptions["customization"])
+    );
+
+    /* CSHAKE is defined to be a call to SHAKE iff both the customization and function-name string are both empty.  This
+       can be accomplished by processing nothing in this step. */
+    if (resolvedOptions["customization"]["binLen"] !== 0 || resolvedOptions["funcName"]["binLen"] !== 0) {
+      const byte_pad_out = byte_pad(packedParams, this.variantBlockSize >>> 3);
+      for (let i = 0; i < byte_pad_out.length; i += this.variantBlockSize >>> 5) {
+        this.intermediateState = this.roundFunc(
+          byte_pad_out.slice(i, i + (this.variantBlockSize >>> 5)),
+          this.intermediateState
+        );
+        this.processedLen += this.variantBlockSize;
+      }
+      return 0x04;
+    } else {
+      return 0x1f;
+    }
+  }
+
+  /**
+   * Initialize KMAC variants.
+   *
+   * @param options Options containing KMAC params.
+   */
+  protected _initializeKMAC(options: KMACOptionsNoEncodingType): void {
+    const resolvedOptions = resolveKMACOptions(options || {});
+
+    this._initializeCSHAKE(options, resolvedOptions["funcName"]);
+    const byte_pad_out = byte_pad(encode_string(resolvedOptions["kmacKey"]), this.variantBlockSize >>> 3);
+    for (let i = 0; i < byte_pad_out.length; i += this.variantBlockSize >>> 5) {
+      this.intermediateState = this.roundFunc(
+        byte_pad_out.slice(i, i + (this.variantBlockSize >>> 5)),
+        this.intermediateState
+      );
+      this.processedLen += this.variantBlockSize;
+    }
+    this.macKeySet = true;
+  }
+
+  /**
+   * Returns the the KMAC in the specified format.
+   *
+   * @param format The desired output formatting.
+   * @param options Hashmap of extra outputs options. `shakeLen` must be specified.
+   * @returns The KMAC in the format specified.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected _getKMAC(options: { outputLen: number }): number[] {
+    const concatedRemainder = packedLEConcat(
+        { value: this.remainder.slice(), binLen: this.remainderLen },
+        right_encode(options["outputLen"])
+      ),
+      finalizedState = this.finalizeFunc(
+        concatedRemainder["value"],
+        concatedRemainder["binLen"],
+        this.processedLen,
+        this.stateCloneFunc(this.intermediateState),
+        options["outputLen"]
+      );
+
+    return finalizedState;
   }
 }

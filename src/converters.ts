@@ -1,12 +1,11 @@
+import { packedValue, EncodingType, FormatType } from "./custom_types";
 /**
  * Return type for all the *2packed functions
  */
-export interface packedValue {
-  value: number[];
-  binLen: number;
-}
-
 const b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+const arraybuffer_error = "ARRAYBUFFER not supported by this environment";
+const uint8array_error = "UINT8ARRAY not supported by this environment";
 
 /**
  * Convert a string to an array of words.
@@ -24,7 +23,7 @@ const b64Tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
  */
 function str2packed(
   str: string,
-  utfType: "UTF8" | "UTF16BE" | "UTF16LE",
+  utfType: EncodingType,
   existingPacked: number[] | undefined,
   existingPackedLen: number | undefined,
   bigEndianMod: -1 | 1
@@ -307,8 +306,8 @@ function arraybuffer2packed(
  * @returns Function that will convert an input to a packed int array.
  */
 export function getStrConverter(
-  format: "HEX" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY" | "TEXT",
-  utfType: "UTF8" | "UTF16BE" | "UTF16LE",
+  format: FormatType,
+  utfType: EncodingType,
   bigEndianMod: -1 | 1
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ): (input: any, existingBin?: number[], existingBinLen?: number) => packedValue {
@@ -371,7 +370,7 @@ export function getStrConverter(
       try {
         new ArrayBuffer(0);
       } catch (ignore) {
-        throw new Error("ARRAYBUFFER not supported by this environment");
+        throw new Error(arraybuffer_error);
       }
       /**
        * @param arr ArrayBuffer to be converted to binary representation.
@@ -386,7 +385,7 @@ export function getStrConverter(
       try {
         new Uint8Array(0);
       } catch (ignore) {
-        throw new Error("UINT8ARRAY not supported by this environment");
+        throw new Error(uint8array_error);
       }
       /**
        * @param arr Uint8Array to be converted to binary representation.
@@ -564,7 +563,7 @@ export function getOutputConverter(
   format: "HEX" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
   outputBinLen: number,
   bigEndianMod: -1 | 1,
-  outputOptions: { outputUpper: boolean; b64Pad: string; shakeLen: number }
+  outputOptions: { outputUpper: boolean; b64Pad: string }
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ): (binarray: number[]) => any {
   switch (format) {
@@ -585,7 +584,7 @@ export function getOutputConverter(
         /* Need to test ArrayBuffer support */
         new ArrayBuffer(0);
       } catch (ignore) {
-        throw new Error("ARRAYBUFFER not supported by this environment");
+        throw new Error(arraybuffer_error);
       }
       return function (binarray): ArrayBuffer {
         return packed2arraybuffer(binarray, outputBinLen, bigEndianMod);
@@ -595,7 +594,7 @@ export function getOutputConverter(
         /* Need to test Uint8Array support */
         new Uint8Array(0);
       } catch (ignore) {
-        throw new Error("UINT8ARRAY not supported by this environment");
+        throw new Error(uint8array_error);
       }
       return function (binarray): Uint8Array {
         return packed2uint8array(binarray, outputBinLen, bigEndianMod);

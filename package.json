@@ -1,7 +1,7 @@
 {
   "name": "jssha",
   "version": "3.0.0",
-  "description": "jsSHA implements the complete Secure Hash Standard family (SHA-1, SHA-224/256, SHA-384/512, SHA3-224/256/384/512, and SHAKE128/256) with HMAC",
+  "description": "jsSHA implements the complete Secure Hash Standard (SHA) family (SHA-1, SHA-224/256/384/512, SHA3-224/256/384/512, SHAKE128/256, cSHAKE128/256, and KMAC128/256) with HMAC",
   "main": "./dist/sha.js",
   "exports": {
     ".": {
@@ -33,6 +33,12 @@
     "SHAKE-256",
     "SHAKE128",
     "SHAKE256",
+    "cSHAKE-128",
+    "cSHAKE-256",
+    "cSHAKE128",
+    "cSHAKE256",
+    "KMAC128",
+    "KMAC256",
     "SHA1",
     "SHA224",
     "SHA256",
@@ -43,8 +49,11 @@
     "SHA-3",
     "SHA3",
     "SHAKE",
+    "cSHAKE",
     "HMAC",
-    "hash"
+    "KMAC",
+    "hash",
+    "cryptography"
   ],
   "license": "BSD-3-Clause",
   "author": "Brian Turek <brian.turek@gmail.com>",
@@ -116,7 +125,15 @@
   },
   "prettier": {
     "printWidth": 120,
-    "proseWrap": "always"
+    "proseWrap": "always",
+    "overrides": [
+      {
+        "files": "*.md",
+        "options": {
+          "printWidth": 80
+        }
+      }
+    ]
   },
   "husky": {
     "hooks": {

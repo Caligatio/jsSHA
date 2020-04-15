@@ -2,6 +2,11 @@ import { describe, it } from "mocha";
 import { assert } from "chai";
 import rewire from "rewire";
 import sinon from "sinon";
+import {
+  FixedLengthOptionsEncodingType,
+  FixedLengthOptionsNoEncodingType,
+  FormatNoTextType,
+} from "../../src/custom_types";
 import { runHashTests } from "./common";
 
 const sha256 = rewire("../../src/sha256"),
@@ -55,34 +60,33 @@ describe("Test roundSHA256", () => {
 describe("Test finalizeSHA256", () => {
   const array8Zeros = [0, 0, 0, 0, 0, 0, 0, 0];
   it("SHA-224 With NIST Test Inputs", () => {
-    const roundStub = sinon.stub().returns(array8Zeros),
-      finalizeSHA256 = sha256.__get__("finalizeSHA256"),
-      revert = sha256.__set__("roundSHA256", roundStub);
-
-    finalizeSHA256(abcPacked, 24, 0, newState224.slice(), "SHA-224");
-    assert.isTrue(roundStub.calledOnceWithExactly(abcPostProcessed, newState224.slice()));
-    revert();
+    const roundStub = sinon.stub().returns(array8Zeros);
+    sha256.__with__({ roundSHA256: roundStub })(() => {
+      sha256.__get__("finalizeSHA256")(abcPacked, 24, 0, newState224.slice(), "SHA-224");
+      assert.isTrue(roundStub.calledOnceWithExactly(abcPostProcessed, newState224.slice()));
+    });
   });
 
   it("SHA-256 With NIST Test Inputs", () => {
-    const roundStub = sinon.stub().returns(array8Zeros),
-      finalizeSHA256 = sha256.__get__("finalizeSHA256"),
-      revert = sha256.__set__("roundSHA256", roundStub);
-
-    finalizeSHA256(abcPacked, 24, 0, newState256.slice(), "SHA-256");
-    assert.isTrue(roundStub.calledOnceWithExactly(abcPostProcessed, newState256.slice()));
-    revert();
+    const roundStub = sinon.stub().returns(array8Zeros);
+    sha256.__with__({ roundSHA256: roundStub })(() => {
+      sha256.__get__("finalizeSHA256")(abcPacked, 24, 0, newState256.slice(), "SHA-256");
+      assert.isTrue(roundStub.calledOnceWithExactly(abcPostProcessed, newState256.slice()));
+    });
   });
 });
 
 describe("Test jsSHA(SHA-256)", () => {
   const jsSHA = sha256.__get__("jsSHA");
   class jsSHAATest extends jsSHA {
+    constructor(variant: "SHA-224" | "SHA-256", inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
     constructor(
       variant: "SHA-224" | "SHA-256",
-      inputFormat: "HEX" | "TEXT" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
-      options?: { encoding?: "UTF8" | "UTF16BE" | "UTF16LE"; numRounds?: number }
-    ) {
+      inputFormat: FormatNoTextType,
+      options?: FixedLengthOptionsNoEncodingType
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    constructor(variant: any, inputFormat: any, options?: any) {
       super(variant, inputFormat, options);
     }
 
@@ -111,39 +115,36 @@ describe("Test jsSHA(SHA-256)", () => {
       sinon.reset();
       const roundFuncSpy = sinon.spy(),
         finalizeFuncSpy = sinon.spy(),
-        newStateFuncSpy = sinon.spy(),
-        roundRevert = sha256.__set__("roundSHA256", roundFuncSpy),
-        finalizeRevert = sha256.__set__("finalizeSHA256", finalizeFuncSpy),
-        newStateRevert = sha256.__set__("getNewState256", newStateFuncSpy),
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        hash = new jsSHAATest(test.variant, "HEX");
+        newStateFuncSpy = sinon.spy();
+      sha256.__with__({ roundSHA256: roundFuncSpy, finalizeSHA256: finalizeFuncSpy, getNewState256: newStateFuncSpy })(
+        () => {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+          // @ts-ignore
+          const hash = new jsSHAATest(test.variant, "HEX");
 
-      // Check #1
-      assert.equal(hash.getter("bigEndianMod"), -1);
-      assert.equal(hash.getter("variantBlockSize"), 512);
-      assert.equal(hash.getter("outputBinLen"), test.outputBinLen);
-      assert.isFalse(hash.getter("isSHAKE"));
+          // Check #1
+          assert.equal(hash.getter("bigEndianMod"), -1);
+          assert.equal(hash.getter("variantBlockSize"), 512);
+          assert.equal(hash.getter("outputBinLen"), test.outputBinLen);
+          assert.isFalse(hash.getter("isVariableLen"));
 
-      // Check #2
-      const state = [0xdeadbeef];
-      const clonedState = hash.getter("stateCloneFunc")(state);
-      assert.notEqual(state, clonedState);
-      assert.deepEqual(state, clonedState);
+          // Check #2
+          const state = [0xdeadbeef];
+          const clonedState = hash.getter("stateCloneFunc")(state);
+          assert.notEqual(state, clonedState);
+          assert.deepEqual(state, clonedState);
 
-      // Check #3
-      hash.getter("roundFunc")([0xdeadbeef], [0xfacefeed]);
-      assert.isTrue(roundFuncSpy.lastCall.calledWithExactly([0xdeadbeef], [0xfacefeed]));
+          // Check #3
+          hash.getter("roundFunc")([0xdeadbeef], [0xfacefeed]);
+          assert.isTrue(roundFuncSpy.lastCall.calledWithExactly([0xdeadbeef], [0xfacefeed]));
 
-      hash.getter("newStateFunc")(test.variant);
-      assert.isTrue(newStateFuncSpy.lastCall.calledWithExactly(test.variant));
+          hash.getter("newStateFunc")(test.variant);
+          assert.isTrue(newStateFuncSpy.lastCall.calledWithExactly(test.variant));
 
-      hash.getter("finalizeFunc")([0xdeadbeef], 32, 0, [0xfacefeed]);
-      assert.isTrue(finalizeFuncSpy.lastCall.calledWithExactly([0xdeadbeef], 32, 0, [0xfacefeed], test.variant));
-
-      roundRevert();
-      finalizeRevert();
-      newStateRevert();
+          hash.getter("finalizeFunc")([0xdeadbeef], 32, 0, [0xfacefeed]);
+          assert.isTrue(finalizeFuncSpy.lastCall.calledWithExactly([0xdeadbeef], 32, 0, [0xfacefeed], test.variant));
+        }
+      );
     });
   });
 
@@ -151,6 +152,18 @@ describe("Test jsSHA(SHA-256)", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore - Deliberate bad variant value to test exceptions
     assert.throws(() => new jsSHA("SHA-TEST", "HEX"), "Chosen SHA variant is not supported");
+  });
+
+  it("With hmacKey Set at Instantiation", () => {
+    const hash = new jsSHAATest("SHA-256", "HEX", { hmacKey: { value: "TEST", format: "TEXT" } });
+    assert.isTrue(hash.getter("macKeySet"));
+  });
+
+  it("With hmacKey Set at Instantiation but then also setHMACKey", () => {
+    const hash = new jsSHAATest("SHA-256", "HEX", { hmacKey: { value: "TEST", format: "TEXT" } });
+    assert.throws(() => {
+      hash.setHMACKey("TEST", "TEXT");
+    }, "MAC key already set");
   });
 });
 
