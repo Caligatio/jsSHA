@@ -3,6 +3,8 @@ import {
   packedValue,
   CSHAKEOptionsNoEncodingType,
   CSHAKEOptionsEncodingType,
+  SHAKEOptionsNoEncodingType,
+  SHAKEOptionsEncodingType,
   KMACOptionsNoEncodingType,
   KMACOptionsEncodingType,
   FixedLengthOptionsEncodingType,
@@ -14,9 +16,9 @@ import {
 import { getStrConverter } from "./converters";
 import { Int_64, rotl_64, xor_64_2, xor_64_5 } from "./primitives_64";
 
-type VariantNoCSHAKEType = "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
+type FixedLengthVariantType = "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
 
-type VariantType = VariantNoCSHAKEType | "CSHAKE128" | "CSHAKE256" | "KMAC128" | "KMAC256";
+type VariantType = FixedLengthVariantType | "SHAKE128" | "SHAKE256" | "CSHAKE128" | "CSHAKE256" | "KMAC128" | "KMAC256";
 
 const rc_sha3 = [
   new Int_64(0x00000000, 0x00000001),
@@ -368,8 +370,14 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
   newStateFunc: (variant: VariantType) => Int_64[][];
   getMAC: ((options: { outputLen: number }) => number[]) | null;
 
-  constructor(variant: VariantNoCSHAKEType, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
-  constructor(variant: VariantNoCSHAKEType, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
+  constructor(variant: FixedLengthVariantType, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
+  constructor(
+    variant: FixedLengthVariantType,
+    inputFormat: FormatNoTextType,
+    options?: FixedLengthOptionsNoEncodingType
+  );
+  constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: "TEXT", options?: SHAKEOptionsEncodingType);
+  constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: FormatNoTextType, options?: SHAKEOptionsNoEncodingType);
   constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: "TEXT", options?: CSHAKEOptionsEncodingType);
   constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: FormatNoTextType, options?: CSHAKEOptionsNoEncodingType);
   constructor(variant: "KMAC128" | "KMAC256", inputFormat: "TEXT", options: KMACOptionsEncodingType);

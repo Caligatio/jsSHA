@@ -2,6 +2,8 @@ import { sha_variant_error } from "./common";
 import {
   CSHAKEOptionsEncodingType,
   CSHAKEOptionsNoEncodingType,
+  SHAKEOptionsEncodingType,
+  SHAKEOptionsNoEncodingType,
   EncodingType,
   FixedLengthOptionsEncodingType,
   FixedLengthOptionsNoEncodingType,
@@ -23,9 +25,7 @@ type FixedLengthVariantType =
   | "SHA3-224"
   | "SHA3-256"
   | "SHA3-384"
-  | "SHA3-512"
-  | "SHAKE128"
-  | "SHAKE256";
+  | "SHA3-512";
 
 export default class jsSHA {
   private readonly shaObj: jsSHA1 | jsSHA256 | jsSHA512 | jsSHA3;
@@ -52,6 +52,8 @@ export default class jsSHA {
     inputFormat: FormatNoTextType,
     options?: FixedLengthOptionsNoEncodingType
   );
+  constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: "TEXT", options?: SHAKEOptionsEncodingType);
+  constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: FormatNoTextType, options?: SHAKEOptionsNoEncodingType);
   constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: "TEXT", options?: CSHAKEOptionsEncodingType);
   constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: FormatNoTextType, options?: CSHAKEOptionsNoEncodingType);
   constructor(variant: "KMAC128" | "KMAC256", inputFormat: "TEXT", options: KMACOptionsEncodingType);

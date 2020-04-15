@@ -45,6 +45,14 @@ export interface packedValue {
   binLen: number;
 }
 
+export interface SHAKEOptionsNoEncodingType {
+  numRounds?: number;
+}
+
+export interface SHAKEOptionsEncodingType extends SHAKEOptionsNoEncodingType {
+  encoding?: EncodingType;
+}
+
 export interface CSHAKEOptionsNoEncodingType {
   customization?: GenericInputType;
   funcName?: GenericInputType;
