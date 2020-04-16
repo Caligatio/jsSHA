@@ -1,6 +1,6 @@
 /**
- * A JavaScript implementation of the SHA family of hashes, as defined in FIPS PUB 180-4 and FIPS PUB 202, as
- * well as the corresponding HMAC implementation as defined in FIPS PUB 198a
+ * A JavaScript implementation of the SHA family of hashes - defined in FIPS PUB 180-4, FIPS PUB 202,
+ * and SP 800-185 - as well as the corresponding HMAC implementation as defined in FIPS PUB 198-1.
  *
  * Copyright 2008-2020 Brian Turek, 1998-2009 Paul Johnston & Contributors
  * Distributed under the BSD License
