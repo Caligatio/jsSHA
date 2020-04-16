@@ -26,18 +26,6 @@ export default [
       }),
     ],
   },
-  /* This next item is a workaround for the fact that custom_types.ts has no real code and therefore doesn't cause a
-  declaration file to be built.  However, a declaration file does need to be built for the sha.d.ts rollup to work.
-  This is combined with an entry in the .gitignore file that specifically excludes the empty custom_types.js.*/
-  {
-    input: "src/custom_types.ts",
-    output: {
-      format: "es",
-      dir: "dist",
-      entryFileNames: "[name].js",
-    },
-    plugins: [typescript({ lib: ["es6"], declaration: true, declarationDir: "dist/types", target: "es6" })],
-  },
   {
     input: "dist/types/src/sha.d.ts",
     output: [{ file: "dist/sha.d.ts", format: "umd" }],

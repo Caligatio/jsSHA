@@ -7,4 +7,3 @@ tsconfig.json
 bower.json
 **/.*
 karma.conf.js
-dist/custom_types.js
