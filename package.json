@@ -13,8 +13,8 @@
     "./sha512": "./dist/sha512.js",
     "./sha3": "./dist/sha3.js"
   },
-  "module": "dist/sha.mjs",
-  "types": "dist/sha.d.ts",
+  "module": "./dist/sha.mjs",
+  "types": "./dist/sha.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/Caligatio/jsSHA.git"
