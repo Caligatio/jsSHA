@@ -145,7 +145,6 @@ function getNewState512(variant: VariantType): Int_64[] {
  *
  * @param block The binary array representation of the block to hash.
  * @param H The intermediate H values from a previous round.
- * @param variant The desired SHA-512 variant.
  * @returns The resulting H values.
  */
 function roundSHA512(block: number[], H: Int_64[]): Int_64[] {

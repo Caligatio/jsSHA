@@ -288,7 +288,6 @@ function right_encode(x: number): packedValue {
  * Performs NIST encode_string function.
  *
  * @param input Packed array of integers.
- * @param inputBinLen Binary length of `input`.
  * @returns NIST encode_string output.
  */
 function encode_string(input: packedValue): packedValue {
@@ -299,7 +298,6 @@ function encode_string(input: packedValue): packedValue {
  * Performs NIST byte_pad function.
  *
  * @param packed Packed array of integers.
- * @param packedBinLen Length of `packed` in bits.
  * @param outputByteLen Desired length of the output in bytes, assumed to be a multiple of 4.
  * @returns NIST byte_pad output.
  */
@@ -573,7 +571,6 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
   /**
    * Returns the the KMAC in the specified format.
    *
-   * @param format The desired output formatting.
    * @param options Hashmap of extra outputs options. `outputLen` must be specified.
    * @returns The KMAC in the format specified.
    */

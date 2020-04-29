@@ -93,9 +93,7 @@ export const mac_rounds_error = "Cannot set numRounds with MAC";
  * Concatenates 2 packed arrays. Clobbers array `a`.
  *
  * @param a First array to concatenate.
- * @param aBinLen Length of `a` in bits.
  * @param b Second array to concatenate.
- * @param bBinLen Length of `b` in bits.
  * @returns The concatentation of `a` + `b`.
  */
 export function packedLEConcat(a: packedValue, b: packedValue): packedValue {

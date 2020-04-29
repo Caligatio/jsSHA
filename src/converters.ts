@@ -485,7 +485,6 @@ export function packed2b64(
  * @param packed Array of integers to be converted.
  * @param outputLength Length of output in bits.
  * @param bigEndianMod Modifier for whether hash function is big or small endian.
- * @param formatOpts Hashmap containing validated output formatting options.
  * @returns Raw bytes representation of `packed`.
  */
 export function packed2bytes(packed: number[], outputLength: number, bigEndianMod: -1 | 1): string {
@@ -510,7 +509,6 @@ export function packed2bytes(packed: number[], outputLength: number, bigEndianMo
  * @param packed Array of integers to be converted.
  * @param outputLength Length of output in bits.
  * @param bigEndianMod Modifier for whether hash function is big or small endian.
- * @param formatOpts Hashmap containing validated output formatting options.
  * @returns An ArrayBuffer containing bytes from `packed.
  */
 export function packed2arraybuffer(packed: number[], outputLength: number, bigEndianMod: -1 | 1): ArrayBuffer {
@@ -533,7 +531,6 @@ export function packed2arraybuffer(packed: number[], outputLength: number, bigEn
  * @param packed Array of integers to be converted.
  * @param outputLength Length of output in bits.
  * @param bigEndianMod Modifier for whether hash function is big or small endian.
- * @param formatOpts Hashmap containing validated output formatting options.
  * @returns An Uint8Array containing bytes from `packed.
  */
 export function packed2uint8array(packed: number[], outputLength: number, bigEndianMod: -1 | 1): Uint8Array {
@@ -556,7 +553,7 @@ export function packed2uint8array(packed: number[], outputLength: number, bigEnd
  * @param format The desired output formatting.
  * @param outputBinLen Output length in bits.
  * @param bigEndianMod Modifier for whether hash function is big or small endian.
- * @param options Hashmap of output formatting options
+ * @param outputOptions Hashmap of output formatting options
  * @returns Function that will convert a packed integer array to desired format.
  */
 export function getOutputConverter(

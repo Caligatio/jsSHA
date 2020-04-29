@@ -43,7 +43,6 @@ function getNewState256(variant: VariantType): number[] {
  *
  * @param block The binary array representation of the block to hash.
  * @param H The intermediate H values from a previous round.
- * @param variant The desired SHA-256 variant.
  * @returns The resulting H values.
  */
 function roundSHA256(block: number[], H: number[]): number[] {
