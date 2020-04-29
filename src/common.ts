@@ -251,10 +251,10 @@ export abstract class jsSHABase<StateT, VariantT> {
   protected abstract readonly newStateFunc: (variant: VariantT) => StateT;
   protected abstract readonly getMAC: ((options: { outputLen: number }) => number[]) | null;
 
-  constructor(variant: VariantT, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
-  constructor(variant: VariantT, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
+  protected constructor(variant: VariantT, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
+  protected constructor(variant: VariantT, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(variant: any, inputFormat: any, options?: any) {
+  protected constructor(variant: any, inputFormat: any, options?: any) {
     const inputOptions = options || {};
     this.inputFormat = inputFormat;
 
