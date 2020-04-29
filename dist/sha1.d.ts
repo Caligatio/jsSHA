@@ -63,8 +63,8 @@ declare abstract class jsSHABase<StateT, VariantT> {
     protected abstract readonly getMAC: ((options: {
         outputLen: number;
     }) => number[]) | null;
-    constructor(variant: VariantT, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
-    constructor(variant: VariantT, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
+    protected constructor(variant: VariantT, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
+    protected constructor(variant: VariantT, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
     /**
      * Hashes as many blocks as possible.  Stores the rest for either a future update or getHash call.
      *

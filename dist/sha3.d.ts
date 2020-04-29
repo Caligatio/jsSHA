@@ -83,8 +83,8 @@ declare abstract class jsSHABase<StateT, VariantT> {
     protected abstract readonly getMAC: ((options: {
         outputLen: number;
     }) => number[]) | null;
-    constructor(variant: VariantT, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
-    constructor(variant: VariantT, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
+    protected constructor(variant: VariantT, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
+    protected constructor(variant: VariantT, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
     /**
      * Hashes as many blocks as possible.  Stores the rest for either a future update or getHash call.
      *
@@ -217,7 +217,6 @@ declare class jsSHA extends jsSHABase<Int_64[][], VariantType> {
     /**
      * Returns the the KMAC in the specified format.
      *
-     * @param format The desired output formatting.
      * @param options Hashmap of extra outputs options. `outputLen` must be specified.
      * @returns The KMAC in the format specified.
      */
