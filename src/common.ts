@@ -325,7 +325,7 @@ export abstract class jsSHABase<StateT, VariantT> {
 
     const outputOptions = getOutputOpts(options);
 
-    if (this.isVariableLen === true) {
+    if (this.isVariableLen) {
       if (outputOptions["outputLen"] === -1) {
         throw new Error("Output length must be specified in options");
       }
@@ -333,7 +333,7 @@ export abstract class jsSHABase<StateT, VariantT> {
     }
 
     const formatFunc = getOutputConverter(format, outputBinLen, this.bigEndianMod, outputOptions);
-    if (this.macKeySet === true && this.getMAC) {
+    if (this.macKeySet && this.getMAC) {
       return formatFunc(this.getMAC(outputOptions));
     }
 
@@ -346,7 +346,7 @@ export abstract class jsSHABase<StateT, VariantT> {
     );
     for (i = 1; i < this.numRounds; i += 1) {
       /* Need to mask out bits that should be zero due to output not being a multiple of 32 */
-      if (this.isVariableLen === true && outputBinLen % 32 !== 0) {
+      if (this.isVariableLen && outputBinLen % 32 !== 0) {
         finalizedState[finalizedState.length - 1] &= 0x00ffffff >>> (24 - (outputBinLen % 32));
       }
       finalizedState = this.finalizeFunc(
@@ -374,11 +374,11 @@ export abstract class jsSHABase<StateT, VariantT> {
   setHMACKey(key: Uint8Array, inputFormat: "UINT8ARRAY"): void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setHMACKey(key: any, inputFormat: any, options?: any): void {
-    if (this.HMACSupported !== true) {
+    if (!this.HMACSupported) {
       throw new Error("Variant does not support HMAC");
     }
 
-    if (true === this.updateCalled) {
+    if (this.updateCalled) {
       throw new Error("Cannot set MAC key after calling update");
     }
 
@@ -401,7 +401,7 @@ export abstract class jsSHABase<StateT, VariantT> {
       throw new Error(mac_rounds_error);
     }
 
-    if (true === this.macKeySet) {
+    if (this.macKeySet) {
       throw new Error("MAC key already set");
     }
 
@@ -457,7 +457,7 @@ export abstract class jsSHABase<StateT, VariantT> {
   protected _getHMAC(): number[] {
     let finalizedState;
 
-    if (false === this.macKeySet) {
+    if (!this.macKeySet) {
       throw new Error("Cannot call getHMAC without first setting MAC key");
     }
 

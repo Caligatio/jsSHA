@@ -295,7 +295,7 @@ export default class jsSHA extends jsSHABase<Int_64[], VariantType> {
   constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(variant: any, inputFormat: any, options?: any) {
-    if (false === ("SHA-384" === variant || "SHA-512" === variant)) {
+    if (!("SHA-384" === variant || "SHA-512" === variant)) {
       throw new Error(sha_variant_error);
     }
     super(variant, inputFormat, options);
