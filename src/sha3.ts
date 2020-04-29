@@ -577,17 +577,16 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected _getKMAC(options: { outputLen: number }): number[] {
     const concatedRemainder = packedLEConcat(
-        { value: this.remainder.slice(), binLen: this.remainderLen },
-        right_encode(options["outputLen"])
-      ),
-      finalizedState = this.finalizeFunc(
-        concatedRemainder["value"],
-        concatedRemainder["binLen"],
-        this.processedLen,
-        this.stateCloneFunc(this.intermediateState),
-        options["outputLen"]
-      );
+      { value: this.remainder.slice(), binLen: this.remainderLen },
+      right_encode(options["outputLen"])
+    );
 
-    return finalizedState;
+    return this.finalizeFunc(
+      concatedRemainder["value"],
+      concatedRemainder["binLen"],
+      this.processedLen,
+      this.stateCloneFunc(this.intermediateState),
+      options["outputLen"]
+    );
   }
 }

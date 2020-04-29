@@ -111,10 +111,8 @@ const K_sha512 = [
  * @returns The initial state values.
  */
 function getNewState512(variant: VariantType): Int_64[] {
-  let retVal;
-
   if ("SHA-384" === variant) {
-    retVal = [
+    return [
       new Int_64(0xcbbb9d5d, H_trunc[0]),
       new Int_64(0x0629a292a, H_trunc[1]),
       new Int_64(0x9159015a, H_trunc[2]),
@@ -126,7 +124,7 @@ function getNewState512(variant: VariantType): Int_64[] {
     ];
   } else {
     /* SHA-512 */
-    retVal = [
+    return [
       new Int_64(H_full[0], 0xf3bcc908),
       new Int_64(H_full[1], 0x84caa73b),
       new Int_64(H_full[2], 0xfe94f82b),
@@ -137,7 +135,6 @@ function getNewState512(variant: VariantType): Int_64[] {
       new Int_64(H_full[7], 0x137e2179),
     ];
   }
-  return retVal;
 }
 
 /**
