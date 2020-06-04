@@ -22,7 +22,9 @@ export default [
       terser({
         sourcemap: true,
         output: { comments: /BSD/ },
-        mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
+        mangle: {
+          properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC", "update"] },
+        },
       }),
     ],
   },
@@ -43,7 +45,9 @@ export default [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
         output: { comments: /BSD/ },
-        mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
+        mangle: {
+          properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC", "update"] },
+        },
       }),
     ],
   },
@@ -64,7 +68,9 @@ export default [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
         output: { comments: /BSD/ },
-        mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
+        mangle: {
+          properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC", "update"] },
+        },
       }),
     ],
   },
@@ -85,7 +91,9 @@ export default [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
         output: { comments: /BSD/ },
-        mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
+        mangle: {
+          properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC", "update"] },
+        },
       }),
     ],
   },
@@ -106,7 +114,9 @@ export default [
       typescript({ lib: ["es6"], target: "es3" }),
       terser({
         output: { comments: /BSD/ },
-        mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
+        mangle: {
+          properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC", "update"] },
+        },
       }),
     ],
   },
@@ -129,7 +139,9 @@ export default [
       terser({
         sourcemap: true,
         output: { comments: /BSD/ },
-        mangle: { properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC"] } },
+        mangle: {
+          properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC", "update"] },
+        },
       }),
     ],
   },
