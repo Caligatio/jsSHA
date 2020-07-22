@@ -11,7 +11,12 @@
     "./sha1": "./dist/sha1.js",
     "./sha256": "./dist/sha256.js",
     "./sha512": "./dist/sha512.js",
-    "./sha3": "./dist/sha3.js"
+    "./sha3": "./dist/sha3.js",
+    "./dist/sha1": "./dist/sha1.js",
+    "./dist/sha256": "./dist/sha256.js",
+    "./dist/sha512": "./dist/sha512.js",
+    "./dist/sha3": "./dist/sha3.js"
+    
   },
   "module": "./dist/sha.mjs",
   "types": "./dist/sha.d.ts",
