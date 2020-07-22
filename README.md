@@ -4,10 +4,10 @@ A pure TypeScript/JavaScript streaming implementation of the complete Secure
 Hash Standard (SHA) family (SHA-1, SHA-224/256/384/512, SHA3-224/256/384/512,
 SHAKE128/256, cSHAKE128/256, and KMAC128/256) with HMAC.
 
-![npm](https://img.shields.io/npm/v/jssha)
+[![npm](https://img.shields.io/npm/v/jssha)](https://www.npmjs.com/package/jssha)
 [![Build Status](https://travis-ci.org/Caligatio/jsSHA.svg?branch=master)](https://travis-ci.org/Caligatio/jsSHA)
 [![Coverage Status](https://coveralls.io/repos/github/Caligatio/jsSHA/badge.svg?branch=master)](https://coveralls.io/github/Caligatio/jsSHA?branch=master)
-![NPM](https://img.shields.io/npm/l/jssha)
+[![NPM](https://img.shields.io/npm/l/jssha)](https://opensource.org/licenses/BSD-3-Clause)
 
 ## Usage
 
