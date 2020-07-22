@@ -1,6 +1,6 @@
 {
   "name": "jssha",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "jsSHA implements the complete Secure Hash Standard (SHA) family (SHA-1, SHA-224/256/384/512, SHA3-224/256/384/512, SHAKE128/256, cSHAKE128/256, and KMAC128/256) with HMAC",
   "main": "./dist/sha.js",
   "exports": {
@@ -16,7 +16,6 @@
     "./dist/sha256": "./dist/sha256.js",
     "./dist/sha512": "./dist/sha512.js",
     "./dist/sha3": "./dist/sha3.js"
-    
   },
   "module": "./dist/sha.mjs",
   "types": "./dist/sha.d.ts",
@@ -94,8 +93,8 @@
     "nyc": "^15.1.0",
     "prettier": "^2.0.5",
     "rewire": "^5.0.0",
-    "rollup": "^2.22.1",
-    "rollup-plugin-dts": "^1.4.8",
+    "rollup": "^2.22.2",
+    "rollup-plugin-dts": "^1.4.9",
     "rollup-plugin-terser": "^5.3.0",
     "sinon": "^9.0.2",
     "ts-node": "^8.10.2",

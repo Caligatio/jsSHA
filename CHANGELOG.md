@@ -1,5 +1,10 @@
 # jsSHA - ChangeLog
 
+## 3.1.1 (2020-07-22)
+
+- Added dist subpath exports to provide forward compatibility with newer node
+  versions (thanks aravinth2094!).
+
 ## 3.1.0 - Still-At-Home Edition (2020-04-15)
 
 - Added support for cSHAKE128/256 and KMAC128/256 (thanks paulg446 for the
