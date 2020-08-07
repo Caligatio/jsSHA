@@ -8,6 +8,7 @@
       "import": "./dist/sha.mjs",
       "require": "./dist/sha.js"
     },
+    "./package.json": "./package.json",
     "./sha1": "./dist/sha1.js",
     "./sha256": "./dist/sha256.js",
     "./sha512": "./dist/sha512.js",
