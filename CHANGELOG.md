@@ -1,5 +1,9 @@
 # jsSHA - ChangeLog
 
+## 3.1.2 (2020-08-08)
+
+- Added explicit package.json export to support React (thanks canpoyrazoglu!).
+
 ## 3.1.1 (2020-07-22)
 
 - Added dist subpath exports to provide forward compatibility with newer node
