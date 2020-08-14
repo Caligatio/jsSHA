@@ -20,7 +20,6 @@ export default [
     plugins: [
       typescript({ lib: ["es6"], declaration: true, declarationDir: "dist/types", target: "es3" }),
       terser({
-        sourcemap: true,
         output: { comments: /BSD/ },
         mangle: {
           properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC", "update"] },
@@ -137,7 +136,6 @@ export default [
     plugins: [
       typescript({ lib: ["es6"], target: "es6" }),
       terser({
-        sourcemap: true,
         output: { comments: /BSD/ },
         mangle: {
           properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC", "update"] },
