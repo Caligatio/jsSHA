@@ -8,15 +8,39 @@
       "import": "./dist/sha.mjs",
       "require": "./dist/sha.js"
     },
-    "./package.json": "./package.json",
-    "./sha1": "./dist/sha1.js",
-    "./sha256": "./dist/sha256.js",
-    "./sha512": "./dist/sha512.js",
-    "./sha3": "./dist/sha3.js",
-    "./dist/sha1": "./dist/sha1.js",
-    "./dist/sha256": "./dist/sha256.js",
-    "./dist/sha512": "./dist/sha512.js",
-    "./dist/sha3": "./dist/sha3.js"
+    "./sha1": {
+      "import": "./dist/sha1.mjs",
+      "require": "./dist/sha1.js"
+    },
+    "./dist/sha1": {
+      "import": "./dist/sha1.mjs",
+      "require": "./dist/sha1.js"
+    },
+    "./sha256": {
+      "import": "./dist/sha256.mjs",
+      "require": "./dist/sha256.js"
+    },
+    "./dist/sha256": {
+      "import": "./dist/sha256.mjs",
+      "require": "./dist/sha256.js"
+    },
+    "./sha512": {
+      "import": "./dist/sha512.mjs",
+      "require": "./dist/sha512.js"
+    },
+    "./dist/sha512": {
+      "import": "./dist/sha512.mjs",
+      "require": "./dist/sha512.js"
+    },
+    "./sha3": {
+      "import": "./dist/sha3.mjs",
+      "require": "./dist/sha3.js"
+    },
+    "./dist/sha3": {
+      "import": "./dist/sha3.mjs",
+      "require": "./dist/sha3.js"
+    },
+    "./package.json": "./package.json"
   },
   "module": "./dist/sha.mjs",
   "types": "./dist/sha.d.ts",
