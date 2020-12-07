@@ -170,16 +170,16 @@ is the desired output length of the KMAC algorithm in a multiple of 8 bits.
   of the library with support for all hash variants. Its accompanying source map
   can be found in dist/sha.mjs.map and its TypeScript declarations in
   dist/sha.d.ts.
-- **dist/sha1.js** - The minified ES3-compatible UMD version of the library with
+- **dist/sha1.{js,mjs}** - The minified UMD and ESM versions of the library with
   support for only the SHA-1 hash variant. Its accompanying TypeScript
   declarations can be found in dist/sha1.d.ts.
-- **dist/sha256.js** - The minified ES3-compatible UMD version of the library
+- **dist/sha256.{js,mjs}** - The minified UMD and ESM versions of the library
   with support for only the SHA-224 and SHA-256 hash variants. Its accompanying
   TypeScript declarations can be found in dist/sha256.d.ts.
-- **dist/sha512.js** - The minified ES3-compatible UMD version of the library
+- **dist/sha512.{js,mjs}** - The minified UMD and ESM versions of the library
   with support for only the SHA-384 and SHA-512 hash variants. Its accompanying
   TypeScript declarations can be found in dist/sha513.d.ts.
-- **dist/sha3.js** - The minified ES3-compatible UMD version of the library with
+- **dist/sha3.{js,mjs}** - The minified UMD and ESM versions of the library with
   support for only the SHA3-224, SHA3-256, SHA3-384, SHA3-512, SHAKE128,
   SHAKE256, cSHAKE128, cSHAKE256, KMAC128, and KMAC256 hash variants. Its
   accompanying TypeScript declarations can be found in dist/sha3.d.ts.
