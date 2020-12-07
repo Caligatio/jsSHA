@@ -1,5 +1,9 @@
 # jsSHA - ChangeLog
 
+## 3.2.0 (2020-12-07)
+
+- Added ESM versions of all variants (thanks wKovacs64!).
+
 ## 3.1.2 (2020-08-08)
 
 - Added explicit package.json export to support React (thanks canpoyrazoglu!).
