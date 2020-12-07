@@ -28,6 +28,25 @@ export default [
     ],
   },
   {
+    input: "src/sha.ts",
+    output: {
+      name: "jsSHA",
+      banner: licenseHeaderES6,
+      format: "es",
+      sourcemap: true,
+      file: "dist/sha.mjs",
+    },
+    plugins: [
+      typescript({ lib: ["es6"], target: "es6" }),
+      terser({
+        output: { comments: /BSD/ },
+        mangle: {
+          properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC", "update"] },
+        },
+      }),
+    ],
+  },
+  {
     input: "dist/types/src/sha.d.ts",
     output: [{ file: "dist/sha.d.ts", format: "umd" }],
     plugins: [dts()],
@@ -42,6 +61,24 @@ export default [
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
+      terser({
+        output: { comments: /BSD/ },
+        mangle: {
+          properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC", "update"] },
+        },
+      }),
+    ],
+  },
+  {
+    input: "src/sha1.ts",
+    output: {
+      name: "jsSHA",
+      banner: licenseHeaderES6,
+      format: "es",
+      file: "dist/sha1.mjs",
+    },
+    plugins: [
+      typescript({ lib: ["es6"], target: "es6" }),
       terser({
         output: { comments: /BSD/ },
         mangle: {
@@ -74,6 +111,24 @@ export default [
     ],
   },
   {
+    input: "src/sha256.ts",
+    output: {
+      name: "jsSHA",
+      banner: licenseHeaderES6,
+      format: "es",
+      file: "dist/sha256.mjs",
+    },
+    plugins: [
+      typescript({ lib: ["es6"], target: "es6" }),
+      terser({
+        output: { comments: /BSD/ },
+        mangle: {
+          properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC", "update"] },
+        },
+      }),
+    ],
+  },
+  {
     input: "dist/types/src/sha256.d.ts",
     output: [{ file: "dist/sha256.d.ts", format: "umd" }],
     plugins: [dts()],
@@ -88,6 +143,24 @@ export default [
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es3" }),
+      terser({
+        output: { comments: /BSD/ },
+        mangle: {
+          properties: { keep_quoted: true, reserved: ["jsSHA", "getHash", "setHMACKey", "getHMAC", "update"] },
+        },
+      }),
+    ],
+  },
+  {
+    input: "src/sha512.ts",
+    output: {
+      name: "jsSHA",
+      banner: licenseHeaderES6,
+      format: "es",
+      file: "dist/sha512.mjs",
+    },
+    plugins: [
+      typescript({ lib: ["es6"], target: "es6" }),
       terser({
         output: { comments: /BSD/ },
         mangle: {
@@ -120,18 +193,12 @@ export default [
     ],
   },
   {
-    input: "dist/types/src/sha3.d.ts",
-    output: [{ file: "dist/sha3.d.ts", format: "umd" }],
-    plugins: [dts()],
-  },
-  {
-    input: "src/sha.ts",
+    input: "src/sha3.ts",
     output: {
       name: "jsSHA",
       banner: licenseHeaderES6,
       format: "es",
-      sourcemap: true,
-      file: "dist/sha.mjs",
+      file: "dist/sha3.mjs",
     },
     plugins: [
       typescript({ lib: ["es6"], target: "es6" }),
@@ -142,5 +209,10 @@ export default [
         },
       }),
     ],
+  },
+  {
+    input: "dist/types/src/sha3.d.ts",
+    output: [{ file: "dist/sha3.d.ts", format: "umd" }],
+    plugins: [dts()],
   },
 ];
