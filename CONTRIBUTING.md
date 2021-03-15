@@ -28,3 +28,6 @@ follow these guidelines when submitting PRs:
   reasons, only `dist` files created by the maintainer(s) are distributed.
 - Although the CI/CD pipeline should take care of this, please, at minimum, run
   `npm build && npm test` before submitting your PR.
+- Some of our users still use JavaScript engines that only support ECMAScript 3
+  (ES3) which was adopted back in 1999. Please try to make sure that any new
+  code is compatible with ES3.
