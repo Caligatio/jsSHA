@@ -95,7 +95,6 @@
     "node": "*"
   },
   "homepage": "https://github.com/Caligatio/jsSHA",
-  "dependencies": {},
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.2.1",
     "@types/chai": "^4.2.17",
