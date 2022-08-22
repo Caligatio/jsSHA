@@ -186,6 +186,6 @@ is the desired output length of the KMAC algorithm in a multiple of 8 bits.
 
 ## Contact Info
 
-The project's website is located at https://caligatio.github.com/jsSHA/
+The project's website is located at https://caligatio.github.io/jsSHA/
 
 [umd]: https://github.com/umdjs/umd
