@@ -173,4 +173,4 @@ declare class jsSHA extends jsSHABase<Int_64[], VariantType> {
     constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
 }
 
-export default jsSHA;
+export { jsSHA as default };

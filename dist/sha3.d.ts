@@ -225,4 +225,4 @@ declare class jsSHA extends jsSHABase<Int_64[][], VariantType> {
     }): number[];
 }
 
-export default jsSHA;
+export { jsSHA as default };
