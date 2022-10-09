@@ -545,7 +545,7 @@ describe("Test getStrConverter", () => {
 
   it("Invalid UTF Exception", () => {
     assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Deliberate bad UTF value to test exceptions
       getStrConverter("HEX", "UTF32", -1);
     }, "encoding must be UTF8, UTF16BE, or UTF16LE");

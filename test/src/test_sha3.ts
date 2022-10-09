@@ -306,7 +306,7 @@ describe("Test jsSHA(SHA3)", () => {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getter(propName: string): any {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Override "any" ban as this is only used in testing
       return this[propName];
     }
@@ -315,7 +315,7 @@ describe("Test jsSHA(SHA3)", () => {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setter(propName: string, value: any): void {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Override "any" ban as this is only used in testing
       this[propName] = value;
     }
@@ -439,7 +439,7 @@ describe("Test jsSHA(SHA3)", () => {
         finalizeFuncSpy = sinon.spy(),
         newStateFuncSpy = sinon.spy();
       sha3.__with__({ roundSHA3: roundFuncSpy, finalizeSHA3: finalizeFuncSpy, getNewState: newStateFuncSpy })(() => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const hash = new jsSHAATest(test.variant, "HEX", { customization: test.customization, kmacKey: test.kmacKey });
 
@@ -521,7 +521,7 @@ describe("Test jsSHA(SHA3)", () => {
   });
 
   it("With Invalid Variant", () => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - Deliberate bad variant value to test exceptions
     assert.throws(() => new jsSHA("SHA-TEST", "HEX"), "Chosen SHA variant is not supported");
   });

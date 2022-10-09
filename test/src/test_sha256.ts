@@ -95,7 +95,7 @@ describe("Test jsSHA(SHA-256)", () => {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getter(propName: string): any {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Override "any" ban as this is only used in testing
       return this[propName];
     }
@@ -118,7 +118,7 @@ describe("Test jsSHA(SHA-256)", () => {
         newStateFuncSpy = sinon.spy();
       sha256.__with__({ roundSHA256: roundFuncSpy, finalizeSHA256: finalizeFuncSpy, getNewState256: newStateFuncSpy })(
         () => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           const hash = new jsSHAATest(test.variant, "HEX");
 
@@ -149,7 +149,7 @@ describe("Test jsSHA(SHA-256)", () => {
   });
 
   it("With Invalid Variant", () => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - Deliberate bad variant value to test exceptions
     assert.throws(() => new jsSHA("SHA-TEST", "HEX"), "Chosen SHA variant is not supported");
   });

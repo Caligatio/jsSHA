@@ -557,23 +557,36 @@ export function packed2uint8array(packed: number[], outputLength: number, bigEnd
  * @returns Function that will convert a packed integer array to desired format.
  */
 export function getOutputConverter(
-  format: "HEX" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY",
+  format: "HEX" | "B64" | "BYTES",
   outputBinLen: number,
   bigEndianMod: -1 | 1,
   outputOptions: { outputUpper: boolean; b64Pad: string }
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-): (binarray: number[]) => any {
+): (binarray: number[]) => string;
+export function getOutputConverter(
+  format: "ARRAYBUFFER",
+  outputBinLen: number,
+  bigEndianMod: -1 | 1,
+  outputOptions: { outputUpper: boolean; b64Pad: string }
+): (binarray: number[]) => ArrayBuffer;
+export function getOutputConverter(
+  format: "UINT8ARRAY",
+  outputBinLen: number,
+  bigEndianMod: -1 | 1,
+  outputOptions: { outputUpper: boolean; b64Pad: string }
+): (binarray: number[]) => Uint8Array;
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export function getOutputConverter(format: any, outputBinLen: any, bigEndianMod: any, outputOptions: any): any {
   switch (format) {
     case "HEX":
-      return function (binarray): string {
+      return function (binarray: number[]): string {
         return packed2hex(binarray, outputBinLen, bigEndianMod, outputOptions);
       };
     case "B64":
-      return function (binarray): string {
+      return function (binarray: number[]): string {
         return packed2b64(binarray, outputBinLen, bigEndianMod, outputOptions);
       };
     case "BYTES":
-      return function (binarray): string {
+      return function (binarray: number[]): string {
         return packed2bytes(binarray, outputBinLen, bigEndianMod);
       };
     case "ARRAYBUFFER":
@@ -583,7 +596,7 @@ export function getOutputConverter(
       } catch (ignore) {
         throw new Error(arraybuffer_error);
       }
-      return function (binarray): ArrayBuffer {
+      return function (binarray: number[]): ArrayBuffer {
         return packed2arraybuffer(binarray, outputBinLen, bigEndianMod);
       };
     case "UINT8ARRAY":
@@ -593,7 +606,7 @@ export function getOutputConverter(
       } catch (ignore) {
         throw new Error(uint8array_error);
       }
-      return function (binarray): Uint8Array {
+      return function (binarray: number[]): Uint8Array {
         return packed2uint8array(binarray, outputBinLen, bigEndianMod);
       };
     default:

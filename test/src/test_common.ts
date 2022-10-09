@@ -56,7 +56,7 @@ describe("Test parseInputOption", () => {
 
   it("For Value Missing value Key", () => {
     assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Deliberately bad value for test
       parseInputOption("kmacKey", { format: "HEX" }, 1);
     }, "kmacKey must include a value and format");
@@ -64,7 +64,7 @@ describe("Test parseInputOption", () => {
 
   it("For Value Missing binLen Key", () => {
     assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Deliberately bad value for test
       parseInputOption("kmacKey", { value: "TEST" }, 1);
     }, "kmacKey must include a value and format");
@@ -102,7 +102,7 @@ describe("Test getOutputOpts", () => {
 
   it("Invalid b64Pad", () => {
     assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Deliberate bad b64Pad value to test exceptions
       getOutputOpts({ b64Pad: 1 });
     }, "Invalid b64Pad formatting option");
@@ -110,7 +110,7 @@ describe("Test getOutputOpts", () => {
 
   it("Invalid outputUpper", () => {
     assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Deliberate bad outputUpper value to test exceptions
       getOutputOpts({ outputUpper: 1 });
     }, "Invalid outputUpper formatting option");
@@ -124,18 +124,8 @@ describe("Test jsSHABase", () => {
     stubbedFinalize = sinon.stub(),
     stubbedStateClone = sinon.stub(),
     dummyVals = [
-      0x11223344,
-      0xaabbccdd,
-      0xdeadbeef,
-      0xfacefeed,
-      0xbaddcafe,
-      0xdeadcafe,
-      0xdead2bad,
-      0xdeaddead,
-      0xcafed00d,
-      0xdecafbad,
-      0xfee1dead,
-      0xdeadfa11,
+      0x11223344, 0xaabbccdd, 0xdeadbeef, 0xfacefeed, 0xbaddcafe, 0xdeadcafe, 0xdead2bad, 0xdeaddead, 0xcafed00d,
+      0xdecafbad, 0xfee1dead, 0xdeadfa11,
     ];
 
   class jsSHAATest extends jsSHABase<number[], "SHA-TEST"> {
@@ -164,7 +154,7 @@ describe("Test jsSHABase", () => {
       this.converterFunc = stubbedStrConverter;
       this.roundFunc = stubbedRound;
       this.stateCloneFunc = stubbedStateClone;
-      this.newStateFunc = (stubbedNewState as unknown) as (variant: "SHA-TEST") => number[];
+      this.newStateFunc = stubbedNewState as unknown as (variant: "SHA-TEST") => number[];
       this.finalizeFunc = stubbedFinalize;
       // eslint-disable-next-line @typescript-eslint/unbound-method
       this.getMAC = this._getHMAC;
@@ -181,7 +171,7 @@ describe("Test jsSHABase", () => {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getter(propName: string): any {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Override "any" ban as this is only used in testing
       return this[propName];
     }
@@ -191,7 +181,7 @@ describe("Test jsSHABase", () => {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setter(propName: string, value: any): void {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Override "any" ban as this is only used in testing
       this[propName] = value;
     }

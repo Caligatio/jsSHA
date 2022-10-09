@@ -34,38 +34,7 @@ const sha512 = rewire("../../src/sha512"),
     new Int_64(H_full[7], 0x137e2179),
   ],
   abcPostProcessed = [
-    0x61626380,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0x00000018,
+    0x61626380, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00000018,
   ],
   abcPacked = [0x61626300];
 
@@ -158,7 +127,7 @@ describe("Test jsSHA(SHA-512)", () => {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getter(propName: string): any {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Override "any" ban as this is only used in testing
       return this[propName];
     }
@@ -184,7 +153,7 @@ describe("Test jsSHA(SHA-512)", () => {
         finalizeSHA512: finalizeFuncSpy,
         getNewState512: newStateFuncSpy,
       })(() => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const hash = new jsSHAATest(test.variant, "HEX");
 
@@ -216,7 +185,7 @@ describe("Test jsSHA(SHA-512)", () => {
   });
 
   it("With Invalid Variant", () => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - Deliberate bad variant value to test exceptions
     assert.throws(() => new jsSHA("SHA-TEST", "HEX"), "Chosen SHA variant is not supported");
   });

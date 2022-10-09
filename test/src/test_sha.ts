@@ -17,14 +17,14 @@ import { runHashTests } from "./common";
   "SHAKE128",
   "SHAKE256",
 ].forEach((variant) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore - Typescript doesn't understand the above array contains only valid values
   runHashTests(variant, jsSHA);
 });
 
 describe("Test jsSHA Constructor", () => {
   it("Invalid Variant", () => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - Deliberate bad variant value
     assert.throws(() => new jsSHA("SHA-TEST", "HEX"), "Chosen SHA variant is not supported");
   });
