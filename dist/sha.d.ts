@@ -78,7 +78,8 @@ declare class jsSHA {
     /**
      * Takes `input` and hashes as many blocks as possible. Stores the rest for either a future `update` or `getHash` call.
      *
-     * @param input The input to be hashed
+     * @param input The input to be hashed.
+     * @returns A reference to the object.
      */
     update(input: string | ArrayBuffer | Uint8Array): this;
     /**
