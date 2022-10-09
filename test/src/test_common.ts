@@ -216,11 +216,12 @@ describe("Test jsSHABase", () => {
   it("Test update", () => {
     /*
      * This is rather difficult to test so we want to check a few basic things:
-     *   1. It passed the input to the string conversion function correctly
-     *   2. It did *not* call the round function when the input was smaller than the block size
-     *   3. Intermediate state was untouched but remainder variables are updated
-     *   4. It *did* call the round function when the input was greater than or equal to than the block size
-     *   5. Intermediate state and associated variables are set correctly
+     *   1. It returns a reference to the jsSHA object
+     *   2. It passed the input to the string conversion function correctly
+     *   3. It did *not* call the round function when the input was smaller than the block size
+     *   4. Intermediate state was untouched but remainder variables are updated
+     *   5. It *did* call the round function when the input was greater than or equal to than the block size
+     *   6. Intermediate state and associated variables are set correctly
      */
     const stubbedJsSHA = new jsSHAATest("SHA-TEST", "HEX"),
       inputStr = "ABCD";
@@ -233,12 +234,13 @@ describe("Test jsSHABase", () => {
       .returns({ value: [dummyVals[0], dummyVals[0]], binLen: 64 });
     stubbedRound.returns([dummyVals[1], dummyVals[2]]);
 
-    stubbedJsSHA.update(inputStr);
     // Check #1
-    assert.isTrue(stubbedStrConverter.calledOnceWith(inputStr, [], 0));
+    assert.equal(stubbedJsSHA, stubbedJsSHA.update(inputStr));
     // Check #2
-    assert.isFalse(stubbedRound.called);
+    assert.isTrue(stubbedStrConverter.calledOnceWith(inputStr, [], 0));
     // Check #3
+    assert.isFalse(stubbedRound.called);
+    // Check #4
     assert.deepEqual(stubbedJsSHA.getter("intermediateState"), [0, 0]);
     assert.deepEqual(stubbedJsSHA.getter("remainder"), [dummyVals[0]]);
     assert.equal(stubbedJsSHA.getter("remainderLen"), 32);
@@ -246,13 +248,13 @@ describe("Test jsSHABase", () => {
     assert.isTrue(stubbedJsSHA.getter("updateCalled"));
 
     stubbedJsSHA.update(inputStr);
-    // Check #1 again to make sure state is being passed correctly
+    // Check #2 again to make sure state is being passed correctly
     assert.equal(stubbedStrConverter.callCount, 2);
     assert.isTrue(stubbedStrConverter.getCall(1).calledWithExactly(inputStr, [dummyVals[0]], 32));
-    // Check #4
+    // Check #5
     assert.isTrue(stubbedRound.calledOnceWith([dummyVals[0], dummyVals[0]], [0, 0]));
 
-    // Check #5
+    // Check #6
     assert.deepEqual(stubbedJsSHA.getter("intermediateState"), [dummyVals[1], dummyVals[2]]);
     assert.deepEqual(stubbedJsSHA.getter("remainder"), []);
     assert.equal(stubbedJsSHA.getter("remainderLen"), 0);

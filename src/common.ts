@@ -227,7 +227,7 @@ export abstract class jsSHABase<StateT, VariantT> {
    *
    * @param srcString The input to be hashed.
    */
-  update(srcString: string | ArrayBuffer | Uint8Array): void {
+  update(srcString: string | ArrayBuffer | Uint8Array): this {
     let i,
       updateProcessedLen = 0;
     const variantBlockIntInc = this.variantBlockSize >>> 5,
@@ -246,6 +246,8 @@ export abstract class jsSHABase<StateT, VariantT> {
     this.remainder = chunk.slice(updateProcessedLen >>> 5);
     this.remainderLen = chunkBinLen % this.variantBlockSize;
     this.updateCalled = true;
+
+    return this;
   }
 
   /**

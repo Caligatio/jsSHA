@@ -70,7 +70,7 @@ declare abstract class jsSHABase<StateT, VariantT> {
      *
      * @param srcString The input to be hashed.
      */
-    update(srcString: string | ArrayBuffer | Uint8Array): void;
+    update(srcString: string | ArrayBuffer | Uint8Array): this;
     /**
      * Returns the desired SHA hash of the input fed in via `update` calls.
      *

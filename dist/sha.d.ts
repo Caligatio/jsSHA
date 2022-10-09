@@ -80,7 +80,7 @@ declare class jsSHA {
      *
      * @param input The input to be hashed
      */
-    update(input: string | ArrayBuffer | Uint8Array): void;
+    update(input: string | ArrayBuffer | Uint8Array): this;
     /**
      * Returns the desired SHA or MAC (if a HMAC/KMAC key was specified) hash of the input fed in via `update` calls.
      *

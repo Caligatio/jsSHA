@@ -89,8 +89,10 @@ export default class jsSHA {
    *
    * @param input The input to be hashed
    */
-  update(input: string | ArrayBuffer | Uint8Array): void {
+  update(input: string | ArrayBuffer | Uint8Array): this {
     this.shaObj.update(input);
+
+    return this;
   }
 
   /**
