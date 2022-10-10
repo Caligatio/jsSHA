@@ -63,7 +63,7 @@ Example to calculate the SHA-512 of "This is a test":
 
 ```javascript
 const shaObj = new jsSHA("SHA-512", "TEXT", { encoding: "UTF8" });
-shaObj.update("This is a ");
+shaObj.update("This is").update(" a ");
 shaObj.update("test");
 const hash = shaObj.getHash("HEX");
 ```
