@@ -1,5 +1,11 @@
 # jsSHA - ChangeLog
 
+## 3.3.0 (2022-10-10)
+
+- `.update()` method now returns a reference to the jsSHA object to allow for
+  method chaining (#100, thanks @ADTC!).
+- Correct bad URL in README (#99, thanks @jbjulia!).
+
 ## 3.2.0 (2020-12-07)
 
 - Added ESM versions of all variants (thanks wKovacs64!).
