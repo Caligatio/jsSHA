@@ -1,5 +1,9 @@
 # jsSHA - ChangeLog
 
+## 3.3.1 (2023-08-04)
+
+- Support latest method of defining type imports (#103, thanks @faljse!).
+
 ## 3.3.0 (2022-10-10)
 
 - `.update()` method now returns a reference to the jsSHA object to allow for
