@@ -1,7 +1,7 @@
 import fs from "fs";
 import dts from "rollup-plugin-dts";
 import typescript from "@rollup/plugin-typescript";
-import { terser } from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 
 const licenseHeaderES3 = fs.readFileSync("src/license_header.es3.txt", { encoding: "utf8" }),
   licenseHeaderES6 = fs.readFileSync("src/license_header.es6.txt", { encoding: "utf8" });
