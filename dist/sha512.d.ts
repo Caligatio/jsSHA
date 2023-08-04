@@ -1,7 +1,7 @@
-declare type EncodingType = "UTF8" | "UTF16BE" | "UTF16LE";
-declare type FormatNoTextType = "HEX" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY";
-declare type FormatType = "TEXT" | FormatNoTextType;
-declare type GenericInputType = {
+type EncodingType = "UTF8" | "UTF16BE" | "UTF16LE";
+type FormatNoTextType = "HEX" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY";
+type FormatType = "TEXT" | FormatNoTextType;
+type GenericInputType = {
     value: string;
     format: "TEXT";
     encoding?: EncodingType;
@@ -15,12 +15,12 @@ declare type GenericInputType = {
     value: Uint8Array;
     format: "UINT8ARRAY";
 };
-declare type FixedLengthOptionsNoEncodingType = {
+type FixedLengthOptionsNoEncodingType = {
     hmacKey?: GenericInputType;
 } | {
     numRounds?: number;
 };
-declare type FixedLengthOptionsEncodingType = {
+type FixedLengthOptionsEncodingType = {
     hmacKey?: GenericInputType;
     encoding?: EncodingType;
 } | {
@@ -156,7 +156,7 @@ declare class Int_64 {
     constructor(msint_32: number, lsint_32: number);
 }
 
-declare type VariantType = "SHA-384" | "SHA-512";
+type VariantType = "SHA-384" | "SHA-512";
 declare class jsSHA extends jsSHABase<Int_64[], VariantType> {
     intermediateState: Int_64[];
     variantBlockSize: number;

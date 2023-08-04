@@ -1,6 +1,6 @@
-declare type EncodingType = "UTF8" | "UTF16BE" | "UTF16LE";
-declare type FormatNoTextType = "HEX" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY";
-declare type GenericInputType = {
+type EncodingType = "UTF8" | "UTF16BE" | "UTF16LE";
+type FormatNoTextType = "HEX" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY";
+type GenericInputType = {
     value: string;
     format: "TEXT";
     encoding?: EncodingType;
@@ -14,12 +14,12 @@ declare type GenericInputType = {
     value: Uint8Array;
     format: "UINT8ARRAY";
 };
-declare type FixedLengthOptionsNoEncodingType = {
+type FixedLengthOptionsNoEncodingType = {
     hmacKey?: GenericInputType;
 } | {
     numRounds?: number;
 };
-declare type FixedLengthOptionsEncodingType = {
+type FixedLengthOptionsEncodingType = {
     hmacKey?: GenericInputType;
     encoding?: EncodingType;
 } | {
@@ -47,7 +47,7 @@ interface KMACOptionsEncodingType extends KMACOptionsNoEncodingType {
     encoding?: EncodingType;
 }
 
-declare type FixedLengthVariantType = "SHA-1" | "SHA-224" | "SHA-256" | "SHA-384" | "SHA-512" | "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512";
+type FixedLengthVariantType = "SHA-1" | "SHA-224" | "SHA-256" | "SHA-384" | "SHA-512" | "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512";
 declare class jsSHA {
     private readonly shaObj;
     /**

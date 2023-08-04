@@ -1,7 +1,7 @@
-declare type EncodingType = "UTF8" | "UTF16BE" | "UTF16LE";
-declare type FormatNoTextType = "HEX" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY";
-declare type FormatType = "TEXT" | FormatNoTextType;
-declare type GenericInputType = {
+type EncodingType = "UTF8" | "UTF16BE" | "UTF16LE";
+type FormatNoTextType = "HEX" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY";
+type FormatType = "TEXT" | FormatNoTextType;
+type GenericInputType = {
     value: string;
     format: "TEXT";
     encoding?: EncodingType;
@@ -15,12 +15,12 @@ declare type GenericInputType = {
     value: Uint8Array;
     format: "UINT8ARRAY";
 };
-declare type FixedLengthOptionsNoEncodingType = {
+type FixedLengthOptionsNoEncodingType = {
     hmacKey?: GenericInputType;
 } | {
     numRounds?: number;
 };
-declare type FixedLengthOptionsEncodingType = {
+type FixedLengthOptionsEncodingType = {
     hmacKey?: GenericInputType;
     encoding?: EncodingType;
 } | {
@@ -176,8 +176,8 @@ declare class Int_64 {
     constructor(msint_32: number, lsint_32: number);
 }
 
-declare type FixedLengthVariantType = "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
-declare type VariantType = FixedLengthVariantType | "SHAKE128" | "SHAKE256" | "CSHAKE128" | "CSHAKE256" | "KMAC128" | "KMAC256";
+type FixedLengthVariantType = "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
+type VariantType = FixedLengthVariantType | "SHAKE128" | "SHAKE256" | "CSHAKE128" | "CSHAKE256" | "KMAC128" | "KMAC256";
 declare class jsSHA extends jsSHABase<Int_64[][], VariantType> {
     intermediateState: Int_64[][];
     variantBlockSize: number;
