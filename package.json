@@ -155,7 +155,8 @@
       "dist",
       "*.js",
       "coverage",
-      "test"
+      "test",
+      "rollup.config.mjs"
     ],
     "reporter": [
       "text",
