@@ -179,8 +179,5 @@
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
     "*.{js,ts,css,md,html,json}": "prettier --write"
-  },
-  "dependencies": {
-    "tough-cookie": "^4.1.3"
   }
 }
