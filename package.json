@@ -5,38 +5,47 @@
   "main": "./dist/sha.js",
   "exports": {
     ".": {
+      "types": "./dist/sha.d.ts",
       "import": "./dist/sha.mjs",
       "require": "./dist/sha.js"
     },
     "./sha1": {
+      "types": "./dist/sha1.d.ts",
       "import": "./dist/sha1.mjs",
       "require": "./dist/sha1.js"
     },
     "./dist/sha1": {
+      "types": "./dist/sha1.d.ts",
       "import": "./dist/sha1.mjs",
       "require": "./dist/sha1.js"
     },
     "./sha256": {
+      "types": "./dist/sha256.d.ts",
       "import": "./dist/sha256.mjs",
       "require": "./dist/sha256.js"
     },
     "./dist/sha256": {
+      "types": "./dist/sha256.d.ts",
       "import": "./dist/sha256.mjs",
       "require": "./dist/sha256.js"
     },
     "./sha512": {
+      "types": "./dist/sha512.d.ts",
       "import": "./dist/sha512.mjs",
       "require": "./dist/sha512.js"
     },
     "./dist/sha512": {
+      "types": "./dist/sha512.d.ts",
       "import": "./dist/sha512.mjs",
       "require": "./dist/sha512.js"
     },
     "./sha3": {
+      "types": "./dist/sha3.d.ts",
       "import": "./dist/sha3.mjs",
       "require": "./dist/sha3.js"
     },
     "./dist/sha3": {
+      "types": "./dist/sha3.d.ts",
       "import": "./dist/sha3.mjs",
       "require": "./dist/sha3.js"
     },
