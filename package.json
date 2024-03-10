@@ -114,7 +114,6 @@
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",
     "chai": "^4.3.7",
-    "coveralls": "^3.1.1",
     "eslint": "^8.46.0",
     "husky": "^8.0.3",
     "karma": "^6.4.2",
@@ -138,7 +137,6 @@
     "build": "rollup -c",
     "test": "nyc --reporter=html --reporter=text mocha test/src/*.ts",
     "test_dist": "mocha test/dist/ && karma start karma.conf.js --file-variant sha && karma start karma.conf.js --file-variant sha1 && karma start karma.conf.js --file-variant sha256 && karma start karma.conf.js --file-variant sha512 && karma start karma.conf.js --file-variant sha3",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "prepare": "husky install"
   },
   "mocha": {
