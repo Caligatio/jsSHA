@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "5.0",
     "target": "es3",
     "strict": true,
     "forceConsistentCasingInFileNames": true,
