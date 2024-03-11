@@ -5,6 +5,7 @@ Hash Standard (SHA) family (SHA-1, SHA-224/256/384/512, SHA3-224/256/384/512,
 SHAKE128/256, cSHAKE128/256, and KMAC128/256) with HMAC.
 
 [![npm](https://img.shields.io/npm/v/jssha)](https://www.npmjs.com/package/jssha)
+![main workflow](https://github.com/Caligatio/jsSHA/actions/workflows/main.yml/badge.svg)
 [![NPM](https://img.shields.io/npm/l/jssha)](https://opensource.org/licenses/BSD-3-Clause)
 
 ## Usage
