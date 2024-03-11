@@ -1,0 +1,20 @@
+name: Build and Test
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+    - uses: browser-actions/setup-chrome@v1
+    - uses: browser-actions/setup-firefox@v1
+    - name: Run Karma Tests
+      run: |
+        npm install
+        npm run test
+        npm run build 
+        npm run test_dist 
