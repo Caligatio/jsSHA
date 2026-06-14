@@ -84,7 +84,7 @@ multiple of 8 bits.
 
 ### HMAC
 
-Instantiate a new `jsSHA` object similiar to hashing but with the third argument
+Instantiate a new `jsSHA` object similar to hashing but with the third argument
 in the form of `{ "hmacKey": { "value": VALUE, "format": FORMAT } }`. FORMAT
 takes the same values as the input format from hashing and the VALUE is then
 either a `string`, `ArrayBuffer`, or `Uint8Array`. You can stream in the input
@@ -105,8 +105,8 @@ Note: You cannot specify `numRounds` with HMAC.
 
 ### cSHAKE
 
-Instantiate a new `jsSHA` object similiar to HMAC but first argument being
-either "CSHAKE128" or "CSHAKE256" and the third argument in the form of
+Instantiate a new `jsSHA` object similar to HMAC but first argument being either
+"CSHAKE128" or "CSHAKE256" and the third argument in the form of
 `{ "customization"?: { "value": VALUE, "format": FORMAT }, "funcName"?: { "value": VALUE, "format": FORMAT } }`.
 FORMAT takes the same values as the input format from hashing and the VALUE is
 then either a `string`, `ArrayBuffer`, or `Uint8Array`. Per the NIST
@@ -133,7 +133,7 @@ is the desired output length of the cSHAKE algorithm in a multiple of 8 bits.
 
 ### KMAC
 
-Instantiate a new `jsSHA` object similiar to cSHAKE but first argument being
+Instantiate a new `jsSHA` object similar to cSHAKE but first argument being
 either "KMAC128" or "KMAC256" and the third argument in the form of
 `{ "customization"?: { "value": VALUE, "format": FORMAT }, "kmacKey?: { "value": VALUE, "format": FORMAT } }`.
 FORMAT takes the same values as the input format from hashing and the VALUE is
