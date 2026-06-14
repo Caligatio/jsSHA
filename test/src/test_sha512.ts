@@ -115,7 +115,7 @@ describe("Test jsSHA(SHA-512)", () => {
     constructor(
       variant: "SHA-384" | "SHA-512",
       inputFormat: FormatNoTextType,
-      options?: FixedLengthOptionsNoEncodingType
+      options?: FixedLengthOptionsNoEncodingType,
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(variant: any, inputFormat: any, options?: any) {
@@ -127,7 +127,6 @@ describe("Test jsSHA(SHA-512)", () => {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getter(propName: string): any {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Override "any" ban as this is only used in testing
       return this[propName];
     }
@@ -153,7 +152,6 @@ describe("Test jsSHA(SHA-512)", () => {
         finalizeSHA512: finalizeFuncSpy,
         getNewState512: newStateFuncSpy,
       })(() => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const hash = new jsSHAATest(test.variant, "HEX");
 
@@ -178,14 +176,13 @@ describe("Test jsSHA(SHA-512)", () => {
 
         hash.getter("finalizeFunc")([0xdeadbeef], 32, 0, [new Int_64(0xfacefeed, 0)]);
         assert.isTrue(
-          finalizeFuncSpy.lastCall.calledWithExactly([0xdeadbeef], 32, 0, [new Int_64(0xfacefeed, 0)], test.variant)
+          finalizeFuncSpy.lastCall.calledWithExactly([0xdeadbeef], 32, 0, [new Int_64(0xfacefeed, 0)], test.variant),
         );
       });
     });
   });
 
   it("With Invalid Variant", () => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - Deliberate bad variant value to test exceptions
     assert.throws(() => new jsSHA("SHA-TEST", "HEX"), "Chosen SHA variant is not supported");
   });

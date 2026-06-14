@@ -204,7 +204,7 @@ function finalizeSHA512(
   remainderBinLen: number,
   processedBinLen: number,
   H: Int_64[],
-  variant: VariantType
+  variant: VariantType,
 ): number[] {
   let i, retVal;
 
@@ -236,7 +236,6 @@ function finalizeSHA512(
   }
 
   if ("SHA-384" === variant) {
-    H = (H as unknown) as Int_64[];
     retVal = [
       H[0].highOrder,
       H[0].lowOrder,

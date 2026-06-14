@@ -26,7 +26,7 @@ function str2packed(
   utfType: EncodingType,
   existingPacked: number[] | undefined,
   existingPackedLen: number | undefined,
-  bigEndianMod: -1 | 1
+  bigEndianMod: -1 | 1,
 ): packedValue {
   let codePnt,
     codePntArr,
@@ -62,7 +62,7 @@ function str2packed(
           0xf0 | (codePnt >>> 18),
           0x80 | ((codePnt >>> 12) & 0x3f),
           0x80 | ((codePnt >>> 6) & 0x3f),
-          0x80 | (codePnt & 0x3f)
+          0x80 | (codePnt & 0x3f),
         );
       }
 
@@ -116,7 +116,7 @@ function hex2packed(
   str: string,
   existingPacked: number[] | undefined,
   existingPackedLen: number | undefined,
-  bigEndianMod: -1 | 1
+  bigEndianMod: -1 | 1,
 ): packedValue {
   let i, num, intOffset, byteOffset;
 
@@ -159,7 +159,7 @@ function bytes2packed(
   str: string,
   existingPacked: number[] | undefined,
   existingPackedLen: number | undefined,
-  bigEndianMod: -1 | 1
+  bigEndianMod: -1 | 1,
 ): packedValue {
   let codePnt, i, intOffset, byteOffset;
 
@@ -195,7 +195,7 @@ function b642packed(
   str: string,
   existingPacked: number[] | undefined,
   existingPackedLen: number | undefined,
-  bigEndianMod: -1 | 1
+  bigEndianMod: -1 | 1,
 ): packedValue {
   let byteCnt = 0,
     index,
@@ -258,7 +258,7 @@ function uint8array2packed(
   arr: Uint8Array,
   existingPacked: number[] | undefined,
   existingPackedLen: number | undefined,
-  bigEndianMod: -1 | 1
+  bigEndianMod: -1 | 1,
 ): packedValue {
   let i, intOffset, byteOffset;
 
@@ -292,7 +292,7 @@ function arraybuffer2packed(
   arr: ArrayBuffer,
   existingPacked: number[] | undefined,
   existingPackedLen: number | undefined,
-  bigEndianMod: -1 | 1
+  bigEndianMod: -1 | 1,
 ): packedValue {
   return uint8array2packed(new Uint8Array(arr), existingPacked, existingPackedLen, bigEndianMod);
 }
@@ -308,7 +308,7 @@ function arraybuffer2packed(
 export function getStrConverter(
   format: FormatType,
   utfType: EncodingType,
-  bigEndianMod: -1 | 1
+  bigEndianMod: -1 | 1,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ): (input: any, existingBin?: number[], existingBinLen?: number) => packedValue {
   /* Validate encoding */
@@ -369,7 +369,7 @@ export function getStrConverter(
     case "ARRAYBUFFER":
       try {
         new ArrayBuffer(0);
-      } catch (ignore) {
+      } catch {
         throw new Error(arraybuffer_error);
       }
       /**
@@ -384,7 +384,7 @@ export function getStrConverter(
     case "UINT8ARRAY":
       try {
         new Uint8Array(0);
-      } catch (ignore) {
+      } catch {
         throw new Error(uint8array_error);
       }
       /**
@@ -417,7 +417,7 @@ export function packed2hex(
   packed: number[],
   outputLength: number,
   bigEndianMod: -1 | 1,
-  formatOpts: { outputUpper: boolean; b64Pad: string }
+  formatOpts: { outputUpper: boolean; b64Pad: string },
 ): string {
   const hex_tab = "0123456789abcdef";
   let str = "",
@@ -449,7 +449,7 @@ export function packed2b64(
   packed: number[],
   outputLength: number,
   bigEndianMod: -1 | 1,
-  formatOpts: { outputUpper: boolean; b64Pad: string }
+  formatOpts: { outputUpper: boolean; b64Pad: string },
 ): string {
   let str = "",
     i,
@@ -560,19 +560,19 @@ export function getOutputConverter(
   format: "HEX" | "B64" | "BYTES",
   outputBinLen: number,
   bigEndianMod: -1 | 1,
-  outputOptions: { outputUpper: boolean; b64Pad: string }
+  outputOptions: { outputUpper: boolean; b64Pad: string },
 ): (binarray: number[]) => string;
 export function getOutputConverter(
   format: "ARRAYBUFFER",
   outputBinLen: number,
   bigEndianMod: -1 | 1,
-  outputOptions: { outputUpper: boolean; b64Pad: string }
+  outputOptions: { outputUpper: boolean; b64Pad: string },
 ): (binarray: number[]) => ArrayBuffer;
 export function getOutputConverter(
   format: "UINT8ARRAY",
   outputBinLen: number,
   bigEndianMod: -1 | 1,
-  outputOptions: { outputUpper: boolean; b64Pad: string }
+  outputOptions: { outputUpper: boolean; b64Pad: string },
 ): (binarray: number[]) => Uint8Array;
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export function getOutputConverter(format: any, outputBinLen: any, bigEndianMod: any, outputOptions: any): any {
@@ -593,7 +593,7 @@ export function getOutputConverter(format: any, outputBinLen: any, bigEndianMod:
       try {
         /* Need to test ArrayBuffer support */
         new ArrayBuffer(0);
-      } catch (ignore) {
+      } catch {
         throw new Error(arraybuffer_error);
       }
       return function (binarray: number[]): ArrayBuffer {
@@ -603,7 +603,7 @@ export function getOutputConverter(format: any, outputBinLen: any, bigEndianMod:
       try {
         /* Need to test Uint8Array support */
         new Uint8Array(0);
-      } catch (ignore) {
+      } catch {
         throw new Error(uint8array_error);
       }
       return function (binarray: number[]): Uint8Array {

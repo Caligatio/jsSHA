@@ -104,7 +104,7 @@ function roundSHA3(block: number[] | null, state: Int_64[][]): Int_64[][] {
     for (x = 0; x < block.length; x += 2) {
       state[(x >>> 1) % 5][((x >>> 1) / 5) | 0] = xor_64_2(
         state[(x >>> 1) % 5][((x >>> 1) / 5) | 0],
-        new Int_64(block[x + 1], block[x])
+        new Int_64(block[x + 1], block[x]),
       );
     }
   }
@@ -140,8 +140,8 @@ function roundSHA3(block: number[] | null, state: Int_64[][]): Int_64[][] {
           B[x][y],
           new Int_64(
             ~B[(x + 1) % 5][y].highOrder & B[(x + 2) % 5][y].highOrder,
-            ~B[(x + 1) % 5][y].lowOrder & B[(x + 2) % 5][y].lowOrder
-          )
+            ~B[(x + 1) % 5][y].lowOrder & B[(x + 2) % 5][y].lowOrder,
+          ),
         );
       }
     }
@@ -172,7 +172,7 @@ function finalizeSHA3(
   state: Int_64[][],
   blockSize: number,
   delimiter: number,
-  outputLen: number
+  outputLen: number,
 ): number[] {
   let i,
     state_offset = 0,
@@ -362,7 +362,7 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
     remainderBinLen: number,
     processedBinLen: number,
     H: Int_64[][],
-    outputLen: number
+    outputLen: number,
   ) => number[];
   stateCloneFunc: (state: Int_64[][]) => Int_64[][];
   newStateFunc: (variant: VariantType) => Int_64[][];
@@ -372,7 +372,7 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
   constructor(
     variant: FixedLengthVariantType,
     inputFormat: FormatNoTextType,
-    options?: FixedLengthOptionsNoEncodingType
+    options?: FixedLengthOptionsNoEncodingType,
   );
   constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: "TEXT", options?: SHAKEOptionsEncodingType);
   constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: FormatNoTextType, options?: SHAKEOptionsNoEncodingType);
@@ -505,7 +505,7 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
         state,
         variantBlockSize,
         delimiter,
-        outputBinLen
+        outputBinLen,
       );
     };
 
@@ -528,7 +528,7 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
     }
     const packedParams = packedLEConcat(
       encode_string(resolvedOptions["funcName"]),
-      encode_string(resolvedOptions["customization"])
+      encode_string(resolvedOptions["customization"]),
     );
 
     /* CSHAKE is defined to be a call to SHAKE iff both the customization and function-name string are both empty.  This
@@ -538,7 +538,7 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
       for (let i = 0; i < byte_pad_out.length; i += this.variantBlockSize >>> 5) {
         this.intermediateState = this.roundFunc(
           byte_pad_out.slice(i, i + (this.variantBlockSize >>> 5)),
-          this.intermediateState
+          this.intermediateState,
         );
         this.processedLen += this.variantBlockSize;
       }
@@ -561,7 +561,7 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
     for (let i = 0; i < byte_pad_out.length; i += this.variantBlockSize >>> 5) {
       this.intermediateState = this.roundFunc(
         byte_pad_out.slice(i, i + (this.variantBlockSize >>> 5)),
-        this.intermediateState
+        this.intermediateState,
       );
       this.processedLen += this.variantBlockSize;
     }
@@ -574,11 +574,10 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
    * @param options Hashmap of extra outputs options. `outputLen` must be specified.
    * @returns The KMAC in the format specified.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected _getKMAC(options: { outputLen: number }): number[] {
     const concatedRemainder = packedLEConcat(
       { value: this.remainder.slice(), binLen: this.remainderLen },
-      right_encode(options["outputLen"])
+      right_encode(options["outputLen"]),
     );
 
     return this.finalizeFunc(
@@ -586,7 +585,7 @@ export default class jsSHA extends jsSHABase<Int_64[][], VariantType> {
       concatedRemainder["binLen"],
       this.processedLen,
       this.stateCloneFunc(this.intermediateState),
-      options["outputLen"]
+      options["outputLen"],
     );
   }
 }

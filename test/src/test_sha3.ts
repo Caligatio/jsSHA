@@ -195,7 +195,7 @@ describe("Test resolveKMACOptions", () => {
         funcName: { value: [0x43414d4b], binLen: 32 },
         customization: { value: [0x33221100], binLen: 32 },
         kmacKey: { value: [0x77665544], binLen: 32 },
-      }
+      },
     );
   });
 
@@ -209,7 +209,7 @@ describe("Test resolveKMACOptions", () => {
         funcName: { value: [0x43414d4b], binLen: 32 },
         customization: { value: [], binLen: 0 },
         kmacKey: { value: [0x77665544], binLen: 32 },
-      }
+      },
     );
   });
 });
@@ -255,9 +255,9 @@ describe("Test finalizeSHA3", () => {
           getNewState(),
           1152,
           0x06,
-          224
+          224,
         ),
-        [0x6a817693, 0x723f50ba, 0xebe76cf9, 0x5d09ac65, 0x4bbee3ee, 0xa1c2bbf9, 0xe0117ecb]
+        [0x6a817693, 0x723f50ba, 0xebe76cf9, 0x5d09ac65, 0x4bbee3ee, 0xa1c2bbf9, 0xe0117ecb],
       );
     });
   });
@@ -272,9 +272,9 @@ describe("Test finalizeSHA3", () => {
         getNewState(),
         1344,
         0x1f,
-        2048
+        2048,
       ),
-      SHAKE128Len2048Out
+      SHAKE128Len2048Out,
     );
   });
 });
@@ -286,13 +286,13 @@ describe("Test jsSHA(SHA3)", () => {
     constructor(
       variant: VariantNoCSHAKEType,
       inputFormat: FormatNoTextType,
-      options?: FixedLengthOptionsNoEncodingType
+      options?: FixedLengthOptionsNoEncodingType,
     );
     constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: "TEXT", options?: CSHAKEOptionsEncodingType);
     constructor(
       variant: "CSHAKE128" | "CSHAKE256",
       inputFormat: FormatNoTextType,
-      options?: CSHAKEOptionsNoEncodingType
+      options?: CSHAKEOptionsNoEncodingType,
     );
     constructor(variant: "KMAC128" | "KMAC256", inputFormat: "TEXT", options: KMACOptionsEncodingType);
     constructor(variant: "KMAC128" | "KMAC256", inputFormat: FormatNoTextType, options: KMACOptionsNoEncodingType);
@@ -306,7 +306,6 @@ describe("Test jsSHA(SHA3)", () => {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getter(propName: string): any {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Override "any" ban as this is only used in testing
       return this[propName];
     }
@@ -315,7 +314,6 @@ describe("Test jsSHA(SHA3)", () => {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setter(propName: string, value: any): void {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Override "any" ban as this is only used in testing
       this[propName] = value;
     }
@@ -439,7 +437,6 @@ describe("Test jsSHA(SHA3)", () => {
         finalizeFuncSpy = sinon.spy(),
         newStateFuncSpy = sinon.spy();
       sha3.__with__({ roundSHA3: roundFuncSpy, finalizeSHA3: finalizeFuncSpy, getNewState: newStateFuncSpy })(() => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const hash = new jsSHAATest(test.variant, "HEX", { customization: test.customization, kmacKey: test.kmacKey });
 
@@ -472,8 +469,8 @@ describe("Test jsSHA(SHA3)", () => {
             [[0xfacefeed]],
             test.variantBlockSize,
             test.delimiter,
-            test.outputBinLen
-          )
+            test.outputBinLen,
+          ),
         );
       });
     });
@@ -521,7 +518,6 @@ describe("Test jsSHA(SHA3)", () => {
   });
 
   it("With Invalid Variant", () => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - Deliberate bad variant value to test exceptions
     assert.throws(() => new jsSHA("SHA-TEST", "HEX"), "Chosen SHA variant is not supported");
   });
@@ -533,14 +529,14 @@ describe("Test jsSHA(SHA3)", () => {
   it("CSHAKE Without Customization Value", () => {
     assert.throws(
       () => new jsSHA("CSHAKE128", "HEX", { customization: { format: "TEXT" } }),
-      "Customization must include a value and format"
+      "Customization must include a value and format",
     );
   });
 
   it("CSHAKE Without Customization Format", () => {
     assert.throws(
       () => new jsSHA("CSHAKE128", "HEX", { customization: { value: "abc" } }),
-      "Customization must include a value and format"
+      "Customization must include a value and format",
     );
   });
 
@@ -548,7 +544,7 @@ describe("Test jsSHA(SHA3)", () => {
     assert.throws(
       () =>
         new jsSHA("CSHAKE128", "HEX", { customization: { value: "abc", format: "TEXT" }, funcName: { value: "A" } }),
-      "funcName must include a value and format"
+      "funcName must include a value and format",
     );
   });
 
@@ -559,14 +555,14 @@ describe("Test jsSHA(SHA3)", () => {
           customization: { value: "abc", format: "TEXT" },
           funcName: { format: "TEXT" },
         }),
-      "funcName must include a value and format"
+      "funcName must include a value and format",
     );
   });
 
   it("KMAC128 With numRounds", () => {
     assert.throws(
       () => new jsSHA("KMAC128", "HEX", { numRounds: 2, kmacKey: { value: "TEST", format: "TEXT" } }),
-      "Cannot set numRounds with MAC"
+      "Cannot set numRounds with MAC",
     );
   });
 
@@ -577,14 +573,14 @@ describe("Test jsSHA(SHA3)", () => {
   it("KMAC128 With kmacKey Missing Value", () => {
     assert.throws(
       () => new jsSHA("KMAC128", "HEX", { kmacKey: { format: "HEX" } }),
-      "kmacKey must include a value and format"
+      "kmacKey must include a value and format",
     );
   });
 
   it("KMAC128 With kmacKey Missing Format", () => {
     assert.throws(
       () => new jsSHA("KMAC128", "HEX", { kmacKey: { value: "AA" } }),
-      "kmacKey must include a value and format"
+      "kmacKey must include a value and format",
     );
   });
 

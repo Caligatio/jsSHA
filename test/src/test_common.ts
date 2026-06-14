@@ -56,7 +56,6 @@ describe("Test parseInputOption", () => {
 
   it("For Value Missing value Key", () => {
     assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Deliberately bad value for test
       parseInputOption("kmacKey", { format: "HEX" }, 1);
     }, "kmacKey must include a value and format");
@@ -64,7 +63,6 @@ describe("Test parseInputOption", () => {
 
   it("For Value Missing binLen Key", () => {
     assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Deliberately bad value for test
       parseInputOption("kmacKey", { value: "TEST" }, 1);
     }, "kmacKey must include a value and format");
@@ -102,7 +100,6 @@ describe("Test getOutputOpts", () => {
 
   it("Invalid b64Pad", () => {
     assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Deliberate bad b64Pad value to test exceptions
       getOutputOpts({ b64Pad: 1 });
     }, "Invalid b64Pad formatting option");
@@ -110,7 +107,6 @@ describe("Test getOutputOpts", () => {
 
   it("Invalid outputUpper", () => {
     assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Deliberate bad outputUpper value to test exceptions
       getOutputOpts({ outputUpper: 1 });
     }, "Invalid outputUpper formatting option");
@@ -154,7 +150,7 @@ describe("Test jsSHABase", () => {
       this.converterFunc = stubbedStrConverter;
       this.roundFunc = stubbedRound;
       this.stateCloneFunc = stubbedStateClone;
-      this.newStateFunc = stubbedNewState as unknown as (variant: "SHA-TEST") => number[];
+      this.newStateFunc = stubbedNewState;
       this.finalizeFunc = stubbedFinalize;
       // eslint-disable-next-line @typescript-eslint/unbound-method
       this.getMAC = this._getHMAC;
@@ -171,7 +167,6 @@ describe("Test jsSHABase", () => {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getter(propName: string): any {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Override "any" ban as this is only used in testing
       return this[propName];
     }
@@ -181,7 +176,6 @@ describe("Test jsSHABase", () => {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setter(propName: string, value: any): void {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Override "any" ban as this is only used in testing
       this[propName] = value;
     }
@@ -303,8 +297,8 @@ describe("Test jsSHABase", () => {
         32,
         64,
         [dummyVals[2], dummyVals[3]],
-        stubbedJsSHA.getter("outputBinLen")
-      )
+        stubbedJsSHA.getter("outputBinLen"),
+      ),
     );
   });
 
@@ -391,7 +385,7 @@ describe("Test jsSHABase", () => {
       stubbedJsSHA.getter("keyWithIPad"),
       [0x41424344, 0].map((val) => {
         return val ^ 0x36363636;
-      })
+      }),
     );
 
     // Check #2
@@ -399,7 +393,7 @@ describe("Test jsSHABase", () => {
       stubbedJsSHA.getter("keyWithOPad"),
       [0x41424344, 0].map((val) => {
         return val ^ 0x5c5c5c5c;
-      })
+      }),
     );
 
     // Check #3
@@ -408,8 +402,8 @@ describe("Test jsSHABase", () => {
         [0x41424344, 0].map((val) => {
           return val ^ 0x36363636;
         }),
-        [0, 0]
-      )
+        [0, 0],
+      ),
     );
     assert.deepEqual(stubbedJsSHA.getter("intermediateState"), [dummyVals[0], dummyVals[1]]);
 
@@ -446,8 +440,8 @@ describe("Test jsSHABase", () => {
         96,
         0,
         [dummyVals[4], dummyVals[5]],
-        stubbedJsSHA.getter("outputBinLen")
-      )
+        stubbedJsSHA.getter("outputBinLen"),
+      ),
     );
 
     // Check #2
@@ -455,7 +449,7 @@ describe("Test jsSHABase", () => {
       stubbedJsSHA.getter("keyWithIPad"),
       [dummyVals[0], dummyVals[1]].map((val) => {
         return val ^ 0x36363636;
-      })
+      }),
     );
 
     // Check #3
@@ -463,7 +457,7 @@ describe("Test jsSHABase", () => {
       stubbedJsSHA.getter("keyWithOPad"),
       [dummyVals[0], dummyVals[1]].map((val) => {
         return val ^ 0x5c5c5c5c;
-      })
+      }),
     );
 
     // Check #4
@@ -472,8 +466,8 @@ describe("Test jsSHABase", () => {
         [dummyVals[0], dummyVals[1]].map((val) => {
           return val ^ 0x36363636;
         }),
-        [0, 0]
-      )
+        [0, 0],
+      ),
     );
     assert.deepEqual(stubbedJsSHA.getter("intermediateState"), [dummyVals[2], dummyVals[3]]);
   });
@@ -563,7 +557,7 @@ describe("Test jsSHABase", () => {
         32,
         stubbedJsSHA.getter("outputBinLen"),
         clonedState,
-        stubbedJsSHA.getter("outputBinLen")
+        stubbedJsSHA.getter("outputBinLen"),
       );
 
     // Check #3
@@ -577,7 +571,7 @@ describe("Test jsSHABase", () => {
         stubbedJsSHA.getter("outputBinLen"),
         stubbedJsSHA.getter("variantBlockSize"),
         [dummyVals[4], dummyVals[5]],
-        stubbedJsSHA.getter("outputBinLen")
+        stubbedJsSHA.getter("outputBinLen"),
       );
 
     // Check #5
