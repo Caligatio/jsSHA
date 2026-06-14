@@ -1,10 +1,11 @@
 /* globals module, define, self */
 (function (global, factory) {
+  /* eslint-disable-next-line @typescript-eslint/no-unused-expressions */
   typeof exports === "object" && typeof module !== "undefined"
     ? (module.exports = factory())
     : typeof define === "function" && define.amd
-    ? define(factory)
-    : ((global = global || self), (global.hashData = factory()));
+      ? define(factory)
+      : ((global = global || self), (global.hashData = factory()));
 })(this, function () {
   "use strict";
 

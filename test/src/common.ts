@@ -20,7 +20,7 @@ export function runHashTests(
     | "KMAC128"
     | "KMAC256",
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  jsSHA: any
+  jsSHA: any,
 ): void {
   describe(`Test jsSHA(${variant}) Using NIST Tests`, () => {
     hashData[variant].forEach((test) => {
@@ -28,7 +28,6 @@ export function runHashTests(
         if (test.hmacKey) {
           it(test.name + " - Old Style", () => {
             const hashObj = new jsSHA(variant, test.input.format);
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             hashObj.setHMACKey(test.hmacKey.value, test.hmacKey.format);
             hashObj.update(test.input.value);

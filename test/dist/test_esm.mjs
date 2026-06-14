@@ -1,7 +1,7 @@
 import jsSHA from "../../dist/sha.mjs";
 import hashData from "../hash_data.js";
 import mocha from "mocha";
-import chai from "chai";
+import { assert } from "chai";
 
 function testVariant(variant) {
   let success = true;
@@ -16,7 +16,7 @@ function testVariant(variant) {
             mocha.it(test.name + " - Old Style", () => {
               hashObj.setHMACKey(test.hmacKey.value, test.hmacKey.format);
               hashObj.update(test.input.value);
-              chai.assert.equal(hashObj.getHMAC(output.format), output.value);
+              assert.equal(hashObj.getHMAC(output.format), output.value);
             });
           }
           const hashObj = new jsSHA(variant, test.input.format, {
@@ -27,7 +27,7 @@ function testVariant(variant) {
           });
           mocha.it(test.name, () => {
             hashObj.update(test.input.value);
-            chai.assert.equal(hashObj.getHash(output.format, { outputLen: output.outputLen || 8 }), output.value);
+            assert.equal(hashObj.getHash(output.format, { outputLen: output.outputLen || 8 }), output.value);
           });
         });
       });

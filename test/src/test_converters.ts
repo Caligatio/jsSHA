@@ -43,9 +43,9 @@ function toPackedTestsBuilder(
     input: any,
     existingBin: number[] | undefined,
     existingBinLen: number | undefined,
-    bigEndianMod: -1 | 1
+    bigEndianMod: -1 | 1,
   ) => packedValue,
-  inputType: "hex" | "b64" | "arrayBuffer" | "uint8Array"
+  inputType: "hex" | "b64" | "arrayBuffer" | "uint8Array",
 ): void {
   toPackedTests.forEach((test) => {
     it(`${test.name} - No Existing Input`, () => {
@@ -60,7 +60,7 @@ function toPackedTestsBuilder(
         {
           value: test.outputs.existing,
           binLen: test.outputs.length + test.inputs.lengthExisting,
-        }
+        },
       );
     });
     it(`${test.name} - No Existing Input with Endian Modifier`, () => {
@@ -75,7 +75,7 @@ function toPackedTestsBuilder(
         {
           value: test.outputs.existingMod,
           binLen: test.outputs.length + test.inputs.lengthExisting,
-        }
+        },
       );
     });
   });
@@ -311,7 +311,7 @@ describe("Test str2packed", () => {
         {
           value: test.outputs.utf8Existing,
           binLen: test.outputs.lengthUtf8 + test.inputs.lengthExisting,
-        }
+        },
       );
     });
   });
@@ -341,7 +341,7 @@ describe("Test str2packed", () => {
         {
           value: test.outputs.utf16leExisting,
           binLen: test.outputs.lengthUtf16 + test.inputs.lengthExisting,
-        }
+        },
       );
     });
   });
@@ -371,7 +371,7 @@ describe("Test str2packed", () => {
         {
           value: test.outputs.utf16beExisting,
           binLen: test.outputs.lengthUtf16 + test.inputs.lengthExisting,
-        }
+        },
       );
     });
   });
@@ -449,7 +449,7 @@ describe("Test packed2arraybuffer", () => {
   it("64-bit Input", () => {
     assert.deepEqual(
       packed2arraybuffer(packedToInput, 64, -1),
-      newArrayBuffer([0, 0x11, 0x22, 0x33, 0xaa, 0xbb, 0xcc, 0xdd])
+      newArrayBuffer([0, 0x11, 0x22, 0x33, 0xaa, 0xbb, 0xcc, 0xdd]),
     );
   });
   it("16-bit Input with Endian Modifier", () => {
@@ -458,7 +458,7 @@ describe("Test packed2arraybuffer", () => {
   it("64-bit with Endian Modifier", () => {
     assert.deepEqual(
       packed2arraybuffer(packedToInput, 64, 1),
-      newArrayBuffer([0x33, 0x22, 0x11, 0, 0xdd, 0xcc, 0xbb, 0xaa])
+      newArrayBuffer([0x33, 0x22, 0x11, 0, 0xdd, 0xcc, 0xbb, 0xaa]),
     );
   });
 });
@@ -472,7 +472,7 @@ describe("Test packed2uint8array", () => {
   it("64-bit Input", () => {
     assert.deepEqual(
       packed2uint8array(packedToInput, 64, -1),
-      Uint8Array.from([0, 0x11, 0x22, 0x33, 0xaa, 0xbb, 0xcc, 0xdd])
+      Uint8Array.from([0, 0x11, 0x22, 0x33, 0xaa, 0xbb, 0xcc, 0xdd]),
     );
   });
   it("16-bit Input with Endian Modifier", () => {
@@ -481,7 +481,7 @@ describe("Test packed2uint8array", () => {
   it("64-bit with Endian Modifier", () => {
     assert.deepEqual(
       packed2uint8array(packedToInput, 64, 1),
-      Uint8Array.from([0x33, 0x22, 0x11, 0, 0xdd, 0xcc, 0xbb, 0xaa])
+      Uint8Array.from([0x33, 0x22, 0x11, 0, 0xdd, 0xcc, 0xbb, 0xaa]),
     );
   });
 });
@@ -495,7 +495,7 @@ describe("Test packed2uint8array", () => {
   it("64-bit Input", () => {
     assert.deepEqual(
       packed2uint8array(packedToInput, 64, -1),
-      Uint8Array.from([0, 0x11, 0x22, 0x33, 0xaa, 0xbb, 0xcc, 0xdd])
+      Uint8Array.from([0, 0x11, 0x22, 0x33, 0xaa, 0xbb, 0xcc, 0xdd]),
     );
   });
   it("16-bit Input with Endian Modifier", () => {
@@ -504,7 +504,7 @@ describe("Test packed2uint8array", () => {
   it("64-bit with Endian Modifier", () => {
     assert.deepEqual(
       packed2uint8array(packedToInput, 64, 1),
-      Uint8Array.from([0x33, 0x22, 0x11, 0, 0xdd, 0xcc, 0xbb, 0xaa])
+      Uint8Array.from([0x33, 0x22, 0x11, 0, 0xdd, 0xcc, 0xbb, 0xaa]),
     );
   });
 });
@@ -545,7 +545,6 @@ describe("Test getStrConverter", () => {
 
   it("Invalid UTF Exception", () => {
     assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Deliberate bad UTF value to test exceptions
       getStrConverter("HEX", "UTF32", -1);
     }, "encoding must be UTF8, UTF16BE, or UTF16LE");

@@ -128,7 +128,7 @@ export function parseInputOption(
   key: string,
   value: GenericInputType | undefined,
   bigEndianMod: -1 | 1,
-  fallback?: packedValue
+  fallback?: packedValue,
 ): packedValue {
   const errStr = key + " must include a value and format";
   if (!value) {
@@ -144,10 +144,9 @@ export function parseInputOption(
 
   return getStrConverter(
     value["format"],
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - the value of encoding gets value checked by getStrConverter
     value["encoding"] || "UTF8",
-    bigEndianMod
+    bigEndianMod,
   )(value["value"]);
 }
 
@@ -189,7 +188,7 @@ export abstract class jsSHABase<StateT, VariantT> {
     remainderBinLen: number,
     processedBinLen: number,
     H: StateT,
-    outputLen: number
+    outputLen: number,
   ) => number[];
   protected abstract readonly stateCloneFunc: (state: StateT) => StateT;
   protected abstract readonly newStateFunc: (variant: VariantT) => StateT;
@@ -205,7 +204,6 @@ export abstract class jsSHABase<StateT, VariantT> {
     this.utfType = inputOptions["encoding"] || "UTF8";
     this.numRounds = inputOptions["numRounds"] || 1;
 
-    /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
     // @ts-ignore - The spec actually says ToString is called on the first parseInt argument so it's OK to use it here
     // to check if an arugment is an integer. This cheat would break if it's used to get the value of the argument.
     if (isNaN(this.numRounds) || this.numRounds !== parseInt(this.numRounds, 10) || 1 > this.numRounds) {
@@ -289,7 +287,7 @@ export abstract class jsSHABase<StateT, VariantT> {
       this.remainderLen,
       this.processedLen,
       this.stateCloneFunc(this.intermediateState),
-      outputBinLen
+      outputBinLen,
     );
     for (i = 1; i < this.numRounds; i += 1) {
       /* Need to mask out bits that should be zero due to output not being a multiple of 32 */
@@ -301,7 +299,7 @@ export abstract class jsSHABase<StateT, VariantT> {
         outputBinLen,
         0,
         this.newStateFunc(this.shaVariant),
-        outputBinLen
+        outputBinLen,
       );
     }
 
@@ -360,7 +358,7 @@ export abstract class jsSHABase<StateT, VariantT> {
         key["binLen"],
         0,
         this.newStateFunc(this.shaVariant),
-        this.outputBinLen
+        this.outputBinLen,
       );
     }
     while (key["value"].length <= lastArrayIndex) {
@@ -413,7 +411,7 @@ export abstract class jsSHABase<StateT, VariantT> {
       this.remainderLen,
       this.processedLen,
       this.stateCloneFunc(this.intermediateState),
-      this.outputBinLen
+      this.outputBinLen,
     );
     finalizedState = this.roundFunc(this.keyWithOPad, this.newStateFunc(this.shaVariant));
     finalizedState = this.finalizeFunc(
@@ -421,7 +419,7 @@ export abstract class jsSHABase<StateT, VariantT> {
       this.outputBinLen,
       this.variantBlockSize,
       finalizedState,
-      this.outputBinLen
+      this.outputBinLen,
     );
 
     return finalizedState;
