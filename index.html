@@ -1,15 +1,15 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
+	<meta charset="utf-8">
 	<title>jsSHA - SHA Hashes in JavaScript</title>
-	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="keywords" content="SHA, SHA1, SHA-1, SHA-2, SHA2, SHA-3, SHA3, SHA-224, SHA-256, SHA-384, SHA-512, SHA-2, SHA3-224, SHA3-256, SHA3-384, SHA3-512,
 		SHAKE128, SHAKE256, SHAKE-128, SHAKE-256, SHAKE128, SHAKE256, cSHAKE128, cSHAKE256, cSHAKE-128, cSHAKE-256, KMAC128, KMAC256, KMAC-128, KMAC-256, HMAC,
-		KMAC, JavaScript, TypeScript, JS, Secure Hash Standard, hash, security, cryptography, FIPS 180, FIPS 202, FIPS 198, SP 800-185" />
-	<link rel="stylesheet" type="text/css" href="style.css" />
-	<script type="text/javascript" src="sha.js"></script>
-	<script type="text/javascript">
+		KMAC, JavaScript, TypeScript, JS, Secure Hash Standard, hash, security, cryptography, FIPS 180, FIPS 202, FIPS 198, SP 800-185">
+	<link rel="stylesheet" href="style.css">
+	<script src="sha.js"></script>
+	<script>
 		function calcHash() {
 			try {
 				var hashInput = document.getElementById("hashInputText");
@@ -59,7 +59,7 @@
 <body onload="calcHash();calcHMAC()">
 	<div id="container">
 		<div>
-			<img src="logo.png" alt="jsSHA" style="margin: 0px auto" />
+			<img src="logo.png" alt="jsSHA" style="margin: 0px auto">
 			<h1>About</h1>
 			<p>
 				jsSHA is a JavaScript/TypeScript implementation of the entire family of SHA hashes as defined in <a href="https://csrc.nist.gov/publications/detail/fips/180/4/final">FIPS PUB 180-4</a>,
@@ -84,17 +84,17 @@
 				<fieldset>
 					<legend>Hashing Demo</legend>
 					<p>
-						Simply insert your text to be hashed, input type, the SHA variant you wish to use, and the output format.<br />
+						Simply insert your text to be hashed, input type, the SHA variant you wish to use, and the output format.<br>
 						<span style="font-size: 12px">Note: You may have to scroll the output text for longer length hashes</span>
 					</p>
 					<div>
-						<label for="hashInputText">Input Text:</label><input type="text" size="75" name="hashInputText" id="hashInputText" onkeyup="calcHash()" />
+						<label for="hashInputText">Input Text:</label><input type="text" size="75" name="hashInputText" id="hashInputText" onkeyup="calcHash()">
 					</div>
 					<div>
 						<label for="hashInputType">Input Type:</label>
 						<select name="hashInputType" id="hashInputType" onchange="calcHash()">
 							<option value="B64">Base-64</option>
-							<option selected="selected">TEXT</option>
+							<option selected>TEXT</option>
 							<option>HEX</option>
 						</select>
 					</div>
@@ -113,45 +113,45 @@
 						</select>
 					</div>
 					<div>
-						<label for="hashRounds">Number of Rounds:</label><input type="text" size="5" name="hashRounds" id="hashRounds" value="1" onkeyup="calcHash()" />
+						<label for="hashRounds">Number of Rounds:</label><input type="number" min="1" step="1" name="hashRounds" id="hashRounds" value="1" onkeyup="calcHash()" onchange="calcHash()">
 					</div>
 					<div>
 						<label for="hashOutputType">Output Type:</label>
 						<select name="hashOutputType" id="hashOutputType" onchange="calcHash()">
 							<option value="B64">Base-64</option>
-							<option selected="selected">HEX</option>
+							<option selected>HEX</option>
 						</select>
 					</div>
 					<div>
 						<label for="hashOutputText">Output Hash:</label>
-						<input type="text" size="75" name="hashOutputText" id="hashOutputText" style="background-color: #b1ceed" />
+						<input type="text" size="75" name="hashOutputText" id="hashOutputText" style="background-color: #b1ceed">
 					</div>
 				</fieldset>
 				<fieldset>
 					<legend>HMAC Demo</legend>
 					<p>
-						Simply insert your text to be hashed, text type, key, key type, the SHA variant you wish to use, and the output format.<br />
+						Simply insert your text to be hashed, text type, key, key type, the SHA variant you wish to use, and the output format.<br>
 						<span style="font-size: 12px">Note: You may have to scroll the output text for longer length hashes</span>
 					</p>
 					<div>
-						<label for="hmacInputText">Input Text:</label><input type="text" size="75" name="hmacInputText" id="hmacInputText" onkeyup="calcHMAC()" />
+						<label for="hmacInputText">Input Text:</label><input type="text" size="75" name="hmacInputText" id="hmacInputText" onkeyup="calcHMAC()">
 					</div>
 					<div>
 						<label for="hmacTextType">Input Type:</label>
 						<select name="hmacTextType" id="hmacTextType" onchange="calcHMAC()">
 							<option value="B64">Base-64</option>
-							<option selected="selected">TEXT</option>
+							<option selected>TEXT</option>
 							<option>HEX</option>
 						</select>
 					</div>
 					<div>
-						<label for="hmacInputKey">Key:</label><input type="text" size="75" name="hmacInputKey" id="hmacInputKey" onkeyup="calcHMAC()" />
+						<label for="hmacInputKey">Key:</label><input type="text" size="75" name="hmacInputKey" id="hmacInputKey" onkeyup="calcHMAC()">
 					</div>
 					<div>
 						<label for="hmacKeyType">Key Type:</label>
 						<select name="hmacKeyType" id="hmacKeyType" onchange="calcHMAC()">
 							<option value="B64">Base-64</option>
-							<option selected="selected">TEXT</option>
+							<option selected>TEXT</option>
 							<option>HEX</option>
 						</select>
 					</div>
@@ -173,12 +173,12 @@
 						<label for="hmacOutputType">Output Type:</label>
 						<select name="hmacOutputType" id="hmacOutputType" onchange="calcHMAC()">
 							<option value="B64">Base-64</option>
-							<option selected="selected">HEX</option>
+							<option selected>HEX</option>
 						</select>
 					</div>
 					<div>
 						<label for="hmacOutputText">Output Hash:</label>
-						<input type="text" size="75" name="hmacOutputText" id="hmacOutputText" style="background-color: #b1ceed" />
+						<input type="text" size="75" name="hmacOutputText" id="hmacOutputText" style="background-color: #b1ceed">
 					</div>
 				</fieldset>
 			</form>
