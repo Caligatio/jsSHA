@@ -5,49 +5,94 @@
   "main": "./dist/sha.js",
   "exports": {
     ".": {
-      "types": "./dist/sha.d.ts",
-      "import": "./dist/sha.mjs",
-      "require": "./dist/sha.js"
+      "import": {
+        "types": "./dist/sha.d.mts",
+        "default": "./dist/sha.mjs"
+      },
+      "require": {
+        "types": "./dist/sha.d.cts",
+        "default": "./dist/sha.js"
+      }
     },
     "./sha1": {
-      "types": "./dist/sha1.d.ts",
-      "import": "./dist/sha1.mjs",
-      "require": "./dist/sha1.js"
+      "import": {
+        "types": "./dist/sha1.d.mts",
+        "default": "./dist/sha1.mjs"
+      },
+      "require": {
+        "types": "./dist/sha1.d.cts",
+        "default": "./dist/sha1.js"
+      }
     },
     "./dist/sha1": {
-      "types": "./dist/sha1.d.ts",
-      "import": "./dist/sha1.mjs",
-      "require": "./dist/sha1.js"
+      "import": {
+        "types": "./dist/sha1.d.mts",
+        "default": "./dist/sha1.mjs"
+      },
+      "require": {
+        "types": "./dist/sha1.d.cts",
+        "default": "./dist/sha1.js"
+      }
     },
     "./sha256": {
-      "types": "./dist/sha256.d.ts",
-      "import": "./dist/sha256.mjs",
-      "require": "./dist/sha256.js"
+      "import": {
+        "types": "./dist/sha256.d.mts",
+        "default": "./dist/sha256.mjs"
+      },
+      "require": {
+        "types": "./dist/sha256.d.cts",
+        "default": "./dist/sha256.js"
+      }
     },
     "./dist/sha256": {
-      "types": "./dist/sha256.d.ts",
-      "import": "./dist/sha256.mjs",
-      "require": "./dist/sha256.js"
+      "import": {
+        "types": "./dist/sha256.d.mts",
+        "default": "./dist/sha256.mjs"
+      },
+      "require": {
+        "types": "./dist/sha256.d.cts",
+        "default": "./dist/sha256.js"
+      }
     },
     "./sha512": {
-      "types": "./dist/sha512.d.ts",
-      "import": "./dist/sha512.mjs",
-      "require": "./dist/sha512.js"
+      "import": {
+        "types": "./dist/sha512.d.mts",
+        "default": "./dist/sha512.mjs"
+      },
+      "require": {
+        "types": "./dist/sha512.d.cts",
+        "default": "./dist/sha512.js"
+      }
     },
     "./dist/sha512": {
-      "types": "./dist/sha512.d.ts",
-      "import": "./dist/sha512.mjs",
-      "require": "./dist/sha512.js"
+      "import": {
+        "types": "./dist/sha512.d.mts",
+        "default": "./dist/sha512.mjs"
+      },
+      "require": {
+        "types": "./dist/sha512.d.cts",
+        "default": "./dist/sha512.js"
+      }
     },
     "./sha3": {
-      "types": "./dist/sha3.d.ts",
-      "import": "./dist/sha3.mjs",
-      "require": "./dist/sha3.js"
+      "import": {
+        "types": "./dist/sha3.d.mts",
+        "default": "./dist/sha3.mjs"
+      },
+      "require": {
+        "types": "./dist/sha3.d.cts",
+        "default": "./dist/sha3.js"
+      }
     },
     "./dist/sha3": {
-      "types": "./dist/sha3.d.ts",
-      "import": "./dist/sha3.mjs",
-      "require": "./dist/sha3.js"
+      "import": {
+        "types": "./dist/sha3.d.mts",
+        "default": "./dist/sha3.mjs"
+      },
+      "require": {
+        "types": "./dist/sha3.d.cts",
+        "default": "./dist/sha3.js"
+      }
     },
     "./package.json": "./package.json"
   },
@@ -134,7 +179,7 @@
     "typescript-eslint": "^8.61.0"
   },
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c && node scripts/generate-dual-types.mjs",
     "test": "nyc --reporter=html --reporter=text mocha test/src/*.ts",
     "test_dist": "mocha test/dist/ && karma start karma.conf.js --file-variant sha && karma start karma.conf.js --file-variant sha1 && karma start karma.conf.js --file-variant sha256 && karma start karma.conf.js --file-variant sha512 && karma start karma.conf.js --file-variant sha3",
     "prepare": "husky"
@@ -157,6 +202,7 @@
       "*.js",
       "coverage",
       "test",
+      "scripts",
       "rollup.config.mjs"
     ],
     "reporter": [

@@ -31,6 +31,26 @@ interface packedValue {
     value: number[];
     binLen: number;
 }
+interface SHAKEOptionsNoEncodingType {
+    numRounds?: number;
+}
+interface SHAKEOptionsEncodingType extends SHAKEOptionsNoEncodingType {
+    encoding?: EncodingType;
+}
+interface CSHAKEOptionsNoEncodingType {
+    customization?: GenericInputType;
+    funcName?: GenericInputType;
+}
+interface CSHAKEOptionsEncodingType extends CSHAKEOptionsNoEncodingType {
+    encoding?: EncodingType;
+}
+interface KMACOptionsNoEncodingType {
+    kmacKey: GenericInputType;
+    customization?: GenericInputType;
+}
+interface KMACOptionsEncodingType extends KMACOptionsNoEncodingType {
+    encoding?: EncodingType;
+}
 
 declare abstract class jsSHABase<StateT, VariantT> {
     /**
@@ -156,22 +176,54 @@ declare class Int_64 {
     constructor(msint_32: number, lsint_32: number);
 }
 
-type VariantType = "SHA-384" | "SHA-512";
-declare class jsSHA extends jsSHABase<Int_64[], VariantType> {
-    intermediateState: Int_64[];
+type FixedLengthVariantType = "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
+type VariantType = FixedLengthVariantType | "SHAKE128" | "SHAKE256" | "CSHAKE128" | "CSHAKE256" | "KMAC128" | "KMAC256";
+declare class jsSHA extends jsSHABase<Int_64[][], VariantType> {
+    intermediateState: Int_64[][];
     variantBlockSize: number;
     bigEndianMod: -1 | 1;
     outputBinLen: number;
     isVariableLen: boolean;
     HMACSupported: boolean;
     converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
-    roundFunc: (block: number[], H: Int_64[]) => Int_64[];
-    finalizeFunc: (remainder: number[], remainderBinLen: number, processedBinLen: number, H: Int_64[]) => number[];
-    stateCloneFunc: (state: Int_64[]) => Int_64[];
-    newStateFunc: (variant: VariantType) => Int_64[];
-    getMAC: () => number[];
-    constructor(variant: VariantType, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
-    constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
+    roundFunc: (block: number[], H: Int_64[][]) => Int_64[][];
+    finalizeFunc: (remainder: number[], remainderBinLen: number, processedBinLen: number, H: Int_64[][], outputLen: number) => number[];
+    stateCloneFunc: (state: Int_64[][]) => Int_64[][];
+    newStateFunc: (variant: VariantType) => Int_64[][];
+    getMAC: ((options: {
+        outputLen: number;
+    }) => number[]) | null;
+    constructor(variant: FixedLengthVariantType, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
+    constructor(variant: FixedLengthVariantType, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
+    constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: "TEXT", options?: SHAKEOptionsEncodingType);
+    constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: FormatNoTextType, options?: SHAKEOptionsNoEncodingType);
+    constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: "TEXT", options?: CSHAKEOptionsEncodingType);
+    constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: FormatNoTextType, options?: CSHAKEOptionsNoEncodingType);
+    constructor(variant: "KMAC128" | "KMAC256", inputFormat: "TEXT", options: KMACOptionsEncodingType);
+    constructor(variant: "KMAC128" | "KMAC256", inputFormat: FormatNoTextType, options: KMACOptionsNoEncodingType);
+    /**
+     * Initialize CSHAKE variants.
+     *
+     * @param options Options containing CSHAKE params.
+     * @param funcNameOverride Overrides any "funcName" present in `options` (used with KMAC)
+     * @returns The delimiter to be used
+     */
+    protected _initializeCSHAKE(options?: CSHAKEOptionsNoEncodingType, funcNameOverride?: packedValue): number;
+    /**
+     * Initialize KMAC variants.
+     *
+     * @param options Options containing KMAC params.
+     */
+    protected _initializeKMAC(options: KMACOptionsNoEncodingType): void;
+    /**
+     * Returns the the KMAC in the specified format.
+     *
+     * @param options Hashmap of extra outputs options. `outputLen` must be specified.
+     * @returns The KMAC in the format specified.
+     */
+    protected _getKMAC(options: {
+        outputLen: number;
+    }): number[];
 }
 
-export = jsSHA;
+export { jsSHA as default };
