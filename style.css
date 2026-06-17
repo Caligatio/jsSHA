@@ -1,39 +1,114 @@
+* {
+	box-sizing: border-box;
+}
+
 body {
 	background-color: #f1f0ec;
 	margin: 0px;
+	font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+	color: #1a1a1a;
+	line-height: 1.5;
 }
+
 #container {
-	background-color: #FFFFFF;
+	background-color: #ffffff;
 	color: #000000;
-	width: 1004px;
-	margin: 5px auto;
-	padding: 10px;
+	max-width: 1000px;
+	width: 100%;
+	margin: 0 auto;
+	padding: 20px;
 	border: 1px solid #000000;
+	border-width: 0 1px;
 }
+
+@media (min-width: 600px) {
+	#container {
+		margin: 20px auto;
+		padding: 20px 30px;
+		border-width: 1px;
+	}
+}
+
 h1 {
 	font-size: 24px;
 	color: #a00101;
-    background-color: #FFFFFF;
+	background-color: #FFFFFF;
 }
+
 p {
-	margin: 5px;
+	margin: 5px 0;
 }
+
+fieldset {
+	margin: 12px 0px;
+	border: 1px solid #999999;
+	padding: 10px 15px 15px;
+}
+
+legend {
+	padding: 0 6px;
+	font-weight: bold;
+}
+
+/* Each labeled field in the demo forms */
+fieldset > div {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px 10px;
+	margin: 8px 0;
+}
+
 label {
 	width: 150px;
-	display: block;
-	float: left;
+	flex: 0 0 150px;
 	text-align: right;
 	padding-right: 10px;
 }
-fieldset {
-	margin: 3px 0px;
+
+fieldset input[type="text"] {
+	flex: 1 1 260px;
+	min-width: 0;
+	max-width: 100%;
 }
+
+fieldset select {
+	flex: 0 1 auto;
+	width: auto;
+	min-width: 100px;
+	max-width: 100%;
+}
+
+@media (max-width: 480px) {
+	fieldset > div {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	label {
+		width: auto;
+		flex-basis: auto;
+		text-align: left;
+		padding-right: 0;
+	}
+	fieldset input[type="text"] {
+		flex-basis: auto;
+		width: 100%;
+	}
+	fieldset select {
+		width: auto;
+	}
+}
+
 #copyright {
 	font-size: 10px;
 	text-align: center;
+	margin-top: 10px;
 }
+
 img {
 	display: block;
+	max-width: 100%;
+	height: auto;
 	margin: 0px auto;
 	border: 0px;
 }
