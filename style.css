@@ -13,24 +13,14 @@ body {
 #container {
 	background-color: #ffffff;
 	color: #000000;
-	max-width: 1000px;
-	width: 100%;
-	margin: 0 auto;
-	padding: 20px;
+	max-width: 60rem;
+	margin: clamp(0px, 3vw, 20px) auto;
+	padding: clamp(12px, 4vw, 30px);
 	border: 1px solid #000000;
-	border-width: 0 1px;
-}
-
-@media (min-width: 600px) {
-	#container {
-		margin: 20px auto;
-		padding: 20px 30px;
-		border-width: 1px;
-	}
 }
 
 h1 {
-	font-size: 24px;
+	font-size: 1.5rem;
 	color: #a00101;
 	background-color: #FFFFFF;
 }
@@ -43,6 +33,7 @@ fieldset {
 	margin: 12px 0px;
 	border: 1px solid #999999;
 	padding: 10px 15px 15px;
+	min-width: 0;
 }
 
 legend {
@@ -50,7 +41,6 @@ legend {
 	font-weight: bold;
 }
 
-/* Each labeled field in the demo forms */
 fieldset > div {
 	display: flex;
 	flex-wrap: wrap;
@@ -60,47 +50,23 @@ fieldset > div {
 }
 
 label {
-	width: 150px;
-	flex: 0 0 150px;
+	flex: 0 0 19ch;
 	text-align: right;
 	padding-right: 10px;
 }
 
 fieldset input[type="text"] {
-	flex: 1 1 260px;
+	flex: 1 1 30ch;
 	min-width: 0;
-	max-width: 100%;
 }
 
 fieldset select {
 	flex: 0 1 auto;
-	width: auto;
-	min-width: 100px;
-	max-width: 100%;
-}
-
-@media (max-width: 480px) {
-	fieldset > div {
-		flex-direction: column;
-		align-items: stretch;
-	}
-	label {
-		width: auto;
-		flex-basis: auto;
-		text-align: left;
-		padding-right: 0;
-	}
-	fieldset input[type="text"] {
-		flex-basis: auto;
-		width: 100%;
-	}
-	fieldset select {
-		width: auto;
-	}
+	min-width: 8ch;
 }
 
 #copyright {
-	font-size: 10px;
+	font-size: 0.7rem;
 	text-align: center;
 	margin-top: 10px;
 }
