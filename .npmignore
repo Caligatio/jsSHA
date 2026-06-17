@@ -1,11 +1,11 @@
-test/
 coverage/
+test/
+scripts/
 dist/types
-*.tgz
-rollup.config.js
+rollup.config.mjs
 tsconfig.json
 bower.json
-**/.*
 karma.conf.js
-.github
-.husky
+eslint.config.js
+*.tgz
+**/.*
