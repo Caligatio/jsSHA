@@ -149,4 +149,4 @@ declare class jsSHA {
     getHMAC(format: "ARRAYBUFFER"): ArrayBuffer;
 }
 
-export = jsSHA;
+export { jsSHA as default };

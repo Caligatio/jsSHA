@@ -143,35 +143,21 @@ declare abstract class jsSHABase<StateT, VariantT> {
     protected _getHMAC(): number[];
 }
 
-/**
- * Int_64 is a object for 2 32-bit numbers emulating a 64-bit number.
- */
-declare class Int_64 {
-    /**
-     * @param msint_32 The most significant 32-bits of a 64-bit number.
-     * @param lsint_32 The least significant 32-bits of a 64-bit number.
-     */
-    readonly highOrder: number;
-    readonly lowOrder: number;
-    constructor(msint_32: number, lsint_32: number);
-}
-
-type VariantType = "SHA-384" | "SHA-512";
-declare class jsSHA extends jsSHABase<Int_64[], VariantType> {
-    intermediateState: Int_64[];
+declare class jsSHA extends jsSHABase<number[], "SHA-1"> {
+    intermediateState: number[];
     variantBlockSize: number;
     bigEndianMod: -1 | 1;
     outputBinLen: number;
     isVariableLen: boolean;
     HMACSupported: boolean;
     converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
-    roundFunc: (block: number[], H: Int_64[]) => Int_64[];
-    finalizeFunc: (remainder: number[], remainderBinLen: number, processedBinLen: number, H: Int_64[]) => number[];
-    stateCloneFunc: (state: Int_64[]) => Int_64[];
-    newStateFunc: (variant: VariantType) => Int_64[];
+    roundFunc: (block: number[], H: number[]) => number[];
+    finalizeFunc: (remainder: number[], remainderBinLen: number, processedBinLen: number, H: number[]) => number[];
+    stateCloneFunc: (state: number[]) => number[];
+    newStateFunc: (variant: "SHA-1") => number[];
     getMAC: () => number[];
-    constructor(variant: VariantType, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
-    constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
+    constructor(variant: "SHA-1", inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
+    constructor(variant: "SHA-1", inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
 }
 
-export = jsSHA;
+export { jsSHA as default };
