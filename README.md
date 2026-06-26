@@ -47,9 +47,19 @@ const jsSHA1 = require("jssha/dist/sha1");
 /* Alternatively, you can load it as an ESM (Node.js v13+ or using
  * --experimental-modules in v12) */
 import jsSHA from "jssha";
-/* For Deno v2+, you can simply use the npm: prefix on the import */
-import jsSHA from "npm:jssha";
 ```
+
+#### Deno
+
+jsSHA simply works with Deno via the `npm:` import specifier:
+
+```typescript
+import jsSHA from "npm:jssha";
+/* Limited variant files are also available */
+import jsSHA1 from "npm:jssha/sha1";
+```
+
+TypeScript types are resolved automatically from the package.
 
 ### Hashing
 
