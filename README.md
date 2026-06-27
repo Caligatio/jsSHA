@@ -177,24 +177,24 @@ is the desired output length of the KMAC algorithm in a multiple of 8 bits.
 - **dist/sha.js** - The minified ECMAScript 3 (ES3) compatible [Universal Module
   Definition (UMD)][umd] version of the library with support for all hash
   variants. Its accompanying source map can be found in dist/sha.js.map and its
-  TypeScript declarations in dist/sha.d.ts.
+  TypeScript declarations in dist/sha.d.cts.
 - **dist/sha.mjs** - The minified ECMAScript 2015 (ES6) compatible ESM version
   of the library with support for all hash variants. Its accompanying source map
   can be found in dist/sha.mjs.map and its TypeScript declarations in
-  dist/sha.d.ts.
+  dist/sha.d.mts.
 - **dist/sha1.{js,mjs}** - The minified UMD and ESM versions of the library with
   support for only the SHA-1 hash variant. Its accompanying TypeScript
-  declarations can be found in dist/sha1.d.ts.
+  declarations can be found in dist/sha1.d.{c,m}ts.
 - **dist/sha256.{js,mjs}** - The minified UMD and ESM versions of the library
   with support for only the SHA-224 and SHA-256 hash variants. Its accompanying
-  TypeScript declarations can be found in dist/sha256.d.ts.
+  TypeScript declarations can be found in dist/sha256.d.{c,m}ts.
 - **dist/sha512.{js,mjs}** - The minified UMD and ESM versions of the library
   with support for only the SHA-384 and SHA-512 hash variants. Its accompanying
-  TypeScript declarations can be found in dist/sha513.d.ts.
+  TypeScript declarations can be found in dist/sha513.d.{c,m}ts.
 - **dist/sha3.{js,mjs}** - The minified UMD and ESM versions of the library with
   support for only the SHA3-224, SHA3-256, SHA3-384, SHA3-512, SHAKE128,
   SHAKE256, cSHAKE128, cSHAKE256, KMAC128, and KMAC256 hash variants. Its
-  accompanying TypeScript declarations can be found in dist/sha3.d.ts.
+  accompanying TypeScript declarations can be found in dist/sha3.d.{c,m}ts.
 
 ## Contact Info
 
