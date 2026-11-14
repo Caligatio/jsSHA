@@ -78,6 +78,10 @@ describe("Test getOutputOpts", () => {
     assert.deepEqual(getOutputOpts({ b64Pad: "#" }), { outputUpper: false, b64Pad: "#", outputLen: -1 });
   });
 
+  it("b64Pad Empty", () => {
+    assert.deepEqual(getOutputOpts({ b64Pad: "" }), { outputUpper: false, b64Pad: "", outputLen: -1 });
+  });
+
   it("outputLen Specified", () => {
     assert.deepEqual(getOutputOpts({ outputLen: 16, shakeLen: 8 }), { outputUpper: false, b64Pad: "=", outputLen: 16 });
   });

@@ -415,6 +415,9 @@ describe("Test packed2b64", () => {
   it("64-bit Input with # Pad", () => {
     assert.equal(packed2b64(packedToInput, 64, -1, { b64Pad: "#" }), "ABEiM6q7zN0#");
   });
+  it("64-bit Input with No Pad", () => {
+    assert.equal(packed2b64(packedToInput, 64, -1, { b64Pad: "" }), "ABEiM6q7zN0");
+  });
   it("16-bit Input with Endian Modifier", () => {
     assert.equal(packed2b64(packedToInput, 16, 1, { b64Pad: "=" }), "MyI=");
   });

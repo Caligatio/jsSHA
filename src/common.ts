@@ -89,7 +89,7 @@ export function getOutputOpts(options?: {
 
   retVal["outputUpper"] = outputOptions["outputUpper"] || false;
 
-  if (outputOptions["b64Pad"]) {
+  if ("undefined" !== typeof outputOptions["b64Pad"]) {
     retVal["b64Pad"] = outputOptions["b64Pad"];
   }
 
