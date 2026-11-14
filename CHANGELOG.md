@@ -1,5 +1,12 @@
 # jsSHA - ChangeLog
 
+## 3.3.3 (2026-11-14)
+
+- Fix empty string b64Pad yielding an actual padding of "=" (#113, thanks
+  @trackoor!)
+- Allow base64 input strings to be 0-length (#113, thanks @trackoor!)
+- Perform better validation of hex input strings (#113, thanks @trackoor!)
+
 ## 3.3.2 (2026-06-26)
 
 - Fix TypeScript definitions for both ESM and CJS variants (#104, thanks
