@@ -124,6 +124,10 @@ function hex2packed(
     throw new Error("String of HEX type must be in byte increments");
   }
 
+  if (-1 === str.search(/^[0-9a-fA-F]*$/)) {
+    throw new Error("String of HEX type contains invalid characters");
+  }
+
   existingPackedLen = existingPackedLen || 0;
   const packed = existingPacked || [0],
     existingByteLen = existingPackedLen >>> 3,
@@ -138,8 +142,6 @@ function hex2packed(
         packed.push(0);
       }
       packed[intOffset] |= num << (8 * (shiftModifier + bigEndianMod * (byteOffset % 4)));
-    } else {
-      throw new Error("String of HEX type contains invalid characters");
     }
   }
 

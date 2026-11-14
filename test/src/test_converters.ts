@@ -112,9 +112,19 @@ describe("Test hex2packed", () => {
       hex2packed("F", undefined, undefined, -1);
     }, "String of HEX type must be in byte increments");
   });
-  it("Invalid Character Exception", () => {
+  it("Invalid Character Exception, All Invalid", () => {
     assert.throws(() => {
       hex2packed("GG", [], 0 - 1);
+    }, "String of HEX type contains invalid characters");
+  });
+  it("Invalid Character Exception, Starts With Valid", () => {
+    assert.throws(() => {
+      hex2packed("1g", [], 0 - 1);
+    }, "String of HEX type contains invalid characters");
+  });
+  it("Invalid Character Exception, With Sign Symbol", () => {
+    assert.throws(() => {
+      hex2packed("-1", [], 0 - 1);
     }, "String of HEX type contains invalid characters");
   });
 });
