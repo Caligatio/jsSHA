@@ -100,7 +100,7 @@
   "types": "./dist/sha.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Caligatio/jsSHA.git"
+    "url": "git+https://github.com/Caligatio/jsSHA.git"
   },
   "keywords": [
     "SHA-1",
