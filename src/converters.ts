@@ -212,7 +212,7 @@ function b642packed(
     shiftModifier = bigEndianMod === -1 ? 3 : 0,
     firstEqual = str.indexOf("=");
 
-  if (-1 === str.search(/^[a-zA-Z0-9=+/]+$/)) {
+  if (-1 === str.search(/^[a-zA-Z0-9=+/]*$/)) {
     throw new Error("Invalid character in base-64 string");
   }
 

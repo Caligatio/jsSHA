@@ -17,6 +17,25 @@ function newArrayBuffer(bytes: number[]): ArrayBuffer {
 
 const toPackedTests = [
   {
+    name: "0-byte Input",
+    inputs: {
+      hex: "",
+      b64: "",
+      arrayBuffer: newArrayBuffer([]),
+      uint8Array: Uint8Array.from([]),
+      existing: [0x45000000],
+      existingMod: [0x00000045],
+      lengthExisting: 8,
+    },
+    outputs: {
+      original: [0x0],
+      existing: [0x45000000],
+      originalMod: [0x0],
+      existingMod: [0x45],
+      length: 0,
+    },
+  },
+  {
     name: "4-byte Input",
     inputs: {
       hex: "41424344",
